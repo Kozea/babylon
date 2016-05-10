@@ -1,5 +1,23 @@
 {% extends "layout.html" %}
 {% block body %} 
 
+<form action="{{ url_for('new_match') }}" method=post class=add-entry>
+    <dl>
+          
+        <dt>Equipe 1:
+        <dd><input type=integer size=30 name=id_team1>
+        
+        <dt>Equipe 2:
+        <dd><input type=integer size=30 name=id_team2>
+        
+        <dt>Score Equipe 1:
+        <dd><input type=integer size=30 name=score_e1>
+        
+        <dt>Score Equipe 2:
+        <dd><input type=integer size=30 name=score_e2 >
+        
+        <dd><input type=submit value=Share>
+    </dl>
+</form>
 
 {% endblock %}

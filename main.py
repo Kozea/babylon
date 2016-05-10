@@ -5,7 +5,7 @@ from flask import Flask, request, session, g, redirect, url_for, \
 import Match
 
 # configuration
-DATABASE = '/tmp/babylonel.db'
+DATABASE = '/tmp/babylone.db'
 DEBUG = True
 SECRET_KEY = 'development key'
 
@@ -15,6 +15,12 @@ app.config.from_object(__name__)
 
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
+    
+def init_db():
+    with closing(connect_db()) as db:
+        with app.open_resource('schema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+    db.commit()
     
 @app.before_request
 def before_request():
@@ -37,12 +43,24 @@ def ranking():
     
 @app.route('/add_match')
 def add_match():
-    return "add_match"    
+    return render_template('add_match.html')   
+    
+@app.route('/new_match', methods=['POST'])
+def new_match():
+    g.db.execute('insert into matchs (id_team1, id_team2, score_e1, score_e2) values (?, ?, ?, ?)',
+                 [request.form['id_team1'], request.form['id_team2'], request.form['score_e1'], request.form['score_e2']])
+    g.db.commit()
+    
+    flash('Le match a été ajouté avec succès')
+    
+    return redirect(url_for('add_match'))
     
 @app.route('/add_player')
 def add_player():
     return "ajout_joueur"
     
+    
+
     
 if __name__ == '__main__':
     app.run()

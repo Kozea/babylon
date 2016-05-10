@@ -11,7 +11,7 @@ create table users (
 drop table if exists matchs;
 create table matchs (
   id_match integer primary key autoincrement,
-  date date not null,
+  date date ,
   score_e1 integer,
   score_e2 integer,
   id_team1 integer,
