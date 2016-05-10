@@ -14,7 +14,7 @@ class Team:
     def get_player2_name(self):
         if(self.player2 is None):
             return None
-        return self.player1.get_full_name()
+        return self.player2.get_full_name()
         
     def get_team_name(self):
         if(self.name is not None):
