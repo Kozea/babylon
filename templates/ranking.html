@@ -10,12 +10,20 @@
         <figure>
             <img>
             <figcaption>
-                <h2>{{user.get_full_name()}}</h2>
-                {% if user.get_nickname() %}<h3>{{user.get_nickname()}}</h3>{% endif %}
+                <h2>
+                    {{user.get_full_name()}}
+                </h2>
+                {% if user.get_nickname() %}
+                <h3>
+                    {{user.get_nickname()}}
+                </h3>
+                {% endif %}
             </figcaption>
         </figure>
     </th>
-    <th>{{user.get_ranking()}}</th>
+    <th>
+        {{user.get_ranking()}}
+    </th>
 </tr>
 {% else %}
 There is no scores yet ! 

@@ -6,33 +6,56 @@
 {% for match in matchs %}
 <li>
     <ul>
-        <li>{{match.date}}</li>
-        
         <li>
-        {% if match.team1.get_team_name()%}<h2>{{match.team1.get_team_name()}}</h2>{% endif %}
-        <figure>
-            <img>
-            <figcaption>{{match.team1.get_player1_name()}}</figcaption>
-            {% if match.team1.get_player2_name() %}
-            <img>
-            <figcaption>{{match.team1.get_player2_name()}}</figcaption>
-            {% endif %}
-        </figure>
-        <h3>{{match.score_e1}}</h3>
+            <time>
+                {{match.date}}
+            </time>
         </li>
         
         <li>
-            
-        {% if match.team2.get_team_name()%}<h2>{{match.team2.get_team_name()}}</h2>{% endif %}
-        <figure>
-            <img>
-            <figcaption>{{match.team2.get_player1_name()}}</figcaption>
-            {% if match.team2.get_player2_name() %}
-            <img>
-            <figcaption>{{match.team2.get_player2_name()}}</figcaption>
+            {% if match.team1.get_team_name()%}
+            <h2>
+                {{match.team1.get_team_name()}}
+            </h2>
             {% endif %}
-        </figure>
-        <h3>{{match.score_e2}}</h3>
+            <figure>
+                <img>
+                <figcaption>
+                    {{match.team1.get_player1_name()}}
+                </figcaption>
+                {% if match.team1.get_player2_name() %}
+                <img>
+                <figcaption>
+                    {{match.team1.get_player2_name()}}
+                </figcaption>
+                {% endif %}
+            </figure>
+            <h3>
+                {{match.score_e1}}
+            </h3>
+        </li>
+        
+        <li>
+            {% if match.team2.get_team_name()%}
+            <h2>
+                {{match.team2.get_team_name()}}
+            </h2>
+            {% endif %}
+            <figure>
+                <img>
+                <figcaption>
+                    {{match.team2.get_player1_name()}}
+                </figcaption>
+                {% if match.team2.get_player2_name() %}
+                <img>
+                <figcaption>
+                    {{match.team2.get_player2_name()}}
+                </figcaption>
+                {% endif %}
+            </figure>
+            <h3>
+                {{match.score_e2}}
+            </h3>
         </li>
 
     </ul>
