@@ -31,7 +31,7 @@ def teardown_request(exception):
 @app.route('/')
 def matchs():
     matchs = []
-    request_match = g.db.execute('select id_match, date, score_e1, score_e2, id_team1, id_team2 from matchs')
+    request_match = g.db.execute('select id_match, date, score_e1, score_e2, id_team1, id_team2 from matchs order by date desc')
     for match in request_match.fetchall():
         # Create the team1
         id_team1 = match[4]
