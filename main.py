@@ -86,8 +86,10 @@ def matchs():
 @app.route('/ranking')
 def ranking():
     scores = {}
-    scores[0]=0
-    scores[1]=0
+    request_user = g.db.execute('select id_user, surname, name, nickname, ranking, photo from users order by ranking desc')
+    for cur_player in request_user.fetchall():
+        player = User.User(cur_player[0],cur_player[1],cur_player[2],cur_player[3],cur_player[4],cur_player[5])
+        scores[player] = cur_player[4]
     return render_template('ranking.html', scores = scores)
     
 @app.route('/add_match')

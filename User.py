@@ -13,3 +13,6 @@ class User:
         
     def get_photo(self):
         return self.photo
+        
+    def get_nickname(self):
+        return self.nickname
