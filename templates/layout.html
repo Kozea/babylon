@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Babylone</title>
+</head>
+
+<body>
+
+<nav>
+    <ul>
+        <li><a href="{{ url_for('matchs')}}">Les matchs</a></li>
+        <li><a href="{{ url_for('ranking')}}">Classement</a></li>
+        <li><a href="{{ url_for('add_match')}}">Ajout match</a></li>
+        <li><a href="{{ url_for('add_player')}}">Ajout utilisateur</a></li>
+    </ul>
+</nav>
+
+{% block body %}{% endblock %}
+
+</body>
+
+</html>
