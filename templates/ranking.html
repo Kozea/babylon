@@ -4,7 +4,7 @@
 <h1>Ranking</h1>
 
 <table>
-{% for user, score in scores.items() %}
+{% for user in users %}
 <tr>
     <th>
         <figure>
@@ -15,7 +15,7 @@
             </figcaption>
         </figure>
     </th>
-    <th>{{score}}</th>
+    <th>{{user.get_ranking()}}</th>
 </tr>
 {% else %}
 There is no scores yet ! 

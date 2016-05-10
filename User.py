@@ -16,3 +16,6 @@ class User:
         
     def get_nickname(self):
         return self.nickname
+        
+    def get_ranking(self):
+        return self.ranking
