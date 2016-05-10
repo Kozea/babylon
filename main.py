@@ -50,11 +50,24 @@ def new_match():
     # Searching Team 1 in database
     request_team1 = g.db.execute('select * from teams where((id_player1=? and id_player2=?) or (id_player1=? and id_player2=?))',
                                         (request.form['id_player11'], request.form['id_player12'], request.form['id_player12'], request.form['id_player11']))                       
+    
     # Creating team if doesn't exist
     if (not request_team1.fetchall()):
         temp = g.db.execute('select max(id_team) from teams')
         index = temp.fetchone()[0]+1
         g.db.execute('insert into teams values (?,?,?,null)', (index, request.form['id_player11'], request.form['id_player12']))
+    
+        
+    # Searching Team 2 in database
+    request_team2 = g.db.execute('select * from teams where((id_player1=? and id_player2=?) or (id_player1=? and id_player2=?))',
+                                        (request.form['id_player21'], request.form['id_player22'], request.form['id_player22'], request.form['id_player21']))                       
+    
+    # Creating team if doesn't exist
+    if (not request_team2.fetchall()):
+        temp = g.db.execute('select max(id_team) from teams')
+        index = temp.fetchone()[0]+1
+        g.db.execute('insert into teams values (?,?,?,null)', (index, request.form['id_player21'], request.form['id_player22']))
+    
     
     #g.db.execute('insert into matchs (id_team1, id_team2, score_e1, score_e2) values (?, ?, ?, ?)',
      #            [request.form['id_team1'], request.form['id_team2'], request.form['score_e1'], request.form['score_e2']])
