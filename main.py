@@ -28,12 +28,15 @@ def teardown_request(exception):
         
 @app.route('/')
 def matchs():
-    matchs = []
-    return render_template('match.html', matchs=matchs)
+    matchs = [0,1]
+    return render_template('match.html', matchs = matchs)
     
 @app.route('/ranking')
 def ranking():
-    return "Classement"
+    scores = {}
+    scores[0]=0
+    scores[1]=0
+    return render_template('ranking.html', scores = scores)
     
 @app.route('/add_match')
 def add_match():

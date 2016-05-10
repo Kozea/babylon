@@ -17,5 +17,13 @@ class Team:
         return self.player1.get_full_name()
         
     def get_team_name(self):
-        return self.name
-    
+        if(self.name is not None):
+            return self.name
+        return None
+            
+    def get_photo_player1(self):
+        return self.player1.get_photo()
+        
+    def get_photo_player2(self):
+        return self.player2.get_photo()
+        

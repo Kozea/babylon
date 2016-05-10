@@ -1,24 +1,39 @@
 {% extends "layout.html" %}
 {% block body %} 
 
+<h1>Matchs</h1>
 <ul>
 {% for match in matchs %}
 <li>
-match.date
+    <ul>
+        <li>match.date</li>
+        
+        <li>
+        match.team1.get_team_name()
+        <figure>
+            <img>
+            <figcaption>match.team1.get_player1_name()</figcaption>
+            <img>
+            <figcaption>match.team1.get_player2_name()</figcaption>
+        </figure>
+        match.score_e1
+        </li>
+        
+        <li>
+        match.team2.get_team_name()
+        <figure>
+            <img>
+            <figcaption>match.team2.get_player1_name()</figcaption>
+            <img>
+            <figcaption>match.team2.get_player2_name()</figcaption>
+        </figure>
+        match.score_e2
+        </li>
 
-match.team1.get_team_name()
-match.team1.get_player1_name()
-match.team1.get_player2_name()
-match.score_e1
-
-match.team2.get_team_name()
-match.team2.get_player1_name()
-match.team2.get_player2_name()
-match.score_e2
-
+    </ul>
 </li>
 {% else %}
-<li>There is no matches yet !</li>
+There is no matches yet !
 {% endfor %}
 </ul>
 

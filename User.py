@@ -10,3 +10,6 @@ class User:
         
     def get_full_name(self):
         return self.surname+" "+self.name
+        
+    def get_photo(self):
+        return self.photo

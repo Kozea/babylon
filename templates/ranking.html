@@ -1,5 +1,22 @@
 {% extends "layout.html" %}
 {% block body %} 
 
+<h1>Ranking</h1>
+
+<table>
+{% for user, score in scores.items() %}
+<tr>
+    <th>
+        <figure>
+            <img>
+            <figcaption>user.get_full_name()</figcaption>
+        </figure>
+    </th>
+    <th>score</th>
+</tr>
+{% else %}
+There is no scores yet ! 
+{% endfor %}
+</table>
 
 {% endblock %}
