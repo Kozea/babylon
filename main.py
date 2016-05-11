@@ -140,21 +140,49 @@ def ranking():
     
 @app.route('/add_match')
 def add_match():
-    return render_template('add_match.html')   
+    users = []
+    request_user = g.db.execute('select id_user, surname, name, nickname,\
+    ranking, photo from users')
+    
+    for cur_player in request_user.fetchall():
+        player = User.User(cur_player[0], cur_player[1], cur_player[2],
+        cur_player[3], cur_player[4], cur_player[5])
+        users.append(player)
+    return render_template('add_match.html', users = users)   
     
 @app.route('/new_match', methods=['POST'])
 def new_match():
     
+    users = []
+    request_user = g.db.execute('select id_user, surname, name, nickname,\
+    ranking, photo from users')
+    
+    for cur_player in request_user.fetchall():
+        player = User.User(cur_player[0], cur_player[1], cur_player[2],
+        cur_player[3], cur_player[4], cur_player[5])
+        users.append(player)
+        
     error = None
     
     if not request.form['id_player11'] :
         error = 'Add a player 1 to team 1'
     elif not request.form['id_player21']:
         error = 'Add a player 1 to team 2'
+        
+    elif ((request.form['id_player11'] == request.form['id_player12'])
+        or (request.form['id_player11'] == request.form['id_player21'])
+        or (request.form['id_player11'] == request.form['id_player22'])
+        or (request.form['id_player12'] == request.form['id_player21'])
+        or (request.form['id_player12'] == request.form['id_player22'])
+        or (request.form['id_player21'] == request.form['id_player22'])):
+        
+        error = 'Please select different users'
+    
     elif not request.form['score_e1'] :
         error = 'Add a score for Team 1'
     elif not request.form['score_e2'] :
         error = 'Add a score for Team 2'
+    
         
     else:  
         # Searching Team 1 in database
@@ -288,9 +316,9 @@ def new_match():
                 
         flash('Le match a été ajouté avec succès')
         
-        return redirect(url_for('add_match'))
+        return render_template('add_match.html', users = users)
         
-    return render_template('add_match.html', error=error)
+    return render_template('add_match.html', error = error, users = users)
        
     
 @app.route('/add_player', methods=['GET', 'POST'])
