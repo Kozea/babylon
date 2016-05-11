@@ -6,7 +6,6 @@ from werkzeug import secure_filename
 import os
 import Elo
 import Match
-import Team
 import User
 import time
 from PIL import Image
@@ -441,6 +440,110 @@ def allowed_file(filename):
     """
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+           
+####### HELPER #########
+def number_of_match(id_player):
+    query = "select count(id_match)\
+            from matchs\
+            where id_player11 = num\
+            or id_player12 = num\
+            or id_player21 = num\
+            or id_player22 = num"
+            
+    query = query.replace("num",str(id_player))
+    cursor = g.db.execute(query)
+    results = cursor.fetchone()
+    if(results):
+        number = results[0]
+    else:
+        number = 0
+    return number
+
+@app.route('/coucou')
+def coucou():
+    users = compute_ranking()
+    toRet = ""
+    for k,v in users.items():
+        toRet += v.get_full_name()+" "+str(v.ranking)+"<br>"
+    return toRet
+    
+def compute_ranking():
+    # Get all users
+    users = {}
+    request_user = g.db.execute('select id_user, surname, name, nickname,\
+                                photo from users')
+    for cur_user in request_user.fetchall():
+        player = User.User(cur_user[0], cur_user[1], cur_user[2],
+        cur_user[3], cur_user[4])
+        users[cur_user[0]] = player
+    
+    # Get all matchs
+    matchs = []
+    request_match = g.db.execute('select id_match, date, score_e1, score_e2,\
+                                 id_player11, id_player12, id_player21, \
+                                 id_player22 from matchs')
+    for cur_match in request_match.fetchall():
+        id_player11 = users[cur_match[4]]
+        id_player12 = users[cur_match[5]] if cur_match[5] in users.keys() else None
+        id_player21 = users[cur_match[6]]
+        id_player22 = users[cur_match[7]] if cur_match[7] in users.keys() else None
+        match = Match.Match(cur_match[0], cur_match[1], cur_match[2],
+                            cur_match[3], id_player11, id_player12,
+                            id_player21, id_player22)
+        matchs.append(match)
+        
+    # For each match
+    for match in matchs:
+        # Get all players and actuals scores
+        player11 = match.player11
+        old_elo11 = player11.ranking
+        
+        player12 = match.player12
+        old_elo12 = player12.ranking if player12 is not None else None
+        
+        player21 = match.player21
+        old_elo21 = player21.ranking 
+        
+        player22 = match.player22
+        old_elo22 = player22.ranking if player22 is not None else None
+                
+        # For player11
+        new_score11 = Elo.new_score(old_elo11, old_elo21, 
+                                old_elo12, old_elo22, 
+                                player11.number_of_match, match.score_e1, 
+                                match.score_e2)
+        match.player11.ranking = new_score11
+        match.player11.number_of_match += 1
+        
+        # For player12 if necessary
+        if(player12 is not None):
+            new_score12 = Elo.new_score(old_elo12, old_elo21, 
+                                    old_elo11, old_elo22, 
+                                    player12.number_of_match, match.score_e1, 
+                                    match.score_e2)
+            match.player12.ranking = new_score12
+            match.player12.number_of_match += 1
+        
+        # For player21
+        new_score21 = Elo.new_score(old_elo21, old_elo11, 
+                                old_elo22, old_elo12, 
+                                player21.number_of_match, match.score_e2, 
+                                match.score_e1)
+        
+        match.player21.ranking = new_score21
+        match.player21.number_of_match += 1
+        
+        # For player 22 if necessary
+        if(player22 is not None):
+            new_score22 = Elo.new_score(old_elo22, old_elo11, 
+                                    old_elo21, old_elo12, 
+                                    player22.number_of_match, match.score_e2, 
+                                    match.score_e1)
+            match.player22.ranking = new_score22
+            match.player22.number_of_match += 1
+                
+    return users
+            
 if __name__ == '__main__':
     app.run()
     

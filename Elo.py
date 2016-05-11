@@ -38,6 +38,10 @@ def new_score(old_elo_player1, old_elo_opponent1, old_elo_player2,
     
     new_score = old_elo_player1 + K * (W - pD)
     return int(round(new_score,0))
-    
+    #~ if(score_player > score_opponent):
+        #~ return old_elo_player1+10
+    #~ else:
+        #~ return old_elo_player1-10
+        
 def p(i):
     return 1/(1+10**(-i/400))
