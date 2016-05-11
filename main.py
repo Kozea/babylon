@@ -125,9 +125,30 @@ def ranking():
 def add_match():
     return "add_match"    
     
-@app.route('/add_player')
+@app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
-    return "ajout_joueur"
+    error = None
+    if request.method == 'POST':
+        surname = request.form['surname']
+        name = request.form['name']
+        nickname = request.form['nickname']
+        
+        cur = g.db.execute('select id_user from users where nickname = ?',
+        (nickname,))
+        if( cur.fetchone() ):
+            error = "This nickname is already used !"
+        else:
+            cur = g.db.execute('select max(id_user) from users')
+            index = cur.fetchone()[0] + 1
+            
+            g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, 1000,'photo0')",
+            (index, surname, name, nickname,))
+            
+            g.db.commit()
+            
+            error = "Let's play !"
+        
+    return render_template('add_player.html', error = error)
     
     
 if __name__ == '__main__':

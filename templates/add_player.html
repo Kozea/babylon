@@ -1,5 +1,26 @@
 {% extends "layout.html" %}
 {% block body %} 
 
+{% if error %}
+<strong>
+    {{error}}
+</strong>
+{% endif %}
 
+<form action="{{ url_for('add_player') }}" method=post class=add-entry>
+    <dl>
+          
+        <dt>Surname:</dt>
+        <dd><input type=integer size=30 name=surname></dd>
+        
+        <dt>Name:</dt>
+        <dd><input type=integer size=30 name=name></dd>
+        
+        <dt>Nickname</dt>
+        <dd><input type=integer size=30 name=nickname></dd>
+        
+        <dd><input type=submit value=Create></dd>
+    </dl>
+    
 {% endblock %}
+
