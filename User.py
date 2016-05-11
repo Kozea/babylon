@@ -5,7 +5,6 @@ class User:
         self.surname = surname
         self.name = name
         self.nickname = nickname
-        self.ranking = ranking
         self.photo = photo
         
     def get_full_name(self):
@@ -17,5 +16,3 @@ class User:
     def get_nickname(self):
         return self.nickname
         
-    def get_ranking(self):
-        return self.ranking
