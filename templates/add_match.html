@@ -14,7 +14,7 @@
          <dd>
              <select name=id_player11
             {% for user in users %}
-                <option value = user.id_user> {{user.name + ' ' + user.surname}} </option>
+                <option value = "user.id"> {{user.name + ' ' + user.surname}} </option>
             {% endfor %}
             </select>
         </dd>
@@ -24,8 +24,9 @@
         
          <dd>
              <select name=id_player12
+             <option></option>
             {% for user in users %}
-                <option value = user.id_user> {{user.name + ' ' + user.surname}} </option>
+                <option value = "user.id"> {{user.name + ' ' + user.surname}} </option>
             {% endfor %}
             </select>
         </dd>
@@ -35,7 +36,7 @@
          <dd>
              <select name=id_player21
             {% for user in users %}
-                <option value = user.id_user> {{user.name + ' ' + user.surname}} </option>
+                <option value = "user.id"> {{user.name + ' ' + user.surname}} </option>
             {% endfor %}
             </select>
         </dd>
@@ -45,7 +46,7 @@
          <dd>
              <select name=id_player22
             {% for user in users %}
-                <option value = user.id_user> {{user.name + ' ' + user.surname}} </option>
+                <option value = "user.id"> {{user.name + ' ' + user.surname}} </option>
             {% endfor %}
             </select>
         </dd>
