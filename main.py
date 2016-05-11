@@ -59,66 +59,52 @@ def matchs():
     from matchs order by date desc')
     
     for match in request_match.fetchall():
-        # Create the team1
-        id_team1 = match[4]
-        request_team = g.db.execute('select id_team, id_player1, \
-        id_player2, name from teams where id_team =?', (id_team1,))
-        team1 = request_team.fetchone()
 
         # Create player1
-        id_player1 = team1[1]
+        id_player11 = match[4]
         request_user = g.db.execute('select id_user, surname, name, \
-        nickname, photo from users where id_user = ?', (id_player1,))
-        cur_player1 = request_user.fetchone()
-        player1 = User.User(cur_player1[0], cur_player1[1], cur_player1[2],
-        cur_player1[3], cur_player1[4])
+        nickname, photo from users where id_user = ?', (id_player11,))
+        cur_player11 = request_user.fetchone()
+        player11 = User.User(cur_player11[0], cur_player11[1], cur_player11[2],
+        cur_player11[3], cur_player11[4])
         
         # Create player2 if exists
-        id_player2 = team1[2]
-        if(id_player2 is not None and id_player2 != ''):
+        id_player12 = match[5]
+        if(id_player12 is not None and id_player12 != ''):
             request_user2 = g.db.execute('select id_user, surname, name,\
             nickname, photo from users where id_user = ?',
-            (id_player2,))
-            cur_player2 = request_user2.fetchone()
-            player2 = User.User(cur_player2[0], cur_player2[1],
-            cur_player2[2], cur_player2[3], cur_player2[4])
+            (id_player12,))
+            cur_player12 = request_user2.fetchone()
+            player12 = User.User(cur_player12[0], cur_player12[1],
+            cur_player12[2], cur_player12[3], cur_player12[4])
         else:
-            player2 = None
+            player12 = None
         
-        cur_team1 = Team.Team(id_team1, player1, player2, team1[3])
-                    
-        # Create the team2
-        id_team2 = match[5]
-        request_team = g.db.execute('select id_team, id_player1, \
-        id_player2, name from teams where id_team =?', (id_team2,))
-        team2 = request_team.fetchone()
 
         # Create player1
-        id_player1 = team2[1]
+        id_player21 = match[6]
         request_user = g.db.execute('select id_user, surname, name, \
         nickname, photo from users where id_user = ?',
-        (id_player1,))
-        cur_player1 = request_user.fetchone()
-        player1 = User.User(cur_player1[0], cur_player1[1], cur_player1[2],
-        cur_player1[3], cur_player1[4], cur_player1[5])
+        (id_player21,))
+        cur_player21 = request_user.fetchone()
+        player21 = User.User(cur_player21[0], cur_player21[1], cur_player21[2],
+        cur_player21[3], cur_player21[4])
         
         # Create player2 if exists
-        id_player2 = team2[2]
-        if(id_player2 is not None and id_player2 != ''):
+        id_player22 = match[7]
+        if(id_player22 is not None and id_player22 != ''):
             request_user2 = g.db.execute('select id_user, surname, \
             name, nickname, photo from users where id_user = ?',
-            (id_player2,))
-            cur_player2 = request_user2.fetchone()
-            player2 = User.User(cur_player2[0], cur_player2[1],
-            cur_player2[2], cur_player2[3], cur_player2[4], cur_player2[5])
+            (id_player22,))
+            cur_player22 = request_user2.fetchone()
+            player22 = User.User(cur_player22[0], cur_player22[1],
+            cur_player22[2], cur_player22[3], cur_player22[4])
         else:
-            player2 = None
+            player22 = None
             
-        cur_team2 = Team.Team(id_team2, player1, player2, team2[3])
-
         # Create the match
         match_to_add = Match.Match(match[0], match[1], match[2], match[3],
-        cur_team1, cur_team2)
+        player11, player12, player21, player22)
         matchs.append(match_to_add)
         
     return render_template('match.html', matchs = matchs)

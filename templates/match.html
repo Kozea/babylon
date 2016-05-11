@@ -13,20 +13,15 @@
         </li>
         
         <li>
-            {% if match.team1.get_team_name()%}
-            <h2>
-                {{match.team1.get_team_name()}}
-            </h2>
-            {% endif %}
             <figure>
-                <img src={{match.team1.get_photo_player1()}}>
+                <img src={{match.player11.get_photo()}}>
                 <figcaption>
-                    {{match.team1.get_player1_name()}}
+                    {{match.player11.get_full_name()}}
                 </figcaption>
-                {% if match.team1.get_player2_name() %}
-                <img src={{match.team1.get_photo_player2()}}>
+                {% if match.player12 %}
+                <img src={{match.player12.get_photo()}}>
                 <figcaption>
-                    {{match.team1.get_player2_name()}}
+                    {{match.player12.get_full_name()}}
                 </figcaption>
                 {% endif %}
             </figure>
@@ -36,20 +31,15 @@
         </li>
         
         <li>
-            {% if match.team2.get_team_name()%}
-            <h2>
-                {{match.team2.get_team_name()}}
-            </h2>
-            {% endif %}
             <figure>
-                <img src={{match.team2.get_photo_player1()}}>
+                  <img src={{match.player21.get_photo()}}>
                 <figcaption>
-                    {{match.team2.get_player1_name()}}
+                    {{match.player21.get_full_name()}}
                 </figcaption>
-                {% if match.team2.get_player2_name() %}
-                <img src={{match.team2.get_photo_player2()}}>
+                {% if match.player22 %}
+                <img src={{match.player22.get_photo()}}>
                 <figcaption>
-                    {{match.team2.get_player2_name()}}
+                    {{match.player22.get_full_name()}}
                 </figcaption>
                 {% endif %}
             </figure>
