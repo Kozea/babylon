@@ -55,14 +55,15 @@ def new_match():
                                         (request.form['id_player11'], request.form['id_player12'], request.form['id_player12'], request.form['id_player11']))                       
     
     # Creating team if doesn't exist
-    if (not request_team1.fetchall()):
+    result = request_team1.fetchone()
+    if (not result):
         temp = g.db.execute('select max(id_team) from teams')
         index1 = temp.fetchone()[0]+1
         g.db.execute('insert into teams values (?,?,?,null)', (index1, request.form['id_player11'], request.form['id_player12']))
         id_t1 = index1
         
     else:
-        id_t1 = request_team1.fetchall()[0]
+        id_t1 = result[0]
     
         
     
@@ -79,7 +80,7 @@ def new_match():
         id_t2 = index2
         
     else:
-        id_t2 = request_team2.fetchall()[0]
+        id_t2 = request_team2.fetchone()[0]
         
         
     #Adding New Match
