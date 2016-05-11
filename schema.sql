@@ -44,5 +44,5 @@ INSERT INTO teams VALUES (2, 2, 1, 'Les poulets mexicains');
 INSERT INTO teams VALUES (3, 3, 0, 'Los Rodrigos Fuerte');
 
 -- Matchs
-INSERT INTO matchs VALUES (0, "2010-12-30 12:10:04.100", 10, 9, 0, 1);
-INSERT INTO matchs VALUES (1, "2010-12-30 12:10:04.100", 1, 10, 2, 3);
+INSERT INTO matchs VALUES (0, "2010-12-30", 10, 9, 0, 1);
+INSERT INTO matchs VALUES (1, "2010-12-30", 1, 10, 2, 3);

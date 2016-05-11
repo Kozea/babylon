@@ -3,6 +3,7 @@ import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 import Match
+import time
 
 # configuration
 DATABASE = '/tmp/babylone.db'
@@ -48,8 +49,6 @@ def add_match():
 @app.route('/new_match', methods=['POST'])
 def new_match():
     
-    
-    
     # Searching Team 1 in database
     request_team1 = g.db.execute('select * from teams where((id_player1=? and id_player2=?) or (id_player1=? and id_player2=?))',
                                         (request.form['id_player11'], request.form['id_player12'], request.form['id_player12'], request.form['id_player11']))                       
@@ -85,8 +84,8 @@ def new_match():
         
         
     #Adding New Match
-    g.db.execute('insert into matchs (id_team1, id_team2, score_e1, score_e2) values (?, ?, ?, ?)',
-                 (id_t1, id_t2, request.form['score_e1'], request.form['score_e2']))
+    g.db.execute('insert into matchs (date, id_team1, id_team2, score_e1, score_e2) values (?, ?, ?, ?, ?)',
+                 (time.strftime("%d/%m/%Y"), id_t1, id_t2, request.form['score_e1'], request.form['score_e2']))
     g.db.commit()
     
     flash('Le match a été ajouté avec succès')
