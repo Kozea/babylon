@@ -9,7 +9,7 @@
 <form action="{{ url_for('new_match') }}" method=post class=add-entry>
     <dl>
           
-        <dt>J1 Equipe 1:</dt>
+        <dt>Player 1 Team 1:</dt>
         
          <dd>
              <select name=id_player11>
@@ -20,7 +20,7 @@
         </dd>
         
         
-        <dt>J2 Equipe 1:</dt>
+        <dt>Player 2 Team 1:</dt>
         
          <dd>
              <select name=id_player12>
@@ -32,7 +32,7 @@
         </dd>
         
         
-        <dt>J1 Equipe 2:</dt>
+        <dt>Player 1 Team 2:</dt>
          <dd>
              <select name=id_player21>
             {% for user in users %}
@@ -42,7 +42,7 @@
         </dd>
         
         
-        <dt>J2 Equipe 2:</dt>
+        <dt>Player 2 Team 2:</dt>
          <dd>
              <select name=id_player22>
             <option value=""></option>
@@ -53,10 +53,10 @@
         </dd>
         
         
-        <dt>Score Equipe 1:</dt>
+        <dt>Score Team 1:</dt>
         <dd><input type=integer size=30 name=score_e1></dd>
         
-        <dt>Score Equipe 2:</dt>
+        <dt>Score Team 2:</dt>
         <dd><input type=integer size=30 name=score_e2 ></dd>
         
         <dd><input type=submit value=Valider></dd>
