@@ -1,6 +1,6 @@
 class User:
     
-    def __init__(self, id, surname, name, nickname, ranking, photo):
+    def __init__(self, id, surname, name, nickname, photo):
         self.id = id
         self.surname = surname
         self.name = name
