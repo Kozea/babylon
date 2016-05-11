@@ -8,22 +8,22 @@
 {% endif %}
 
 <form action="{{ url_for('add_player') }}" method=post class=add-entry enctype="multipart/form-data">
-    <dl>
+    
           
-        <dt>Surname:</dt>
-        <dd><input type=integer size=30 name=surname></dd>
+        <label>Surname:</label>
+        <input type=integer size=30 name=surname>
         
-        <dt>Name:</dt>
-        <dd><input type=integer size=30 name=name></dd>
+        <label>Name:</label>
+        <input type=integer size=30 name=name>
         
-        <dt>Nickname</dt>
-        <dd><input type=integer size=30 name=nickname></dd>
+        <label>Nickname</label>
+        <input type=integer size=30 name=nickname>
         
-        <dt>Photo</dt>
-        <dd><input type=file size=30 name=photo></dd>
+        <label>Photo</label>
+        <input type=file size=30 name=photo>
         
-        <dd><input type=submit value=Create></dd>
-    </dl>
+        <input type=submit value=Create>
+
     
 {% endblock %}
 
