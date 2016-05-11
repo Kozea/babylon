@@ -163,6 +163,7 @@ def new_match():
         users.append(player)
         
     error = None
+    success = None
     
     if not request.form['id_player11'] :
         error = 'Add a player 1 to team 1'
@@ -318,11 +319,9 @@ def new_match():
             g.db.execute('update users set ranking = ? where id_user = ?',(newelo22,id_player22,))
             g.db.commit()
                 
-        flash('Le match a été ajouté avec succès')
-        
-        return render_template('add_match.html', users = users)
-        
-    return render_template('add_match.html', error = error, users = users)
+        success = "Match was successfully added "
+               
+    return render_template('add_match.html', success = success, error = error, users = users)
        
     
 @app.route('/add_player', methods=['GET', 'POST'])

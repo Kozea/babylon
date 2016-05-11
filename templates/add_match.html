@@ -6,6 +6,11 @@
         <strong>Error:</strong> {{ error }}
 {% endif %}
 
+{% if success %}
+    <p class=error>
+        <strong>Info:</strong> {{ success }}
+{% endif %}
+
 <form action="{{ url_for('new_match') }}" method=post class=add-entry>
     <dl>
           
