@@ -1,4 +1,4 @@
-def new_score_2vs2(old_elo_player1, old_elo_opponent1, old_elo_player2, 
+def new_score(old_elo_player1, old_elo_opponent1, old_elo_player2, 
     old_elo_opponent2, number_of_matches, score_player, score_opponent):
     """ 
         Compute the new elo score for player1 according to the following
@@ -20,9 +20,10 @@ def new_score_2vs2(old_elo_player1, old_elo_opponent1, old_elo_player2,
     
     if(score_player > score_opponent):
         W = 1
-    elif:
+    else:
         W = 0
         
+    D = 0
     if(old_elo_opponent2 is None):
         D -= old_elo_opponent1
     else:
@@ -35,8 +36,8 @@ def new_score_2vs2(old_elo_player1, old_elo_opponent1, old_elo_player2,
         
     pD = p(D)
     
-    new_score = old_elo_player + K * (W - pD)
-    return new_score
+    new_score = old_elo_player1 + K * (W - pD)
+    return int(round(new_score,0))
     
 def p(i):
     return 1/(1+10**(-i/400))

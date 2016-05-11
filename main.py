@@ -4,9 +4,11 @@ from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, send_from_directory
 from werkzeug import secure_filename
 import os
+import Elo
 import Match
 import Team
 import User
+import time
 
 # configuration
 DATABASE = '/tmp/babylone.db'
@@ -22,6 +24,12 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
+    
+def init_db():
+    with closing(connect_db()) as db:
+        with app.open_resource('schema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+    db.commit()
     
 @app.before_request
 def before_request():
@@ -64,7 +72,7 @@ def matchs():
         
         # Create player2 if exists
         id_player2 = team1[2]
-        if(id_player2 is not None):
+        if(id_player2 is not None and id_player2 != ''):
             request_user2 = g.db.execute('select id_user, surname, name,\
             nickname, ranking, photo from users where id_user = ?',
             (id_player2,))
@@ -93,7 +101,7 @@ def matchs():
         
         # Create player2 if exists
         id_player2 = team2[2]
-        if(id_player2 is not None):
+        if(id_player2 is not None and id_player2 != ''):
             request_user2 = g.db.execute('select id_user, surname, \
             name, nickname, ranking, photo from users where id_user = ?',
             (id_player2,))
@@ -128,8 +136,158 @@ def ranking():
     
 @app.route('/add_match')
 def add_match():
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               "chaton.jpg", as_attachment=True)  
+    return render_template('add_match.html')   
+    
+@app.route('/new_match', methods=['POST'])
+def new_match():
+    
+    error = None
+    
+    if not request.form['id_player11'] :
+        error = 'Add a player 1 to team 1'
+    elif not request.form['id_player21']:
+        error = 'Add a player 1 to team 2'
+    elif not request.form['score_e1'] :
+        error = 'Add a score for Team 1'
+    elif not request.form['score_e2'] :
+        error = 'Add a score for Team 2'
+        
+    else:  
+        # Searching Team 1 in database
+        request_team1 = g.db.execute('select * from teams where((id_player1=? and id_player2=?) or (id_player1=? and id_player2=?))',
+                                            (request.form['id_player11'], request.form['id_player12'], request.form['id_player12'], request.form['id_player11']))                       
+        
+        # Creating team if doesn't exist
+        result = request_team1.fetchone()
+        if (not result):
+            temp = g.db.execute('select max(id_team) from teams')
+            
+            res = temp.fetchone()
+            if(res):
+                if(res[0] is None):
+                    index1 = 0
+                else:
+                    index1 = res[0] + 1
+                        
+            g.db.execute('insert into teams values (?,?,?,null)', (index1, request.form['id_player11'], request.form['id_player12']))
+            id_t1 = index1
+            
+        else:
+            id_t1 = result[0]
+        
+            
+        # Searching Team 2 in database
+        request_team2 = g.db.execute('select * from teams where((id_player1=? and id_player2=?) or (id_player1=? and id_player2=?))',
+                                            (request.form['id_player21'], request.form['id_player22'], request.form['id_player22'], request.form['id_player21']))                       
+        
+        # Creating team if doesn't exist
+        result = request_team2.fetchone()
+        if (not result):
+            temp = g.db.execute('select max(id_team) from teams')
+            
+            res = temp.fetchone()
+            if(res):
+                if(res[0] is None):
+                    index2 = 0
+                else:
+                    index2 = res[0] + 1
+            g.db.execute('insert into teams values (?,?,?,null)', (index2, request.form['id_player21'], request.form['id_player22']))
+            id_t2 = index2
+            
+        else:
+            id_t2 = result[0]
+            
+            
+        #Adding New Match
+        g.db.execute('insert into matchs (date, id_team1, id_team2, score_e1, score_e2) values (?, ?, ?, ?, ?)',
+                     (time.strftime("%d/%m/%Y"), id_t1, id_t2, request.form['score_e1'], request.form['score_e2']))
+        g.db.commit()
+        
+        # update rank
+        id_player11 = request.form['id_player11']
+        id_player12 = request.form['id_player12']
+        id_player21 = request.form['id_player21']
+        id_player22 = request.form['id_player22']
+        
+        score_e1 = request.form['score_e1']
+        score_e2 = request.form['score_e2']
+        
+        # get old elo for 11
+        cur = g.db.execute('select ranking from users where id_user =?',(id_player11,))
+        old_elo_player11 = cur.fetchone()[0]
+        
+        cur = g.db.execute('select numberMatchs from users where id_user =?',(id_player11,))
+        number11 = cur.fetchone()[0]+1
+        g.db.execute('update users set numberMatchs = ? where id_user = ?',(number11, id_player11,))
+        g.db.commit()
+        
+       
+        # get old elo for 12
+        if(request.form['id_player12']):
+            cur = g.db.execute('select ranking from users where id_user =?',(id_player12,))
+            old_elo_player12 = cur.fetchone()[0]
+            
+            cur = g.db.execute('select numberMatchs from users where id_user =?',(id_player12,))
+            number12 = cur.fetchone()[0]+1
+            g.db.execute('update users set numberMatchs = ? where id_user = ?',(number12, id_player12,))
+            g.db.commit()
+        else:
+            old_elo_player12 = None
+            
+        # get old elo for 21
+        cur = g.db.execute('select ranking from users where id_user =?',(id_player21,))
+        old_elo_player21 = cur.fetchone()[0]
+        
+        cur = g.db.execute('select numberMatchs from users where id_user =?',(id_player21,))
+        number21 = cur.fetchone()[0]+1
+        g.db.execute('update users set numberMatchs = ? where id_user = ?',(number21, id_player21,))
+        g.db.commit()
+        
+        # get old elo for 22
+        if(request.form['id_player22']):
+            cur = g.db.execute('select ranking from users where id_user =?',(id_player22,))
+            old_elo_player22 = cur.fetchone()[0]
+            
+            cur = g.db.execute('select numberMatchs from users where id_user =?',(id_player22,))
+            number22 = cur.fetchone()[0]+1
+            g.db.execute('update users set numberMatchs = ? where id_user = ?',(number22, id_player22,))
+            g.db.commit()
+                    
+        else:
+            old_elo_player22 = None
+            
+        newelo11 =Elo.new_score(old_elo_player11, old_elo_player21, old_elo_player12, 
+        old_elo_player22, number11, score_e1, score_e2)
+        
+        g.db.execute('update users set ranking = ? where id_user = ?',(newelo11,id_player11,))
+        g.db.commit()
+    
+        if(request.form['id_player12']):
+            newelo12 = Elo.new_score(old_elo_player12, old_elo_player21, old_elo_player11, 
+            old_elo_player22, number12, score_e1, score_e2)
+            
+            g.db.execute('update users set ranking = ? where id_user = ?',(newelo12,id_player12,))
+            g.db.commit()
+            
+        newelo21 = Elo.new_score(old_elo_player21, old_elo_player11, old_elo_player22, 
+        old_elo_player12, number21, score_e2, score_e1)
+        
+        g.db.execute('update users set ranking = ? where id_user = ?',(newelo21,id_player21,))
+        g.db.commit()
+        
+        if(request.form['id_player22']):
+            newelo22 = Elo.new_score(old_elo_player22, old_elo_player11, old_elo_player22, 
+            old_elo_player12, number22, score_e2, score_e1)
+            
+            g.db.execute('update users set ranking = ? where id_user = ?',(newelo22,id_player22,))
+            g.db.commit()
+                
+        flash('Le match a été ajouté avec succès')
+        
+        return redirect(url_for('add_match'))
+        
+    return render_template('add_match.html', error=error)
+       
     
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
@@ -163,7 +321,7 @@ def add_player():
                 else:
                     index = 0
                 
-                g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, 1000,?)",
+                g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, 1000,?, 0)",
                 (index, surname, name, nickname, filename,))
                 
                 g.db.commit()
@@ -184,7 +342,6 @@ def allowed_file(filename):
     """
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-           
 if __name__ == '__main__':
     app.run()
     
