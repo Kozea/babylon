@@ -12,9 +12,9 @@
         <dt>J1 Equipe 1:</dt>
         
          <dd>
-             <select name=id_player11
+             <select name=id_player11>
             {% for user in users %}
-                <option value = "user.id"> {{user.name + ' ' + user.surname}} </option>
+                <option value = {{user.id}}> {{user.name + ' ' + user.surname}} </option>
             {% endfor %}
             </select>
         </dd>
@@ -23,10 +23,10 @@
         <dt>J2 Equipe 1:</dt>
         
          <dd>
-             <select name=id_player12
-             <option></option>
+             <select name=id_player12>
+            <option value=""></option>
             {% for user in users %}
-                <option value = "user.id"> {{user.name + ' ' + user.surname}} </option>
+                <option value = {{user.id}}> {{user.name + ' ' + user.surname}} </option>
             {% endfor %}
             </select>
         </dd>
@@ -34,9 +34,9 @@
         
         <dt>J1 Equipe 2:</dt>
          <dd>
-             <select name=id_player21
+             <select name=id_player21>
             {% for user in users %}
-                <option value = "user.id"> {{user.name + ' ' + user.surname}} </option>
+                <option value = {{user.id}}> {{user.name + ' ' + user.surname}} </option>
             {% endfor %}
             </select>
         </dd>
@@ -44,9 +44,10 @@
         
         <dt>J2 Equipe 2:</dt>
          <dd>
-             <select name=id_player22
+             <select name=id_player22>
+            <option value=""></option>
             {% for user in users %}
-                <option value = "user.id"> {{user.name + ' ' + user.surname}} </option>
+                <option value = {{user.id}}> {{user.name + ' ' + user.surname}} </option>
             {% endfor %}
             </select>
         </dd>
