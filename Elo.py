@@ -8,7 +8,7 @@ def new_score(old_elo_player1, old_elo_opponent1, old_elo_player2,
         # @old_elo_player2 : the old elo score for player2
         # @old_elo_opponent2: the old elo score for opponent2
         # @number_of_matches: the number of matchs played by player1
-        # @ score_player: the score of team1
+        # @score_player: the score of team1
         # @score_opponent: the score of team2
     """
     if(number_of_matches < 30):

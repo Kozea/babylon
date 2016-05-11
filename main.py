@@ -10,7 +10,6 @@ import Team
 import User
 import time
 from PIL import Image
-
 from resizeimage import resizeimage
 
 # configuration
