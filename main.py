@@ -55,13 +55,12 @@ def new_match():
         error = 'Add a player 1 to team 1'
     elif not request.form['id_player21']:
         error = 'Add a player 1 to team 2'
-    elif not request.form['score_e1'] is None:
+    elif not request.form['score_e1'] :
         error = 'Add a score for Team 1'
-    elif not request.form['score_e2'] is None:
+    elif not request.form['score_e2'] :
         error = 'Add a score for Team 2'
         
     else:  
-        print ('Steeeeeeeerf il est ser ton pote ?')
         # Searching Team 1 in database
         request_team1 = g.db.execute('select * from teams where((id_player1=? and id_player2=?) or (id_player1=? and id_player2=?))',
                                             (request.form['id_player11'], request.form['id_player12'], request.form['id_player12'], request.form['id_player11']))                       
