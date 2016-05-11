@@ -133,20 +133,24 @@ def add_player():
         name = request.form['name']
         nickname = request.form['nickname']
         
-        cur = g.db.execute('select id_user from users where nickname = ?',
-        (nickname,))
-        if( cur.fetchone() ):
-            error = "This nickname is already used !"
-        else:
-            cur = g.db.execute('select max(id_user) from users')
-            index = cur.fetchone()[0] + 1
-            
-            g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, 1000,'photo0')",
-            (index, surname, name, nickname,))
-            
-            g.db.commit()
-            
-            error = "Let's play !"
+        if(surname == "" or name == "" or nickname == ""):
+            error = "Some fields are empty !"
+        
+        else :
+            cur = g.db.execute('select id_user from users where nickname = ?',
+            (nickname,))
+            if( cur.fetchone() ):
+                error = "This nickname is already used !"
+            else:
+                cur = g.db.execute('select max(id_user) from users')
+                index = cur.fetchone()[0] + 1
+                
+                g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, 1000,'photo0')",
+                (index, surname, name, nickname,))
+                
+                g.db.commit()
+                
+                error = "Let's play !"
         
     return render_template('add_player.html', error = error)
     
