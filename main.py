@@ -136,7 +136,15 @@ def ranking():
     
 @app.route('/add_match')
 def add_match():
-    return render_template('add_match.html')   
+    users = []
+    request_user = g.db.execute('select id_user, surname, name, nickname,\
+    ranking, photo from users')
+    
+    for cur_player in request_user.fetchall():
+        player = User.User(cur_player[0], cur_player[1], cur_player[2],
+        cur_player[3], cur_player[4], cur_player[5])
+        users.append(player)
+    return render_template('add_match.html', users = users)   
     
 @app.route('/new_match', methods=['POST'])
 def new_match():
