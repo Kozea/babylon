@@ -131,6 +131,7 @@ def ranking():
     request_user = g.db.execute('select id_user, surname, name, nickname,\
     ranking, photo from users order by ranking desc')
     rank = 1
+    # Get all users and rank
     for cur_player in request_user.fetchall():
         player = User.User(cur_player[0], cur_player[1], cur_player[2],
         cur_player[3], cur_player[4], cur_player[5])
@@ -144,10 +145,17 @@ def add_match():
     request_user = g.db.execute('select id_user, surname, name, nickname,\
     ranking, photo from users')
     
+    # Get all users
     for cur_player in request_user.fetchall():
         player = User.User(cur_player[0], cur_player[1], cur_player[2],
         cur_player[3], cur_player[4], cur_player[5])
         users.append(player)
+    
+    print(users)
+    if(len(users) == 0):
+        success = "There are no players yet !"
+        return render_template('add_match.html',success = success, user = True)
+        
     return render_template('add_match.html', users = users)   
     
 @app.route('/new_match', methods=['POST'])
@@ -165,11 +173,15 @@ def new_match():
     error = None
     success = None
     
-    if not request.form['id_player11'] :
+    
+    
+    # Check if some players are missing
+    if not request.form['id_player11']:
         error = 'Add a player 1 to team 1'
     elif not request.form['id_player21']:
         error = 'Add a player 1 to team 2'
         
+    # Check if some users appear twice
     elif ((request.form['id_player11'] == request.form['id_player12'])
         or (request.form['id_player11'] == request.form['id_player21'])
         or (request.form['id_player11'] == request.form['id_player22'])
@@ -191,8 +203,13 @@ def new_match():
         
     else:  
         # Searching Team 1 in database
-        request_team1 = g.db.execute('select * from teams where((id_player1=? and id_player2=?) or (id_player1=? and id_player2=?))',
-                                            (request.form['id_player11'], request.form['id_player12'], request.form['id_player12'], request.form['id_player11']))                       
+        request_team1 = g.db.execute('select * from teams where\
+                                    ((id_player1=? and id_player2=?) \
+                                    or (id_player1=? and id_player2=?))',
+                                    (request.form['id_player11'], 
+                                    request.form['id_player12'], 
+                                    request.form['id_player12'], 
+                                    request.form['id_player11']))                       
         
         # Creating team if doesn't exist
         result = request_team1.fetchone()
@@ -206,7 +223,9 @@ def new_match():
                 else:
                     index1 = res[0] + 1
                         
-            g.db.execute('insert into teams values (?,?,?,null)', (index1, request.form['id_player11'], request.form['id_player12']))
+            g.db.execute('insert into teams values (?,?,?,null)', 
+                        (index1, request.form['id_player11'], 
+                        request.form['id_player12']))
             id_t1 = index1
             
         else:
@@ -214,8 +233,13 @@ def new_match():
         
             
         # Searching Team 2 in database
-        request_team2 = g.db.execute('select * from teams where((id_player1=? and id_player2=?) or (id_player1=? and id_player2=?))',
-                                            (request.form['id_player21'], request.form['id_player22'], request.form['id_player22'], request.form['id_player21']))                       
+        request_team2 = g.db.execute('select * from teams where\
+                                    ((id_player1=? and id_player2=?) or \
+                                    (id_player1=? and id_player2=?))',
+                                    (request.form['id_player21'], 
+                                    request.form['id_player22'], 
+                                    request.form['id_player22'], 
+                                    request.form['id_player21']))                       
         
         # Creating team if doesn't exist
         result = request_team2.fetchone()
@@ -228,7 +252,9 @@ def new_match():
                     index2 = 0
                 else:
                     index2 = res[0] + 1
-            g.db.execute('insert into teams values (?,?,?,null)', (index2, request.form['id_player21'], request.form['id_player22']))
+            g.db.execute('insert into teams values (?,?,?,null)', 
+                        (index2, request.form['id_player21'], 
+                        request.form['id_player22']))
             id_t2 = index2
             
         else:
@@ -236,8 +262,10 @@ def new_match():
             
             
         #Adding New Match
-        g.db.execute('insert into matchs (date, id_team1, id_team2, score_e1, score_e2) values (?, ?, ?, ?, ?)',
-                     (time.strftime("%d/%m/%Y"), id_t1, id_t2, request.form['score_e1'], request.form['score_e2']))
+        g.db.execute('insert into matchs (date, id_team1, id_team2, \
+                    score_e1, score_e2) values (?, ?, ?, ?, ?)',
+                    (time.strftime("%d/%m/%Y"), id_t1, id_t2, 
+                    request.form['score_e1'], request.form['score_e2']))
         g.db.commit()
         
         # update rank
@@ -250,88 +278,113 @@ def new_match():
         score_e2 = request.form['score_e2']
         
         # get old elo for 11
-        cur = g.db.execute('select ranking from users where id_user =?',(id_player11,))
+        cur = g.db.execute('select ranking from users where id_user =?',
+                            (id_player11,))
         old_elo_player11 = cur.fetchone()[0]
         
-        cur = g.db.execute('select numberMatchs from users where id_user =?',(id_player11,))
+        cur = g.db.execute('select numberMatchs from users where id_user =?',
+                            (id_player11,))
         number11 = cur.fetchone()[0]+1
-        g.db.execute('update users set numberMatchs = ? where id_user = ?',(number11, id_player11,))
+        g.db.execute('update users set numberMatchs = ? where id_user = ?',
+                            (number11, id_player11,))
         g.db.commit()
         
        
         # get old elo for 12
         if(request.form['id_player12']):
-            cur = g.db.execute('select ranking from users where id_user =?',(id_player12,))
+            cur = g.db.execute('select ranking from users where id_user =?',
+                            (id_player12,))
             old_elo_player12 = cur.fetchone()[0]
             
-            cur = g.db.execute('select numberMatchs from users where id_user =?',(id_player12,))
+            cur = g.db.execute('select numberMatchs from users where id_user =?',
+                            (id_player12,))
             number12 = cur.fetchone()[0]+1
-            g.db.execute('update users set numberMatchs = ? where id_user = ?',(number12, id_player12,))
+            g.db.execute('update users set numberMatchs = ? where id_user = ?',
+                            (number12, id_player12,))
             g.db.commit()
         else:
             old_elo_player12 = None
             
         # get old elo for 21
-        cur = g.db.execute('select ranking from users where id_user =?',(id_player21,))
+        cur = g.db.execute('select ranking from users where id_user =?',
+                        (id_player21,))
         old_elo_player21 = cur.fetchone()[0]
         
-        cur = g.db.execute('select numberMatchs from users where id_user =?',(id_player21,))
+        cur = g.db.execute('select numberMatchs from users where id_user =?',
+                        (id_player21,))
         number21 = cur.fetchone()[0]+1
-        g.db.execute('update users set numberMatchs = ? where id_user = ?',(number21, id_player21,))
+        g.db.execute('update users set numberMatchs = ? where id_user = ?',
+                        (number21, id_player21,))
         g.db.commit()
         
         # get old elo for 22
         if(request.form['id_player22']):
-            cur = g.db.execute('select ranking from users where id_user =?',(id_player22,))
+            cur = g.db.execute('select ranking from users where id_user =?',
+                        (id_player22,))
             old_elo_player22 = cur.fetchone()[0]
             
-            cur = g.db.execute('select numberMatchs from users where id_user =?',(id_player22,))
+            cur = g.db.execute('select numberMatchs from users where id_user =?',
+                        (id_player22,))
             number22 = cur.fetchone()[0]+1
-            g.db.execute('update users set numberMatchs = ? where id_user = ?',(number22, id_player22,))
+            g.db.execute('update users set numberMatchs = ? where id_user = ?',
+                        (number22, id_player22,))
             g.db.commit()
                     
         else:
             old_elo_player22 = None
             
+        # Modify score for 11
         newelo11 =Elo.new_score(old_elo_player11, old_elo_player21, old_elo_player12, 
         old_elo_player22, number11, score_e1, score_e2)
         
-        g.db.execute('update users set ranking = ? where id_user = ?',(newelo11,id_player11,))
+        g.db.execute('update users set ranking = ? where id_user = ?',
+                    (newelo11,id_player11,))
         g.db.commit()
     
+        # Modify score for 12 if necessary
         if(request.form['id_player12']):
-            newelo12 = Elo.new_score(old_elo_player12, old_elo_player21, old_elo_player11, 
-            old_elo_player22, number12, score_e1, score_e2)
+            newelo12 = Elo.new_score(old_elo_player12, old_elo_player21, 
+            old_elo_player11, old_elo_player22, number12, score_e1, score_e2)
             
-            g.db.execute('update users set ranking = ? where id_user = ?',(newelo12,id_player12,))
+            g.db.execute('update users set ranking = ? where id_user = ?',
+                        (newelo12,id_player12,))
+                        
             g.db.commit()
             
-        newelo21 = Elo.new_score(old_elo_player21, old_elo_player11, old_elo_player22, 
-        old_elo_player12, number21, score_e2, score_e1)
+        # Modify score for 21
+        newelo21 = Elo.new_score(old_elo_player21, old_elo_player11, 
+                    old_elo_player22, old_elo_player12, number21, 
+                    score_e2, score_e1)
         
-        g.db.execute('update users set ranking = ? where id_user = ?',(newelo21,id_player21,))
+        g.db.execute('update users set ranking = ? where id_user = ?',
+                    (newelo21,id_player21,))
         g.db.commit()
         
+        # Modify score for 22 if necessary
         if(request.form['id_player22']):
-            newelo22 = Elo.new_score(old_elo_player22, old_elo_player11, old_elo_player22, 
-            old_elo_player12, number22, score_e2, score_e1)
+            newelo22 = Elo.new_score(old_elo_player22, old_elo_player11, 
+            old_elo_player22, old_elo_player12, number22, score_e2, score_e1)
             
-            g.db.execute('update users set ranking = ? where id_user = ?',(newelo22,id_player22,))
+            g.db.execute('update users set ranking = ? where id_user = ?',
+                        (newelo22,id_player22,))
             g.db.commit()
                 
         success = "Match was successfully added "
                
-    return render_template('add_match.html', success = success, error = error, users = users)
+    return render_template('add_match.html', success = success, 
+                            error = error, users = users)
        
     
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
     error = None
     if request.method == 'POST':
+        # Get user infos
         surname = request.form['surname']
         name = request.form['name']
         nickname = request.form['nickname']
         
+        # Get user photo and work on it
         photo = request.files['photo']
         if photo and allowed_file(photo.filename):
             filename = app.config['UPLOAD_FOLDER']+"/"+nickname+get_extension_file(photo.filename)
@@ -341,15 +394,18 @@ def add_player():
                     cover = resizeimage.resize_contain(image, [200, 100])
                     cover.save(filename, image.format)
         
+        # If some field are empty
         if(surname == "" or name == "" or nickname == ""):
             error = "Some fields are empty !"
         
         else :
+            # Check if user already exists
             cur = g.db.execute('select id_user from users where nickname = ?',
             (nickname,))
             if( cur.fetchone() ):
                 error = "This nickname is already used !"
             else:
+                # Find the new index
                 cur = g.db.execute('select max(id_user) from users')
                 res = cur.fetchone()
                 if(res):
@@ -360,6 +416,7 @@ def add_player():
                 else:
                     index = 0
                 
+                # Add the new user to the database
                 g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, 1000,?, 0)",
                 (index, surname, name, nickname, filename,))
                 
@@ -371,6 +428,9 @@ def add_player():
  
                                
 def get_extension_file(filename):
+    """
+        Return the extension of the file
+    """
     index = filename.rfind('.')
     return filename[index:]
     

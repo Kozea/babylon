@@ -7,10 +7,11 @@
 {% endif %}
 
 {% if success %}
-    <p class=error>
+    <p class=success>
         <strong>Info:</strong> {{ success }}
 {% endif %}
 
+{% if not user %}
 <form action="{{ url_for('new_match') }}" method=post class=add-entry>
     <dl>
           
@@ -67,5 +68,6 @@
         <dd><input type=submit value=Valider></dd>
     </dl>
 </form>
+{% endif %}
 
 {% endblock %}
