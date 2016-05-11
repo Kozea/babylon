@@ -173,7 +173,11 @@ def new_match():
         or (request.form['id_player11'] == request.form['id_player21'])
         or (request.form['id_player11'] == request.form['id_player22'])
         or (request.form['id_player12'] == request.form['id_player21'])
-        or (request.form['id_player12'] == request.form['id_player22'])
+        or (
+        request.form['id_player12'] == request.form['id_player22']
+        and request.form['id_player12']
+        )
+        
         or (request.form['id_player21'] == request.form['id_player22'])):
         
         error = 'Please select different users'
