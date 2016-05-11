@@ -1,9 +1,7 @@
-import Team
-
 class Match:
-    
-    def __init__(self, id, date, score_e1, score_e2, player11, player12, 
-                player21, player22):
+
+    def __init__(self, id, date, score_e1, score_e2, player11,
+                 player12, player21, player22):
         self.id = id
         self.date = date
         self.score_e1 = score_e1
