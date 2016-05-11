@@ -4,19 +4,22 @@
 <h1>Ranking</h1>
 
 <table>
-{% for user in users %}
+{% for (rank, user) in users %}
 <tr>
     <th>
         <figure>
             <img src={{user.get_photo()}}>
             <figcaption>
                 <h2>
-                    {{user.get_full_name()}}
+                    {{rank}}
                 </h2>
-                {% if user.get_nickname() %}
                 <h3>
-                    {{user.get_nickname()}}
+                    {{user.get_full_name()}}
                 </h3>
+                {% if user.get_nickname() %}
+                <h4>
+                    {{user.get_nickname()}}
+                </h4>
                 {% endif %}
             </figcaption>
         </figure>

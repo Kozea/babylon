@@ -128,10 +128,12 @@ def ranking():
     users = []
     request_user = g.db.execute('select id_user, surname, name, nickname,\
     ranking, photo from users order by ranking desc')
+    rank = 0
     for cur_player in request_user.fetchall():
         player = User.User(cur_player[0], cur_player[1], cur_player[2],
         cur_player[3], cur_player[4], cur_player[5])
-        users.append(player)
+        users.append((rank, player))
+        rank += 1
     return render_template('ranking.html', users = users)
     
 @app.route('/add_match')
