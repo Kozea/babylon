@@ -307,7 +307,7 @@ def add_player():
             photo.save(filename)
             with open(filename, 'r+b') as f:
                 with Image.open(f) as image:
-                    cover = resizeimage.resize_cover(image, [200, 100])
+                    cover = resizeimage.resize_contain(image, [200, 100])
                     cover.save(filename, image.format)
         
         if(surname == "" or name == "" or nickname == ""):
