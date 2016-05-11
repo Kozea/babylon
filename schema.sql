@@ -40,7 +40,7 @@ INSERT INTO users VALUES (3, 'Lepeigneux', 'Estelle', 'La Malgache', 4, 'photo3'
 -- teams
 INSERT INTO teams VALUES (0, 1, NULL, NULL);
 INSERT INTO teams VALUES (1, 2, NULL, NULL);
-INSERT INTO teams VALUES (2, 2, 1, 'Les poulets mexicains');
+INSERT INTO teams VALUES (2, 2, 1, 'La team 1');
 INSERT INTO teams VALUES (3, 3, 0, 'Los Rodrigos Fuerte');
 
 -- Matchs
