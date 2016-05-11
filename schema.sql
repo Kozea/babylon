@@ -32,17 +32,17 @@ create table teams (
 );
 
 -- Users
-INSERT INTO users VALUES (0, 'Michel', 'Guy', 'Peupeul', 1,'photo0');
-INSERT INTO users VALUES (1, 'Gripay', 'Yann', 'Cocaine', 2, 'photo1');
-INSERT INTO users VALUES (2, 'Guégan', 'Thomas', 'Barbiche', 3, 'photo2');
-INSERT INTO users VALUES (3, 'Lepeigneux', 'Estelle', 'La Malgache', 4, 'photo3');
+-- ~ INSERT INTO users VALUES (0, 'Michel', 'Guy', 'Peupeul', 1,'photo0');
+-- ~ INSERT INTO users VALUES (1, 'Gripay', 'Yann', 'Cocaine', 2, 'photo1');
+-- ~ INSERT INTO users VALUES (2, 'Guégan', 'Thomas', 'Barbiche', 3, 'photo2');
+-- ~ INSERT INTO users VALUES (3, 'Lepeigneux', 'Estelle', 'La Malgache', 4, 'photo3');
 
 -- teams
-INSERT INTO teams VALUES (0, 1, NULL, NULL);
-INSERT INTO teams VALUES (1, 2, NULL, NULL);
-INSERT INTO teams VALUES (2, 2, 1, 'La team 1');
-INSERT INTO teams VALUES (3, 3, 0, 'Los Rodrigos Fuerte');
+-- ~ INSERT INTO teams VALUES (0, 1, NULL, NULL);
+-- ~ INSERT INTO teams VALUES (1, 2, NULL, NULL);
+-- ~ INSERT INTO teams VALUES (2, 2, 1, 'La team 1');
+-- ~ INSERT INTO teams VALUES (3, 3, 0, 'Los Rodrigos Fuerte');
 
 -- Matchs
-INSERT INTO matchs VALUES (0, "2010-12-30 12:10:04.100", 10, 9, 0, 1);
-INSERT INTO matchs VALUES (1, "2010-12-30 12:11:04.100", 1, 10, 2, 3);
+-- ~ INSERT INTO matchs VALUES (0, "2010-12-30 12:10:04.100", 10, 9, 0, 1);
+-- ~ INSERT INTO matchs VALUES (1, "2010-12-30 12:11:04.100", 1, 10, 2, 3);

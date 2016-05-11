@@ -1,7 +1,9 @@
 # all the imports
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
+     abort, render_template, flash, send_from_directory
+from werkzeug import secure_filename
+import os
 import Match
 import Team
 import User
@@ -10,10 +12,13 @@ import User
 DATABASE = '/tmp/babylone.db'
 DEBUG = True
 SECRET_KEY = 'development key'
+UPLOAD_FOLDER = './static/image_flask'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 # create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
@@ -123,7 +128,8 @@ def ranking():
     
 @app.route('/add_match')
 def add_match():
-    return "add_match"    
+    return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               "chaton.jpg", as_attachment=True)  
     
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
@@ -132,6 +138,11 @@ def add_player():
         surname = request.form['surname']
         name = request.form['name']
         nickname = request.form['nickname']
+        
+        photo = request.files['photo']
+        if photo and allowed_file(photo.filename):
+            filename = app.config['UPLOAD_FOLDER']+"/"+nickname+get_extension_file(photo.filename)
+            photo.save(filename)
         
         if(surname == "" or name == "" or nickname == ""):
             error = "Some fields are empty !"
@@ -143,18 +154,37 @@ def add_player():
                 error = "This nickname is already used !"
             else:
                 cur = g.db.execute('select max(id_user) from users')
-                index = cur.fetchone()[0] + 1
+                res = cur.fetchone()
+                if(res):
+                    if(res[0] is None):
+                        index = 0
+                    else:
+                        index = res[0] + 1
+                else:
+                    index = 0
                 
-                g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, 1000,'photo0')",
-                (index, surname, name, nickname,))
+                g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, 1000,?)",
+                (index, surname, name, nickname, filename,))
                 
                 g.db.commit()
                 
                 error = "Let's play !"
         
     return render_template('add_player.html', error = error)
+ 
+                               
+def get_extension_file(filename):
+    index = filename.rfind('.')
+    return filename[index:]
     
     
+def allowed_file(filename):
+    """
+        Test to know if a file has a correct extension.
+    """
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+           
 if __name__ == '__main__':
     app.run()
     
