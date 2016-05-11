@@ -37,7 +37,6 @@ def new_score(old_elo_player1, old_elo_opponent1, old_elo_player2,
     pD = p(D)
     
     new_score = old_elo_player1 + K * (W - pD)
-    print("OUAIS", new_score, int(round(new_score,0)), pD)
     return int(round(new_score,0))
     
 def p(i):
