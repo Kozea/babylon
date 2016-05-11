@@ -9,6 +9,9 @@ import Match
 import Team
 import User
 import time
+from PIL import Image
+
+from resizeimage import resizeimage
 
 # configuration
 DATABASE = '/tmp/babylone.db'
@@ -128,7 +131,7 @@ def ranking():
     users = []
     request_user = g.db.execute('select id_user, surname, name, nickname,\
     ranking, photo from users order by ranking desc')
-    rank = 0
+    rank = 1
     for cur_player in request_user.fetchall():
         player = User.User(cur_player[0], cur_player[1], cur_player[2],
         cur_player[3], cur_player[4], cur_player[5])
@@ -303,6 +306,10 @@ def add_player():
         if photo and allowed_file(photo.filename):
             filename = app.config['UPLOAD_FOLDER']+"/"+nickname+get_extension_file(photo.filename)
             photo.save(filename)
+            with open(filename, 'r+b') as f:
+                with Image.open(f) as image:
+                    cover = resizeimage.resize_cover(image, [200, 100])
+                    cover.save(filename, image.format)
         
         if(surname == "" or name == "" or nickname == ""):
             error = "Some fields are empty !"
