@@ -11,7 +11,10 @@ class User:
 
     def get_full_name(self):
         return self.surname+" "+self.name
-
+        
+    def get_name(self):
+        return self.name
+        
     def get_photo(self):
         return self.photo
 
@@ -20,3 +23,6 @@ class User:
 
     def set_ranking(self, ranking):
         self.ranking = ranking
+
+    def get_ranking(self):
+        return self.ranking
