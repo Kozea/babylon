@@ -41,8 +41,9 @@ from database import *
 
 
 @app.route('/caca')
-def caca:
+def caca():
     return ("CACAAAAAA")
+    
 @app.route('/')
 def matchs():
     """Querying for all matchs in the database"""
@@ -64,13 +65,6 @@ def add_match():
 
     users = User.query.all()
       
-    # Get all users
-    for cur_player in users:
-        player = User(cur_player.surname, cur_player.name, cur_player.nickname,
-        cur_player.photo)
-        users.append(player)
-
-    print(users)
     if(len(users) == 0):
         success = "There are no players yet !"
         return render_template('add_match.html',success = success, user = True)
@@ -83,12 +77,6 @@ def new_match():
     """Creates a new match using values given to the add_match form"""
         
     users = User.query.all()
-
-    # Get all users
-    for cur_player in users:
-        player = User(cur_player.surname, cur_player.name, cur_player.nickname,
-        cur_player.photo)
-        users.append(player)
 
     error = None
     success = None

@@ -18,7 +18,7 @@
     <label>Player 1 Team 1:</label>
      <select name=id_player11>
     {% for user in users %}
-        <option value = {{user.id}}> {{user.name + ' ' + user.surname}} </option>
+        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
     {% endfor %}
     </select>
 
@@ -27,7 +27,7 @@
      <select name=id_player12>
     <option value=""></option>
     {% for user in users %}
-        <option value = {{user.id}}> {{user.name + ' ' + user.surname}} </option>
+        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
     {% endfor %}
     </select>
     
@@ -36,7 +36,7 @@
     <label>Player 1 Team 2:</label> 
      <select name=id_player21>
     {% for user in users %}
-        <option value = {{user.id}}> {{user.name + ' ' + user.surname}} </option>
+        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
     {% endfor %}
     </select>
     
@@ -46,7 +46,7 @@
      <select name=id_player22>
     <option value=""></option>
     {% for user in users %}
-        <option value = {{user.id}}> {{user.name + ' ' + user.surname}} </option>
+        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
     {% endfor %}
     </select>
     

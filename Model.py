@@ -18,6 +18,17 @@ class Match(db.Model):
     player22_id = db.Column(db.Integer, db.ForeignKey('user.id_user'))
     player22 = db.relationship('User', foreign_keys=[player22_id])
     
+    def __init__(self, date, score_e1, score_e2, player11,
+             player12, player21, player22):
+
+        self.date = date
+        self.score_e1 = score_e1
+        self.score_e2 = score_e2
+        self.player11 = player11
+        self.player12 = player12
+        self.player21 = player21
+        self.player22 = player22
+    
 
 class User(db.Model):
     """ This class represent a user in data with some others attributes."""
@@ -26,6 +37,13 @@ class User(db.Model):
     name = db.Column(db.String(100))
     nickname = db.Column(db.String(100), unique=True)
     photo = db.Column(db.String(200))
+
+    def __init__(self, surname, name, nickname, photo):
+
+        self.surname = surname
+        self.name = name
+        self.nickname = nickname
+        self.photo = photo
 
 
     def get_full_name(self):
