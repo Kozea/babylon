@@ -40,6 +40,9 @@ from database import *
         #~ db.close()
 
 
+@app.route('/caca')
+def caca:
+    return ("CACAAAAAA")
 @app.route('/')
 def matchs():
     """Querying for all matchs in the database"""
@@ -59,12 +62,12 @@ def ranking():
 def add_match():
     """Allows user to access the match adding form."""
 
-    users = session.query(User).all()
+    users = User.query.all()
       
     # Get all users
     for cur_player in users:
-        player = User(cur_player[0], cur_player[1], cur_player[2],
-        cur_player[3], cur_player[4])
+        player = User(cur_player.surname, cur_player.name, cur_player.nickname,
+        cur_player.photo)
         users.append(player)
 
     print(users)
@@ -79,11 +82,12 @@ def add_match():
 def new_match():
     """Creates a new match using values given to the add_match form"""
         
-    users = db.session.query(User).all()
+    users = User.query.all()
 
-    for cur_player in users():
-        player = User(cur_player[0], cur_player[1], cur_player[2],
-        cur_player[3], cur_player[4],)
+    # Get all users
+    for cur_player in users:
+        player = User(cur_player.surname, cur_player.name, cur_player.nickname,
+        cur_player.photo)
         users.append(player)
 
     error = None
@@ -130,7 +134,7 @@ def new_match():
                      
         match = Match((time.strftime("%d/%m/%Y"), score_e1, score_e2,
                       id_player11, id_player12, id_player21,
-                      id_player22)
+                      id_player22))
 
         db.session.add(match)
         db.session.commit()
@@ -168,28 +172,21 @@ def add_player():
 
         else:
             # Check if user already exists
-            cur = g.db.execute('select id_user from users where nickname = ?',
-                               (nickname,))
-            if(cur.fetchone()):
+            cur = User.query.filter_by(nickname = request.form['nickname']).first()
+            if(cur):
                 error = "This nickname is already used !"
             else:
-                # Find the new index
-                cur = g.db.execute('select max(id_user) from users')
-                res = cur.fetchone()
-                if(res):
-                    if(res[0] is None):
-                        index = 0
-                    else:
-                        index = res[0] + 1
-                else:
-                    index = 0
-
+              
                 # Add the new user to the database
-                g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?)",
-                             (index, surname, name, nickname,
-                              filename,))
+                
+                new_user = User(surname, name, nickname,
+                              filename)
+                #~ g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?)",
+                             #~ (index, surname, name, nickname,
+                              #~ filename,))
 
-                g.db.commit()
+                db.session.add(new_user)
+                db.session.commit()
 
                 error = "Let's play !"
 
