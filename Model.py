@@ -11,8 +11,7 @@ class User(db.Model):
     nickname = db.Column(db.String(100), unique=True)
     photo = db.Column(db.String(200))
 
-    def __init__(self, id_user, surname, name, nickname, photo):
-        self.id_user = id_user
+    def __init__(self, surname, name, nickname, photo):
         self.surname = surname
         self.name = name
         self.nickname = nickname
@@ -51,18 +50,18 @@ class Match(db.Model):
     date = db.Column(db.Date)
     score_e1 = db.Column(db.Integer)
     score_e2 = db.Column(db.Integer)
-    player11 = db.Column(db.Integer, db.ForeignKey('user.id_user'))
-    player12 = db.Column(db.Integer, db.ForeignKey('User.id_user'))
-    player21 = db.Column(db.Integer, db.ForeignKey('User.id_user'))
-    player22 = db.Column(db.Integer, db.ForeignKey('User.id_user'))
-    
     user = db.relationship('User')
+    player11 = db.Column(db.Integer, db.ForeignKey('user.id_user'))
+    player12 = db.Column(db.Integer, db.ForeignKey('user.id_user'))
+    player21 = db.Column(db.Integer, db.ForeignKey('user.id_user'))
+    player22 = db.Column(db.Integer, db.ForeignKey('user.id_user'))
+    
+    
     
     
 
-    def __init__(self, id_match, date, score_e1, score_e2, player11,
+    def __init__(self, date, score_e1, score_e2, player11,
                  player12, player21, player22):
-        self.id_match = id_match
         self.date = date
         self.score_e1 = score_e1
         self.score_e2 = score_e2
