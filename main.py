@@ -111,12 +111,10 @@ def ranking():
 def add_match():
     """Allows user to access the match adding form."""
 
-    users = []
-    request_user = g.db.execute('select id_user, surname, name, nickname,\
-     photo from users')
-
+    users = session.query(User).all()
+      
     # Get all users
-    for cur_player in request_user.fetchall():
+    for cur_player in users:
         player = User(cur_player[0], cur_player[1], cur_player[2],
         cur_player[3], cur_player[4])
         users.append(player)
@@ -133,11 +131,9 @@ def add_match():
 def new_match():
     """Creates a new match using values given to the add_match form"""
         
-    users = []
-    request_user = g.db.execute('select id_user, surname, name, nickname,\
-     photo from users')
+    users = db.session.query(User).all()
 
-    for cur_player in request_user.fetchall():
+    for cur_player in users():
         player = User(cur_player[0], cur_player[1], cur_player[2],
         cur_player[3], cur_player[4],)
         users.append(player)
@@ -177,14 +173,19 @@ def new_match():
         score_e2 = request.form['score_e2']
 
         # Adding New Match
-        g.db.execute('insert into matchs (date, score_e1, score_e2,\
-                    id_player11, id_player12, id_player21, id_player22) \
-                    values (?, ?, ?, ?, ?, ?, ?)',
-                    (time.strftime("%d/%m/%Y"), score_e1, score_e2,
-                     id_player11, id_player12, id_player21,
-                     id_player22))
+        #~ g.db.execute('insert into matchs (date, score_e1, score_e2,\
+                    #~ id_player11, id_player12, id_player21, id_player22) \
+                    #~ values (?, ?, ?, ?, ?, ?, ?)',
+                    #~ (time.strftime("%d/%m/%Y"), score_e1, score_e2,
+                     #~ id_player11, id_player12, id_player21,
+                     #~ id_player22))
+                     
+        match = Match((time.strftime("%d/%m/%Y"), score_e1, score_e2,
+                      id_player11, id_player12, id_player21,
+                      id_player22)
 
-        g.db.commit()
+        db.session.add(match)
+        db.session.commit()
 
         #~ # get old elo for 11
         #~ cur = g.db.execute('select ranking from users where id_user =?',
