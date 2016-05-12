@@ -1,8 +1,9 @@
 class Match:
+    """This class represents a match in database."""
 
-    def __init__(self, id, date, score_e1, score_e2, player11,
+    def __init__(self, id_match, date, score_e1, score_e2, player11,
                  player12, player21, player22):
-        self.id = id
+        self.id_match = id_match
         self.date = date
         self.score_e1 = score_e1
         self.score_e2 = score_e2
