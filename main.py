@@ -144,6 +144,7 @@ def add_player():
         name = request.form['name']
         nickname = request.form['nickname']
 
+        filename =""
         # Get user photo and work on it
         photo = request.files['photo']
         if photo and allowed_file(photo.filename):
@@ -167,8 +168,7 @@ def add_player():
               
                 # Add the new user to the database
                 
-                new_user = User(surname, name, nickname,
-                              filename)
+                new_user = User(surname, name, nickname,filename)
                 #~ g.db.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?)",
                              #~ (index, surname, name, nickname,
                               #~ filename,))
