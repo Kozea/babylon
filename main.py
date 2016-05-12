@@ -24,9 +24,11 @@ app.config.from_object(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def connect_db():
+    """Called when app is launched , to connect to the Database."""
     return sqlite3.connect(app.config['DATABASE'])
     
 def init_db():
+    """Initializes the schema of the database."""
     with closing(connect_db()) as db:
         with app.open_resource('schema.sql', mode='r') as f:
             db.cursor().executescript(f.read())
@@ -34,25 +36,19 @@ def init_db():
     
 @app.before_request
 def before_request():
-    """
-        Called before each query on the database.
-    """
+    """Called before each query on the database."""
     g.db = connect_db()
 
 @app.teardown_request
 def teardown_request(exception):
-    """
-        Called after each query on the database.
-    """
+    """Called after each query on the database."""
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
         
 @app.route('/')
 def matchs():
-    """
-        Querying for all matchs in the database
-    """
+    """Querying for all matchs in the database"""
     matchs = []
     request_match = g.db.execute('select id_match, date, score_e1, \
     score_e2, id_player11, id_player12, id_player21, id_player22 \
@@ -111,15 +107,14 @@ def matchs():
     
 @app.route('/ranking')
 def ranking():
-    """
-        Querying for the ranking
-    """
+    """Querying for the ranking"""
     unordered_ranking = compute_ranking().values()
     ordered_ranking = sorted(unordered_ranking, key = lambda user: -user.ranking)
     return render_template('ranking.html', users = ordered_ranking)
     
 @app.route('/add_match')
 def add_match():
+    """Allows user to access the match adding form."""
     users = []
     request_user = g.db.execute('select id_user, surname, name, nickname,\
      photo from users')
@@ -138,8 +133,10 @@ def add_match():
     return render_template('add_match.html', users = users)   
     
 @app.route('/new_match', methods=['POST'])
+
+
 def new_match():
-    
+    """Creates a new match using values given to the add_match form"""    
     users = []
     request_user = g.db.execute('select id_user, surname, name, nickname,\
      photo from users')
@@ -299,6 +296,7 @@ def new_match():
     
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
+"""Creates a new user using values given in the add_player form"""
     error = None
     if request.method == 'POST':
         # Get user infos
@@ -351,21 +349,30 @@ def add_player():
                                
 def get_extension_file(filename):
     """
-        Return the extension of the file
+        Return the extension of a file
+        
+        :param filename: The full name of the file
+        :return: The extension of the file
     """
+    
     index = filename.rfind('.')
     return filename[index:]
     
     
 def allowed_file(filename):
-    """
-        Test to know if a file has a correct extension.
-    """
+    """ Test to know if a file has a correct extension.  """
+    
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
            
 ####### HELPER #########
 def number_of_match(id_player):
+    """
+        Returns the number of matches played by a player
+        
+        :param id_player: ID of the player
+        :return: Number of matches played by the player
+    """
     query = "select count(id_match)\
             from matchs\
             where id_player11 = num\
@@ -382,15 +389,9 @@ def number_of_match(id_player):
         number = 0
     return number
 
-@app.route('/coucou')
-def coucou():
-    users = compute_ranking()
-    toRet = ""
-    for k,v in users.items():
-        toRet += v.get_full_name()+" "+str(v.ranking)+"<br>"
-    return toRet
     
 def compute_ranking():
+    """Calculates score for each player, using matches played by the user."""
     # Get all users
     users = {}
     request_user = g.db.execute('select id_user, surname, name, nickname,\
