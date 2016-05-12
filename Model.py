@@ -1,11 +1,12 @@
 """
 This module is here to store data in database and make computation on it.
 """
-from database import *
+from database import db
+
 
 class Match(db.Model):
     """This class represents a match in database."""
-    id_match = db.Column(db.Integer, primary_key = True)
+    id_match = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date)
     score_e1 = db.Column(db.Integer)
     score_e2 = db.Column(db.Integer)
@@ -17,9 +18,9 @@ class Match(db.Model):
     player21 = db.relationship('User', foreign_keys=[player21_id])
     player22_id = db.Column(db.Integer, db.ForeignKey('user.id_user'))
     player22 = db.relationship('User', foreign_keys=[player22_id])
-    
+
     def __init__(self, date, score_e1, score_e2, player11,
-             player12, player21, player22):
+                 player12, player21, player22):
 
         self.date = date
         self.score_e1 = score_e1
@@ -28,7 +29,7 @@ class Match(db.Model):
         self.player12 = player12
         self.player21 = player21
         self.player22 = player22
-    
+
 
 class User(db.Model):
     """ This class represent a user in data with some others attributes."""
@@ -44,7 +45,7 @@ class User(db.Model):
         self.nickname = nickname
         self.photo = photo
         self.ranking = -1
-
+        self.number_of_match = 0
 
     def get_full_name(self):
         """ Return the full name of a user"""
@@ -65,8 +66,9 @@ class User(db.Model):
     def set_ranking(self, ranking):
         """ Set the ranking of a user"""
         self.ranking = ranking
-    
+
     def set_number_of_matchs(self):
+        """ Init the number of match."""
         self.number_of_match = 0
 
     def get_ranking(self):
