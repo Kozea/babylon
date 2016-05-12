@@ -39,11 +39,11 @@ class User(db.Model):
     photo = db.Column(db.String(200))
 
     def __init__(self, surname, name, nickname, photo):
-
         self.surname = surname
         self.name = name
         self.nickname = nickname
         self.photo = photo
+        self.ranking = -1
 
 
     def get_full_name(self):
