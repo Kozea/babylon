@@ -39,8 +39,7 @@ class User(db.Model):
     nickname = db.Column(db.String(100), unique=True)
     photo = db.Column(db.String(200))
 
-    def __init__(self, id_user, surname, name, nickname, photo):
-        self.id_user = id_user
+    def __init__(self, surname, name, nickname, photo):
         self.surname = surname
         self.name = name
         self.nickname = nickname
