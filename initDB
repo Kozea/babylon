@@ -1,0 +1,3 @@
+rm /tmp/babylone.db
+
+python zdededex.py
