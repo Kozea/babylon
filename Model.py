@@ -1,3 +1,8 @@
+"""
+This module is here to store data in database and make computation on it.
+"""
+
+
 class User:
     """ This class represent a user in data with some others attributes."""
 
@@ -33,3 +38,18 @@ class User:
     def get_ranking(self):
         """ Return the ranking of a user"""
         return self.ranking
+
+
+class Match:
+    """This class represents a match in database."""
+
+    def __init__(self, id_match, date, score_e1, score_e2, player11,
+                 player12, player21, player22):
+        self.id_match = id_match
+        self.date = date
+        self.score_e1 = score_e1
+        self.score_e2 = score_e2
+        self.player11 = player11
+        self.player12 = player12
+        self.player21 = player21
+        self.player22 = player22

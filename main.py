@@ -4,8 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, send_from_directory
 from werkzeug import secure_filename
 import os
-import Match
-import User
+from Model import User, Match
 import time
 from PIL import Image
 from resizeimage import resizeimage
@@ -64,7 +63,7 @@ def matchs():
         request_user = g.db.execute('select id_user, surname, name, \
         nickname, photo from users where id_user = ?', (id_player11,))
         cur_player11 = request_user.fetchone()
-        player11 = User.User(cur_player11[0], cur_player11[1], cur_player11[2],
+        player11 = User(cur_player11[0], cur_player11[1], cur_player11[2],
         cur_player11[3], cur_player11[4])
 
         # Create player2 if exists
@@ -74,7 +73,7 @@ def matchs():
             nickname, photo from users where id_user = ?',
             (id_player12,))
             cur_player12 = request_user2.fetchone()
-            player12 = User.User(cur_player12[0], cur_player12[1],
+            player12 = User(cur_player12[0], cur_player12[1],
             cur_player12[2], cur_player12[3], cur_player12[4])
         else:
             player12 = None
@@ -85,7 +84,7 @@ def matchs():
         nickname, photo from users where id_user = ?',
         (id_player21,))
         cur_player21 = request_user.fetchone()
-        player21 = User.User(cur_player21[0], cur_player21[1], cur_player21[2],
+        player21 = User(cur_player21[0], cur_player21[1], cur_player21[2],
         cur_player21[3], cur_player21[4])
 
         # Create player2 if exists
@@ -95,13 +94,13 @@ def matchs():
             name, nickname, photo from users where id_user = ?',
             (id_player22,))
             cur_player22 = request_user2.fetchone()
-            player22 = User.User(cur_player22[0], cur_player22[1],
+            player22 = User(cur_player22[0], cur_player22[1],
             cur_player22[2], cur_player22[3], cur_player22[4])
         else:
             player22 = None
 
         # Create the match
-        match_to_add = Match.Match(match[0], match[1], match[2], match[3],
+        match_to_add = Match(match[0], match[1], match[2], match[3],
         player11, player12, player21, player22)
         matchs.append(match_to_add)
 
@@ -126,7 +125,7 @@ def add_match():
 
     # Get all users
     for cur_player in request_user.fetchall():
-        player = User.User(cur_player[0], cur_player[1], cur_player[2],
+        player = User(cur_player[0], cur_player[1], cur_player[2],
         cur_player[3], cur_player[4])
         users.append(player)
 
@@ -147,7 +146,7 @@ def new_match():
      photo from users')
 
     for cur_player in request_user.fetchall():
-        player = User.User(cur_player[0], cur_player[1], cur_player[2],
+        player = User(cur_player[0], cur_player[1], cur_player[2],
         cur_player[3], cur_player[4],)
         users.append(player)
 
@@ -399,7 +398,7 @@ def compute_ranking():
     request_user = g.db.execute('select id_user, surname, name, nickname,\
                                 photo from users')
     for cur_user in request_user.fetchall():
-        player = User.User(cur_user[0], cur_user[1], cur_user[2],
+        player = User(cur_user[0], cur_user[1], cur_user[2],
                            cur_user[3], cur_user[4])
         users[cur_user[0]] = player
 
@@ -413,7 +412,7 @@ def compute_ranking():
         id_player12 = users[cur_match[5]] if cur_match[5] in users.keys() else None
         id_player21 = users[cur_match[6]]
         id_player22 = users[cur_match[7]] if cur_match[7] in users.keys() else None
-        match = Match.Match(cur_match[0], cur_match[1], cur_match[2],
+        match = Match(cur_match[0], cur_match[1], cur_match[2],
                             cur_match[3], id_player11, id_player12,
                             id_player21, id_player22)
         matchs.append(match)
