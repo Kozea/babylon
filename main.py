@@ -3,24 +3,16 @@ import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, send_from_directory
 from werkzeug import secure_filename
+from flask_sqlalchemy import SQLAlchemy
 import os
-from Model import User, Match
 import time
 from PIL import Image
 from resizeimage import resizeimage
 
-# configuration
-DATABASE = '/tmp/babylone.db'
-DEBUG = True
-SECRET_KEY = 'development key'
-UPLOAD_FOLDER = './static/image_flask'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
-# create our little application :)
-app = Flask(__name__)
-app.config.from_object(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+# DO NOT DELETE OR MOVE THIS LINE
+from Model import User, Match
+from database import *
 
 def connect_db():
     """Called when app is launched , to connect to the Database."""

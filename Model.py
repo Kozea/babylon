@@ -1,10 +1,15 @@
 """
 This module is here to store data in database and make computation on it.
 """
+from database import *
 
-
-class User:
+class User(db.Model):
     """ This class represent a user in data with some others attributes."""
+    id_user = db.Column(db.Integer, primary_key=True)
+    surname = db.Column(db.String(100))
+    name = db.Column(db.String(100))
+    nickname = db.Column(db.String(100), unique=True)
+    photo = db.Column(db.String(200))
 
     def __init__(self, id_user, surname, name, nickname, photo):
         self.id_user = id_user
@@ -40,7 +45,7 @@ class User:
         return self.ranking
 
 
-class Match:
+class Match():
     """This class represents a match in database."""
 
     def __init__(self, id_match, date, score_e1, score_e2, player11,
