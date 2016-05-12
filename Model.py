@@ -45,8 +45,20 @@ class User(db.Model):
         return self.ranking
 
 
-class Match():
+class Match(db.Model):
     """This class represents a match in database."""
+    id_match = db.Column(db.Integer, primary_key = True)
+    date = db.Column(db.Date)
+    score_e1 = db.Column(db.Integer)
+    score_e2 = db.Column(db.Integer)
+    player11 = db.Column(db.Integer, db.ForeignKey('user.id_user'))
+    player12 = db.Column(db.Integer, db.ForeignKey('User.id_user'))
+    player21 = db.Column(db.Integer, db.ForeignKey('User.id_user'))
+    player22 = db.Column(db.Integer, db.ForeignKey('User.id_user'))
+    
+    user = db.relationship('User')
+    
+    
 
     def __init__(self, id_match, date, score_e1, score_e2, player11,
                  player12, player21, player22):
