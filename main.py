@@ -8,6 +8,7 @@ import os
 import time
 from PIL import Image
 from resizeimage import resizeimage
+from datetime import datetime
 
 
 # DO NOT DELETE OR MOVE THIS LINE
@@ -81,18 +82,14 @@ def new_match():
 
         score_e1 = request.form['score_e1']
         score_e2 = request.form['score_e2']
-
-        # Adding New Match
-        #~ g.db.execute('insert into matchs (date, score_e1, score_e2,\
-                    #~ id_player11, id_player12, id_player21, id_player22) \
-                    #~ values (?, ?, ?, ?, ?, ?, ?)',
-                    #~ (time.strftime("%d/%m/%Y"), score_e1, score_e2,
-                     #~ id_player11, id_player12, id_player21,
-                     #~ id_player22))
+                    
+        player11 = User.query.filter_by(id_user=id_player11).first()
+        player12 = User.query.filter_by(id_user=id_player12).first()
+        player21 = User.query.filter_by(id_user=id_player21).first()
+        player22 = User.query.filter_by(id_user=id_player22).first()
                      
-        match = Match((time.strftime("%d/%m/%Y"), score_e1, score_e2,
-                      id_player11, id_player12, id_player21,
-                      id_player22))
+        match = Match(datetime.now(), score_e1, score_e2,
+                      player11, player12, player21, player22)
 
         db.session.add(match)
         db.session.commit()
