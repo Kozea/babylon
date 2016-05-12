@@ -14,88 +14,36 @@ from resizeimage import resizeimage
 from Model import User, Match
 from database import *
 
-def connect_db():
-    """Called when app is launched , to connect to the Database."""
-    return sqlite3.connect(app.config['DATABASE'])
+#~ def connect_db():
+    #~ """Called when app is launched , to connect to the Database."""
+    #~ return sqlite3.connect(app.config['DATABASE'])
 
 
-def init_db():
-    """Initializes the schema of the database."""
-    with closing(connect_db()) as db:
-        with app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-    db.commit()
+#~ def init_db():
+    #~ """Initializes the schema of the database."""
+    #~ with closing(connect_db()) as db:
+        #~ with app.open_resource('schema.sql', mode='r') as f:
+            #~ db.cursor().executescript(f.read())
+    #~ db.commit()
 
-@app.before_request
-def before_request():
-    """Called before each query on the database."""
-    g.db = connect_db()
+#~ @app.before_request
+#~ def before_request():
+    #~ """Called before each query on the database."""
+    #~ g.db = connect_db()
 
 
-@app.teardown_request
-def teardown_request(exception):
-    """Called after each query on the database."""
-    db = getattr(g, 'db', None)
-    if db is not None:
-        db.close()
+#~ @app.teardown_request
+#~ def teardown_request(exception):
+    #~ """Called after each query on the database."""
+    #~ db = getattr(g, 'db', None)
+    #~ if db is not None:
+        #~ db.close()
 
 
 @app.route('/')
 def matchs():
     """Querying for all matchs in the database"""
-    matchs = []
-    request_match = g.db.execute('select id_match, date, score_e1, \
-    score_e2, id_player11, id_player12, id_player21, id_player22 \
-    from matchs order by date desc')
-
-    for match in request_match.fetchall():
-
-        # Create player1
-        id_player11 = match[4]
-        request_user = g.db.execute('select id_user, surname, name, \
-        nickname, photo from users where id_user = ?', (id_player11,))
-        cur_player11 = request_user.fetchone()
-        player11 = User(cur_player11[0], cur_player11[1], cur_player11[2],
-        cur_player11[3], cur_player11[4])
-
-        # Create player2 if exists
-        id_player12 = match[5]
-        if(id_player12 is not None and id_player12 != ''):
-            request_user2 = g.db.execute('select id_user, surname, name,\
-            nickname, photo from users where id_user = ?',
-            (id_player12,))
-            cur_player12 = request_user2.fetchone()
-            player12 = User(cur_player12[0], cur_player12[1],
-            cur_player12[2], cur_player12[3], cur_player12[4])
-        else:
-            player12 = None
-
-        # Create player1
-        id_player21 = match[6]
-        request_user = g.db.execute('select id_user, surname, name, \
-        nickname, photo from users where id_user = ?',
-        (id_player21,))
-        cur_player21 = request_user.fetchone()
-        player21 = User(cur_player21[0], cur_player21[1], cur_player21[2],
-        cur_player21[3], cur_player21[4])
-
-        # Create player2 if exists
-        id_player22 = match[7]
-        if(id_player22 is not None and id_player22 != ''):
-            request_user2 = g.db.execute('select id_user, surname, \
-            name, nickname, photo from users where id_user = ?',
-            (id_player22,))
-            cur_player22 = request_user2.fetchone()
-            player22 = User(cur_player22[0], cur_player22[1],
-            cur_player22[2], cur_player22[3], cur_player22[4])
-        else:
-            player22 = None
-
-        # Create the match
-        match_to_add = Match(match[0], match[1], match[2], match[3],
-        player11, player12, player21, player22)
-        matchs.append(match_to_add)
-
+    matchs = Match.query.all()
     return render_template('match.html', matchs = matchs)
 
 
@@ -187,98 +135,6 @@ def new_match():
         db.session.add(match)
         db.session.commit()
 
-        #~ # get old elo for 11
-        #~ cur = g.db.execute('select ranking from users where id_user =?',
-                            #~ (id_player11,))
-        #~ old_elo_player11 = cur.fetchone()[0]
-        
-        #~ cur = g.db.execute('select numberMatchs from users where id_user =?',
-                            #~ (id_player11,))
-        #~ number11 = cur.fetchone()[0]+1
-        #~ g.db.execute('update users set numberMatchs = ? where id_user = ?',
-                            #~ (number11, id_player11,))
-        #~ g.db.commit()
-        
-       
-        #~ # get old elo for 12
-        #~ if(request.form['id_player12']):
-            #~ cur = g.db.execute('select ranking from users where id_user =?',
-                            #~ (id_player12,))
-            #~ old_elo_player12 = cur.fetchone()[0]
-            
-            #~ cur = g.db.execute('select numberMatchs from users where id_user =?',
-                            #~ (id_player12,))
-            #~ number12 = cur.fetchone()[0]+1
-            #~ g.db.execute('update users set numberMatchs = ? where id_user = ?',
-                            #~ (number12, id_player12,))
-            #~ g.db.commit()
-        #~ else:
-            #~ old_elo_player12 = None
-            
-        #~ # get old elo for 21
-        #~ cur = g.db.execute('select ranking from users where id_user =?',
-                        #~ (id_player21,))
-        #~ old_elo_player21 = cur.fetchone()[0]
-        
-        #~ cur = g.db.execute('select numberMatchs from users where id_user =?',
-                        #~ (id_player21,))
-        #~ number21 = cur.fetchone()[0]+1
-        #~ g.db.execute('update users set numberMatchs = ? where id_user = ?',
-                        #~ (number21, id_player21,))
-        #~ g.db.commit()
-        
-        #~ # get old elo for 22
-        #~ if(request.form['id_player22']):
-            #~ cur = g.db.execute('select ranking from users where id_user =?',
-                        #~ (id_player22,))
-            #~ old_elo_player22 = cur.fetchone()[0]
-            
-            #~ cur = g.db.execute('select numberMatchs from users where id_user =?',
-                        #~ (id_player22,))
-            #~ number22 = cur.fetchone()[0]+1
-            #~ g.db.execute('update users set numberMatchs = ? where id_user = ?',
-                        #~ (number22, id_player22,))
-            #~ g.db.commit()
-                    
-        #~ else:
-            #~ old_elo_player22 = None
-            
-        #~ # Modify score for 11
-        #~ newelo11 =Elo.new_score(old_elo_player11, old_elo_player21, old_elo_player12, 
-        #~ old_elo_player22, number11, score_e1, score_e2)
-        
-        #~ g.db.execute('update users set ranking = ? where id_user = ?',
-                    #~ (newelo11,id_player11,))
-        #~ g.db.commit()
-    
-        #~ # Modify score for 12 if necessary
-        #~ if(request.form['id_player12']):
-            #~ newelo12 = Elo.new_score(old_elo_player12, old_elo_player21, 
-            #~ old_elo_player11, old_elo_player22, number12, score_e1, score_e2)
-            
-            #~ g.db.execute('update users set ranking = ? where id_user = ?',
-                        #~ (newelo12,id_player12,))
-                        
-            #~ g.db.commit()
-            
-        #~ # Modify score for 21
-        #~ newelo21 = Elo.new_score(old_elo_player21, old_elo_player11, 
-                    #~ old_elo_player22, old_elo_player12, number21, 
-                    #~ score_e2, score_e1)
-        
-        #~ g.db.execute('update users set ranking = ? where id_user = ?',
-                    #~ (newelo21,id_player21,))
-        #~ g.db.commit()
-        
-        #~ # Modify score for 22 if necessary
-        #~ if(request.form['id_player22']):
-            #~ newelo22 = Elo.new_score(old_elo_player22, old_elo_player11, 
-            #~ old_elo_player22, old_elo_player12, number22, score_e2, score_e1)
-            
-            #~ g.db.execute('update users set ranking = ? where id_user = ?',
-                        #~ (newelo22,id_player22,))
-            #~ g.db.commit()
-
         success = "Match was successfully added "
 
     return render_template('add_match.html', success=success,
@@ -360,29 +216,6 @@ def allowed_file(filename):
 
 
 # HELPER #
-def number_of_match(id_player):
-    """
-        Returns the number of matches played by a player
-
-        :param id_player: ID of the player
-        :return: Number of matches played by the player
-    """
-    query = "select count(id_match)\
-            from matchs\
-            where id_player11 = num\
-            or id_player12 = num\
-            or id_player21 = num\
-            or id_player22 = num"
-
-    query = query.replace("num", str(id_player))
-    cursor = g.db.execute(query)
-    results = cursor.fetchone()
-    if(results):
-        number = results[0]
-    else:
-        number = 0
-    return number
-
 
 def compute_ranking():
     """Calculates score for each player, using matches played by the user."""
