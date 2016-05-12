@@ -10,7 +10,6 @@ from PIL import Image
 from resizeimage import resizeimage
 from datetime import datetime
 
-
 # DO NOT DELETE OR MOVE THIS LINE
 from Model import User, Match
 from database import *
@@ -196,29 +195,20 @@ def compute_ranking():
     users = User.query.all()
     for user in users:
         user.set_ranking(1000)
+        user.set_number_of_matchs()
 
     matchs = Match.query.all()
     
     for match in matchs:
-        match.player11.set_ranking(1000)
-        match.player11.set_number_of_matchs()
-        
-        if(match.player12 is not None):
-            match.player12.set_ranking(1000)
-            match.player12.set_number_of_matchs()
-            
-        match.player21.set_ranking(1000)
-        match.player21.set_number_of_matchs()
-        
-        if(match.player22 is not None):
-            match.player22.set_ranking(1000)
-            match.player22.set_number_of_matchs()
-        
-    for match in matchs:
         elo(match.player11, match.player12,match.player21,match.player22,
             match.score_e1, match.score_e2)
+        print(match.score_e1, match.score_e2)
+        print(match.player11.nickname, match.player21.nickname)
+        print(match.player11.ranking, match.player21.ranking)
+        
             
     users = User.query.all()
+
     return users
 
 def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
@@ -255,7 +245,7 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
     
     # Get points to real users
     if(my_friend is None):
-        me.ranking += int(round(score_p2,0))
+        me.ranking += int(round(score_p1,0))
         me.number_of_match += 1
     else:
         sum_ranking = me.ranking+my_friend.ranking
@@ -267,7 +257,7 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
         my_friend.number_of_match += 1  
         
     if(my_ennemy2 is None):
-        my_ennemy1.ranking += int(round((score_p1),0))
+        my_ennemy1.ranking += int(round((score_p2),0))
         my_ennemy1.number_of_match += 1
     else:
         sum_ranking = my_ennemy1.ranking+my_ennemy2.ranking
@@ -303,6 +293,9 @@ def chooseW(score_e1, score_e2):
     
 def p(i):
     return 1/(1+10**(-i/400))
+    
+def init_db():
+    db.create_all()
     
 if __name__ == '__main__':
     app.run()
