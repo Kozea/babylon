@@ -19,18 +19,6 @@ class Match(db.Model):
     player22 = db.relationship('User', foreign_keys=[player22_id])
     
 
-    def __init__(self, id_match, date, score_e1, score_e2, player11,
-                 player12, player21, player22):
-        self.id_match = id_match
-        self.date = date
-        self.score_e1 = score_e1
-        self.score_e2 = score_e2
-        self.player11 = player11
-        self.player12 = player12
-        self.player21 = player21
-        self.player22 = player22
-
-
 class User(db.Model):
     """ This class represent a user in data with some others attributes."""
     id_user = db.Column(db.Integer, primary_key=True)
@@ -39,13 +27,6 @@ class User(db.Model):
     nickname = db.Column(db.String(100), unique=True)
     photo = db.Column(db.String(200))
 
-    def __init__(self, surname, name, nickname, photo):
-        self.surname = surname
-        self.name = name
-        self.nickname = nickname
-        self.photo = photo
-        self.ranking = 1000
-        self.number_of_match = 0
 
     def get_full_name(self):
         """ Return the full name of a user"""
@@ -66,6 +47,9 @@ class User(db.Model):
     def set_ranking(self, ranking):
         """ Set the ranking of a user"""
         self.ranking = ranking
+    
+    def set_number_of_matchs(self):
+        self.number_of_match = 0
 
     def get_ranking(self):
         """ Return the ranking of a user"""

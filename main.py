@@ -50,7 +50,7 @@ def matchs():
 @app.route('/ranking')
 def ranking():
     """Querying for the ranking"""
-    unordered_ranking = compute_ranking().values()
+    unordered_ranking = compute_ranking()
     ordered_ranking = sorted(unordered_ranking, key = lambda user: -user.ranking)
     return render_template('ranking.html', users = ordered_ranking)
 
@@ -213,40 +213,51 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-
-# HELPER #
-
-def compute_ranking():
-    """Calculates score for each player, using matches played by the user."""
-    # Get all users
-    users = {}
-    request_user = g.db.execute('select id_user, surname, name, nickname,\
-                                photo from users')
-    for cur_user in request_user.fetchall():
-        player = User(cur_user[0], cur_user[1], cur_user[2],
-                           cur_user[3], cur_user[4])
-        users[cur_user[0]] = player
-
-    # Get all matchs
-    matchs = []
-    request_match = g.db.execute('select id_match, date, score_e1, score_e2,\
-                                 id_player11, id_player12, id_player21, \
-                                 id_player22 from matchs')
-    for cur_match in request_match.fetchall():
-        id_player11 = users[cur_match[4]]
-        id_player12 = users[cur_match[5]] if cur_match[5] in users.keys() else None
-        id_player21 = users[cur_match[6]]
-        id_player22 = users[cur_match[7]] if cur_match[7] in users.keys() else None
-        match = Match(cur_match[0], cur_match[1], cur_match[2],
-                            cur_match[3], id_player11, id_player12,
-                            id_player21, id_player22)
-        matchs.append(match)
-
-    # For each match
+@app.route('/coucou')
+def coucou():
+    toRet = ""
+    matchs = Match.query.all()
+    
+    for match in matchs:
+        match.player11.set_ranking(1000)
+        match.player12.set_ranking(1000)
+        match.player21.set_ranking(1000)
+        match.player22.set_ranking(1000)
+        match.player11.set_number_of_matchs()
+        match.player12.set_number_of_matchs()
+        match.player21.set_number_of_matchs()
+        match.player22.set_number_of_matchs()
+        
     for match in matchs:
         elo(match.player11, match.player12,match.player21,match.player22,
             match.score_e1, match.score_e2)
-                
+            
+    users = User.query.all()
+    for user in users:
+        toRet += str(user.ranking)
+        toRet+='<br>'
+    return toRet
+# HELPER #
+
+def compute_ranking():
+    matchs = Match.query.all()
+    
+    for match in matchs:
+        match.player11.set_ranking(1000)
+        match.player12.set_ranking(1000)
+        match.player21.set_ranking(1000)
+        match.player22.set_ranking(1000)
+        match.player11.set_number_of_matchs()
+        match.player12.set_number_of_matchs()
+        match.player21.set_number_of_matchs()
+        match.player22.set_number_of_matchs()
+        
+    for match in matchs:
+        elo(match.player11, match.player12,match.player21,match.player22,
+            match.score_e1, match.score_e2)
+            
+    users = User.query.all()
+
     return users
 
 def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
