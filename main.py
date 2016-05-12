@@ -13,37 +13,7 @@ from resizeimage import resizeimage
 # DO NOT DELETE OR MOVE THIS LINE
 from Model import User, Match
 from database import *
-
-#~ def connect_db():
-    #~ """Called when app is launched , to connect to the Database."""
-    #~ return sqlite3.connect(app.config['DATABASE'])
-
-
-#~ def init_db():
-    #~ """Initializes the schema of the database."""
-    #~ with closing(connect_db()) as db:
-        #~ with app.open_resource('schema.sql', mode='r') as f:
-            #~ db.cursor().executescript(f.read())
-    #~ db.commit()
-
-#~ @app.before_request
-#~ def before_request():
-    #~ """Called before each query on the database."""
-    #~ g.db = connect_db()
-
-
-#~ @app.teardown_request
-#~ def teardown_request(exception):
-    #~ """Called after each query on the database."""
-    #~ db = getattr(g, 'db', None)
-    #~ if db is not None:
-        #~ db.close()
-
-
-@app.route('/caca')
-def caca():
-    return ("CACAAAAAA")
-    
+   
 @app.route('/')
 def matchs():
     """Querying for all matchs in the database"""
