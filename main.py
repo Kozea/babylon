@@ -422,54 +422,93 @@ def compute_ranking():
 
     # For each match
     for match in matchs:
-        # Get all players and actuals scores
-        player11 = match.player11
-        old_elo11 = player11.ranking
-
-        player12 = match.player12
-        old_elo12 = player12.ranking if player12 is not None else None
-
-        player21 = match.player21
-        old_elo21 = player21.ranking
-
-        player22 = match.player22
-        old_elo22 = player22.ranking if player22 is not None else None
-
-        # For player11
-        new_score11 = Elo.new_score(old_elo11, old_elo21,
-                                    old_elo12, old_elo22,
-                                    player11.number_of_match,
-                                    match.score_e1, match.score_e2)
-        match.player11.ranking = new_score11
-        match.player11.number_of_match += 1
-
-        # For player12 if necessary
-        if(player12 is not None):
-            new_score12 = Elo.new_score(old_elo12, old_elo21,
-                                        old_elo11, old_elo22,
-                                        player12.number_of_match,
-                                        match.score_e1, match.score_e2)
-            match.player12.ranking = new_score12
-            match.player12.number_of_match += 1
-
-        # For player21
-        new_score21 = Elo.new_score(old_elo21, old_elo11,
-                                    old_elo22, old_elo12,
-                                    player21.number_of_match,
-                                    match.score_e2, match.score_e1)
-        match.player21.ranking = new_score21
-        match.player21.number_of_match += 1
-
-        # For player 22 if necessary
-        if(player22 is not None):
-            new_score22 = Elo.new_score(old_elo22, old_elo11,
-                                        old_elo21, old_elo12,
-                                        player22.number_of_match,
-                                        match.score_e2, match.score_e1)
-            match.player22.ranking = new_score22
-            match.player22.number_of_match += 1
-
+        elo(match.player11, match.player12,match.player21,match.player22,
+            match.score_e1, match.score_e2)
+                
     return users
 
+def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
+    # Create fictive player1
+    if(my_friend is None):
+        elo1 =  me.ranking
+        number_match1 = me.number_of_match
+    else:
+        elo1 = (me.ranking+my_friend.ranking)/2
+        number_match1 = (me.number_of_match+my_friend.number_of_match)/2
+    
+    # Create fictive player2
+    if(my_ennemy2 is None):
+        elo2 =  my_ennemy1.ranking
+        number_match2 = my_ennemy1.number_of_match
+    else:
+        elo2 = (my_ennemy1.ranking+my_ennemy2.ranking)/2
+        number_match2 = (my_ennemy1.number_of_match+my_ennemy2.number_of_match)/2
+    
+    
+    # Score for player1
+    We1 = p(my_score-opponent_score)
+    K = chooseK(number_match1, elo1)
+    G = chooseG(my_score, opponent_score)
+    W = chooseW(my_score, opponent_score)
+    score_p1 = K*G*(W-We1)
+    
+    # Score for player2
+    We2 = 1 - We1
+    K = chooseK(number_match2, elo2)
+    G = chooseG(opponent_score, my_score)
+    W = chooseW(opponent_score, my_score)
+    score_p2 = K*G*(W-We2)
+    
+    # Get points to real users
+    if(my_friend is None):
+        me.ranking += int(round(score_p2,0))
+        me.number_of_match += 1
+    else:
+        sum_ranking = me.ranking+my_friend.ranking
+        # update my score
+        me.ranking += int(round((me.ranking/sum_ranking)*score_p1,0))
+        me.number_of_match += 1  
+        # update my friend score
+        my_friend.ranking += int(round((my_friend.ranking/sum_ranking)*score_p1,0))
+        my_friend.number_of_match += 1  
+        
+    if(my_ennemy2 is None):
+        my_ennemy1.ranking += int(round((score_p1),0))
+        my_ennemy1.number_of_match += 1
+    else:
+        sum_ranking = my_ennemy1.ranking+my_ennemy2.ranking
+        # update my score
+        my_ennemy1.ranking += int(round((my_ennemy1.ranking/sum_ranking)*score_p2,0))
+        my_ennemy1.number_of_match += 1  
+        # update my friend score
+        my_ennemy2.ranking += int(round((my_ennemy2.ranking/sum_ranking)*score_p2,0))
+        my_ennemy2.number_of_match += 1  
+    
+def chooseK(number_of_match, elo):
+    if(number_of_match < 40):
+        return 40
+    elif(elo<2400):
+        return 20
+    else:
+        return 10
+        
+def chooseG(score_e1, score_e2):
+    diff = abs(score_e1 - score_e2)
+    if(diff <2):
+        G = 1
+    elif(diff == 2):
+        G = 1+1/2
+    elif(diff == 3):
+        G = 1+3/4
+    else:
+        G = 1+3/4+(diff-3)/8
+    return G
+    
+def chooseW(score_e1, score_e2):
+    return 1 if score_e1 > score_e2 else 0
+    
+def p(i):
+    return 1/(1+10**(-i/400))
+    
 if __name__ == '__main__':
     app.run()
