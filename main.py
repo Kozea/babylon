@@ -202,7 +202,7 @@ def compute_ranking():
         elo(match.player11, match.player12, match.player21, match.player22,
             match.score_e1, match.score_e2)
 
-    users = User.query.all()
+    #~ users = User.query.all()
 
     return users
 
@@ -356,7 +356,27 @@ def build_avg_temp(pairs, participants):
         temp_avg = (participants[pair[0]].ranking+participants[pair[1]].ranking)/2
         s.append(temp_avg)
     return s
-        
+     
+def get_ranking_at_timet(date):
+    # Compute the elo at time date
+    users = User.query.all()
+    for user in users:
+        user.set_ranking(1000)
+        user.set_number_of_matchs()
+
+    matchs = Match.query.filter(Match.date < date).all()
+
+    for match in matchs:
+        elo(match.player11, match.player12, match.player21, match.player22,
+            match.score_e1, match.score_e2)
+
+    # Get the match per week
+    matchs = Match.query.group_by(Match.date).filter(Match.data >= date)
+    print(matchs)
+    
+
+    return users
+    
 def init_db():
     db.create_all()
 
