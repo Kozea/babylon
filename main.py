@@ -264,8 +264,8 @@ def chooseW(score_e1, score_e2):
 
 def p(i):
     return 1/(1+10**(-i/400))
-
-
+   
+    
 def init_db():
     db.create_all()
 
