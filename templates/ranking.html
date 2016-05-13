@@ -25,17 +25,40 @@
                 </h4>
                 {% endif %}
                 
+                {% if user.get_number_of_matchs() != 0 %}
                 <h4>
-                    {{user.get_nb_victories()}} Victories
+                    {{user.get_nb_victories()}} 
+                    
+                    {% if user.get_nb_victories()==1 %}
+                        Victory
+                    {% else %}
+                        Victories
+                    {% endif %}
                 </h4>
                 
+                
                 <h4>
-                    {{user.get_nb_defeats()}} Defeats
+                    
+                    {{user.get_nb_defeats()}}
+                    
+                    {% if user.get_nb_defeats()==1 %}
+                        Defeat
+                    {% else %}
+                        Defeats
+                    {% endif %}
                 </h4>
+                
                 
                 <h4>
                     Ratio : {{(user.get_nb_victories()/user.get_number_of_matchs())*100}} %
                 </h4>
+                
+                {% else %}
+                <h4>
+                    Hasn't played yet
+                </h4>
+                
+                {% endif %}
                 
             </figcaption>
         </figure>
