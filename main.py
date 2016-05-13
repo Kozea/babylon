@@ -56,8 +56,10 @@ def new_match():
     # Check if some players are missing
     if not id_player11:
         error = 'Add a player 1 to team 1'
+        
     elif not id_player21:
         error = 'Add a player 1 to team 2'    
+        
     # Check if some users appear twice
     elif ((id_player11 == id_player12) or
           (id_player11 == id_player21) or
