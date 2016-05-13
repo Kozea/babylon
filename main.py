@@ -5,7 +5,7 @@ from resizeimage import resizeimage
 from datetime import datetime
 from Model import User, Match
 from database import db, app, ALLOWED_EXTENSIONS
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 @app.route('/')
 def matchs():
@@ -21,19 +21,12 @@ def ranking():
     
     for user in unordered_ranking :
         
-        #~ victories_as_team1 = User.query(func.count(Match.id_match)).filter(Match.player11 == user or Match.player12 == user).filter(Match.score_e1 > Match.score_e2)
-        victories_as_team1 = db.session.query(func.count(Match.id_match)).filter(Match.player11 == user or Match.player12 == user).filter(Match.score_e1 > Match.score_e2)
+        victories_as_team1 = db.session.query(Match.id_match).filter((Match.player11 == user) | (Match.player12 == user)).filter(Match.score_e1 > Match.score_e2).count()
+        victories_as_team2 = db.session.query(Match.id_match).filter((Match.player21 == user) | (Match.player22 == user)).filter(Match.score_e1 < Match.score_e2).count()
+
+        user.nb_victories = victories_as_team1 + victories_as_team2
+        user.nb_defeats = user.number_of_match - user.nb_victories
                                                       
-        #~ victories_as_team2 = User.query.filter(Match.player21 == user or Match.player22 == user).filter(Match.score_e2 > Match.score_e1)
-        
-        #~ user.nb_victories = victories_as_team1 + victories_as_team1
-        #~ user.nb_defeats = user.number_of_match - user.nb_victories
-                                                      
-        print (user.name)
-        print (victories_as_team1)
-        #~ print (victories_as_team2)
-        #~ print (user.nb_victories)
-        #~ print (user.nb_defeats)
     
     ordered_ranking = sorted(unordered_ranking,
                              key = lambda user: -user.ranking)

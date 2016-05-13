@@ -10,23 +10,53 @@
         <figure>
             <img src={{user.get_photo()}}>
             <figcaption>
+                
                 <h2>
                     {{loop.index}}
                 </h2>
+                
                 <h3>
                     {{user.get_full_name()}}
                 </h3>
+                
                 {% if user.get_nickname() %}
                 <h4>
                     {{user.get_nickname()}}
                 </h4>
                 {% endif %}
+                
+                <h4>
+                    {{user.get_nb_victories()}} Victories
+                </h4>
+                
+                <h4>
+                    {{user.get_nb_defeats()}} Defeats
+                </h4>
+                
+                <h4>
+                    Ratio : {{(user.get_nb_victories()/user.get_number_of_matchs())*100}} %
+                </h4>
+                
             </figcaption>
         </figure>
     </th>
     <th>
         {{user.get_ranking()}}
     </th>
+    
+    <th>
+
+    </th>
+    
+    <th>
+
+    </th>
+    
+    <th>
+
+    </th>
+
+        
 </tr>
 {% else %}
 There is no scores yet ! 
