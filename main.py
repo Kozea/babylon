@@ -171,9 +171,6 @@ def compute_ranking():
     for match in matchs:
         elo(match.player11, match.player12, match.player21, match.player22,
             match.score_e1, match.score_e2)
-        print(match.score_e1, match.score_e2)
-        print(match.player11.nickname, match.player21.nickname)
-        print(match.player11.ranking, match.player21.ranking)
 
     users = User.query.all()
 
