@@ -46,6 +46,8 @@ class User(db.Model):
         self.photo = photo
         self.ranking = -1
         self.number_of_match = 0
+        self.nb_victories = 0
+        self.nb_defeats = 0
 
     def get_full_name(self):
         """ Return the full name of a user"""

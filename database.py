@@ -6,6 +6,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
+
 # configuration
 DATABASE = '/tmp/babylone.db'
 DEBUG = True

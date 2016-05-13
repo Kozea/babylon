@@ -5,7 +5,7 @@ from resizeimage import resizeimage
 from datetime import datetime
 from Model import User, Match
 from database import db, app, ALLOWED_EXTENSIONS
-
+from sqlalchemy import func
 
 @app.route('/')
 def matchs():
@@ -18,6 +18,23 @@ def matchs():
 def ranking():
     """Querying for the ranking"""
     unordered_ranking = compute_ranking()
+    
+    for user in unordered_ranking :
+        
+        #~ victories_as_team1 = User.query(func.count(Match.id_match)).filter(Match.player11 == user or Match.player12 == user).filter(Match.score_e1 > Match.score_e2)
+        victories_as_team1 = db.session.query(func.count(Match.id_match)).filter(Match.player11 == user or Match.player12 == user).filter(Match.score_e1 > Match.score_e2)
+                                                      
+        #~ victories_as_team2 = User.query.filter(Match.player21 == user or Match.player22 == user).filter(Match.score_e2 > Match.score_e1)
+        
+        #~ user.nb_victories = victories_as_team1 + victories_as_team1
+        #~ user.nb_defeats = user.number_of_match - user.nb_victories
+                                                      
+        print (user.name)
+        print (victories_as_team1)
+        #~ print (victories_as_team2)
+        #~ print (user.nb_victories)
+        #~ print (user.nb_defeats)
+    
     ordered_ranking = sorted(unordered_ranking,
                              key = lambda user: -user.ranking)
     return render_template('ranking.html', users = ordered_ranking)
