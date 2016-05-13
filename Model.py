@@ -7,7 +7,7 @@ from database import db
 class Match(db.Model):
     """This class represents a match in database."""
     id_match = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date)
+    date = db.Column(db.DateTime)
     score_e1 = db.Column(db.Integer)
     score_e2 = db.Column(db.Integer)
     player11_id = db.Column(db.Integer, db.ForeignKey('user.id_user'))

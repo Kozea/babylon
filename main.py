@@ -10,7 +10,7 @@ from database import db, app, ALLOWED_EXTENSIONS
 @app.route('/')
 def matchs():
     """Querying for all matchs in the database"""
-    matchs = Match.query.all()
+    matchs = Match.query.order_by(-Match.id_match).all()
     return render_template('match.html', matchs=matchs)
 
 
@@ -108,6 +108,9 @@ def add_player():
         # Get user photo and work on it
         photo = request.files['photo']
         if photo and allowed_file(photo.filename):
+            nickname = nickname.replace(" ","")
+            nickname = nickname.replace("/","")
+            nickname = nickname.replace("\\","")
             filename = app.config['UPLOAD_FOLDER']+"/"+nickname+get_extension_file(photo.filename)
             photo.save(filename)
             with open(filename, 'r+b') as f:
