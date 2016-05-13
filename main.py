@@ -157,34 +157,6 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-
-@app.route('/coucou')
-def coucou():
-    toRet = ""
-    matchs = Match.query.all()
-
-    for match in matchs:
-        match.player11.set_ranking(1000)
-        match.player12.set_ranking(1000)
-        match.player21.set_ranking(1000)
-        match.player22.set_ranking(1000)
-        match.player11.set_number_of_matchs()
-        match.player12.set_number_of_matchs()
-        match.player21.set_number_of_matchs()
-        match.player22.set_number_of_matchs()
-
-    for match in matchs:
-        elo(match.player11, match.player12, match.player21, match.player22,
-            match.score_e1, match.score_e2)
-
-    users = User.query.all()
-    for user in users:
-        toRet += str(user.ranking)
-        toRet += '<br>'
-    return toRet
-# HELPER #
-
-
 def compute_ranking():
     users = User.query.all()
     for user in users:
