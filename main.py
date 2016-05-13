@@ -1,11 +1,13 @@
 # all the imports
-from flask import request, render_template
+from flask import request, render_template, redirect
 from PIL import Image
 from resizeimage import resizeimage
 from datetime import datetime
 from Model import User, Match
 from database import db, app, ALLOWED_EXTENSIONS
+import math
 
+player_tournament = 2
 
 @app.route('/')
 def matchs():
@@ -22,6 +24,28 @@ def ranking():
                              key = lambda user: -user.ranking)
     return render_template('ranking.html', users = ordered_ranking)
 
+@app.route('/addOneTournament')
+def addOneTournament():
+    global player_tournament
+    player_tournament += 1
+    #~ return render_template('tournament.html', users = users, nb_select = player_tournament)
+    return redirect('/tournament')
+        
+@app.route('/tournament', methods=['GET','POST'])
+def tournament():
+    users = compute_ranking()
+    if request.method == 'POST':
+        players = []
+        for i in range(player_tournament):
+            idp = 'id_player'+str(i+1)
+            id_player = request.form[idp]
+            user = User.query.filter_by(id_user=id_player).first()
+            players.append(user)
+    
+        tournament = generate_tournament(players)
+        
+        return render_template('tournament.html', users = users, nb_select = player_tournament, tournament = tournament)
+    return render_template('tournament.html', users = users, nb_select = player_tournament)
 
 @app.route('/add_match')
 def add_match():
@@ -270,7 +294,69 @@ def chooseW(score_e1, score_e2):
 def p(i):
     return 1/(1+10**(-i/400))
    
+def generate_tournament(participants):
+    number_of_participants = len(participants)
+    if(number_of_participants%2 != 0):
+        raise Exception("You must be a power of 2 !")
+                
+    #get the list of all players
+    players = participants
     
+    # ordered the list of all players
+    players = sorted(players, key=lambda player: player.ranking)  
+    
+    # create the team
+    teams = [(players[i], players[len(players)-1-i]) 
+                for i in range(math.floor(len(players)/2))]    
+        
+    # ordered the team
+    teams = sorted(teams, key=lambda team: (team[0].ranking+team[1].ranking)/2)
+    
+    index = 1
+    for team in teams:
+        index += 1
+
+    tournament_head = []
+    tournament_queue = []
+    first = True
+    # create the tournament to make distance between contenders
+    for i in range(math.floor(len(teams)/2)):
+        if(first):
+            tournament_head.append(((teams[i]),teams[len(teams)-1-i]))
+        else:
+            tournament_queue.insert(0,((teams[i]),teams[len(teams)-1-i]))
+        first = not first
+        
+    tournament = tournament_head + tournament_queue
+    print("TOURNAMENT")
+    for (team1, team2) in tournament:
+        print(team1[0].name, team1[0].ranking)
+        print(team1[1].name, team1[1].ranking)
+        print((team1[0].ranking+team1[1].ranking)/2)        
+        print(team2[0].name, team2[0].ranking)
+        print(team2[1].name, team2[1].ranking)
+        print((team2[0].ranking+team2[1].ranking)/2)        
+        print()
+    return tournament
+
+        
+def all_pairs(lst):
+    if len(lst) < 2:
+        yield lst
+        return
+    a = lst[0]
+    for i in range(1,len(lst)):
+        pair = (a,lst[i])
+        for rest in all_pairs(lst[1:i]+lst[i+1:]):
+            yield [pair] + rest
+    
+def build_avg_temp(pairs, participants):
+    s = []
+    for pair in pairs:
+        temp_avg = (participants[pair[0]].ranking+participants[pair[1]].ranking)/2
+        s.append(temp_avg)
+    return s
+        
 def init_db():
     db.create_all()
 

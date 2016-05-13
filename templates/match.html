@@ -18,13 +18,15 @@
                 <figcaption>
                     {{match.player11.get_full_name()}}
                 </figcaption>
-                {% if match.player12 %}
+            </figure>
+            {% if match.player12 %}
+            <figure>
                 <img src={{match.player12.get_photo()}}>
                 <figcaption>
                     {{match.player12.get_full_name()}}
                 </figcaption>
-                {% endif %}
             </figure>
+            {% endif %}
             <h3>
                 {{match.score_e1}}
             </h3>
@@ -36,13 +38,15 @@
                 <figcaption>
                     {{match.player21.get_full_name()}}
                 </figcaption>
-                {% if match.player22 %}
+            </figure>
+            {% if match.player22 %}
+            <figure>
                 <img src={{match.player22.get_photo()}}>
                 <figcaption>
                     {{match.player22.get_full_name()}}
                 </figcaption>
-                {% endif %}
             </figure>
+            {% endif %}
             <h3>
                 {{match.score_e2}}
             </h3>
