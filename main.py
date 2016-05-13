@@ -31,7 +31,8 @@ def add_match():
 
     if(len(users) == 0):
         success = "There are no players yet !"
-        return render_template('add_match.html', success = success, user = True)
+        return render_template('add_match.html', success = success,
+                               user = True)
 
     return render_template('add_match.html', users = users)
 
@@ -44,7 +45,7 @@ def new_match():
 
     error = None
     success = None
-    
+
     id_player11 = request.form['id_player11']
     id_player12 = request.form['id_player12']
     id_player21 = request.form['id_player21']
@@ -52,14 +53,14 @@ def new_match():
 
     score_e1 = request.form['score_e1']
     score_e2 = request.form['score_e2']
- 
+
     # Check if some players are missing
     if not id_player11:
         error = 'Add a player 1 to team 1'
-        
+
     elif not id_player21:
-        error = 'Add a player 1 to team 2'    
-        
+        error = 'Add a player 1 to team 2'
+
     # Check if some users appear twice
     elif ((id_player11 == id_player12) or
           (id_player11 == id_player21) or
@@ -74,12 +75,12 @@ def new_match():
 
     elif not score_e2:
         error = 'Add a score for Team 2'
-    
+
     elif(not(score_e1.isdigit()) or not(score_e2.isdigit())):
         error = 'Please give integer values for score !'
-        
+
     else:
-           
+
         player11 = User.query.filter_by(id_user=id_player11).first()
         player12 = User.query.filter_by(id_user=id_player12).first()
         player21 = User.query.filter_by(id_user=id_player21).first()
@@ -94,7 +95,7 @@ def new_match():
         success = "Match was successfully added "
 
 
-    return render_template('add_match.html', success=success,
+    return render_template('add_match.html', success= success,
                            error=error, users=users)
 
 
@@ -113,9 +114,9 @@ def add_player():
         # Get user photo and work on it
         photo = request.files['photo']
         if photo and allowed_file(photo.filename):
-            nickname = nickname.replace(" ","")
-            nickname = nickname.replace("/","")
-            nickname = nickname.replace("\\","")
+            nickname = nickname.replace(" ", "")
+            nickname = nickname.replace("/", "")
+            nickname = nickname.replace("\\", "")
             filename = app.config['UPLOAD_FOLDER']+"/"+nickname+get_extension_file(photo.filename)
             photo.save(filename)
             with open(filename, 'r+b') as f:
@@ -162,7 +163,10 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+
 def compute_ranking():
+    """ To be completed"""
+
     users = User.query.all()
     for user in users:
         user.set_ranking(1000)
@@ -194,7 +198,8 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
         number_match2 = my_ennemy1.number_of_match
     else:
         elo2 = (my_ennemy1.ranking+my_ennemy2.ranking)/2
-        number_match2 = (my_ennemy1.number_of_match+my_ennemy2.number_of_match)/2
+        number_match2 = (my_ennemy1.number_of_match +
+                         my_ennemy2.number_of_match)/2
 
     # Score for player1
     We1 = p(my_score-opponent_score)
@@ -239,7 +244,7 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
 def chooseK(number_of_match, elo):
     if(number_of_match < 40):
         return 40
-    elif(elo<2400):
+    elif(elo < 2400):
         return 20
     else:
         return 10
@@ -247,7 +252,7 @@ def chooseK(number_of_match, elo):
 
 def chooseG(score_e1, score_e2):
     diff = abs(score_e1 - score_e2)
-    if(diff <2):
+    if(diff < 2):
         G = 1
     elif(diff == 2):
         G = 1+1/2
