@@ -65,38 +65,33 @@ def new_match():
 
     elif not request.form['score_e2']:
         error = 'Add a score for Team 2'
-
+    
+    elif(not(request.form['score_e1'].isdigit()) or not(request.form['score_e2'].isdigit())):
+        error = 'Please give integer values for score !'
+        
     else:
         
-        try:
-            #Check if scores are integers 
-            
-            int(request.form['score_e1'])
-            int(request.form['score_e2'])
-            
-            id_player11 = request.form['id_player11']
-            id_player12 = request.form['id_player12']
-            id_player21 = request.form['id_player21']
-            id_player22 = request.form['id_player22']
+        id_player11 = request.form['id_player11']
+        id_player12 = request.form['id_player12']
+        id_player21 = request.form['id_player21']
+        id_player22 = request.form['id_player22']
 
-            score_e1 = request.form['score_e1']
-            score_e2 = request.form['score_e2']
+        score_e1 = request.form['score_e1']
+        score_e2 = request.form['score_e2']
+        
+        player11 = User.query.filter_by(id_user=id_player11).first()
+        player12 = User.query.filter_by(id_user=id_player12).first()
+        player21 = User.query.filter_by(id_user=id_player21).first()
+        player22 = User.query.filter_by(id_user=id_player22).first()
 
-            player11 = User.query.filter_by(id_user=id_player11).first()
-            player12 = User.query.filter_by(id_user=id_player12).first()
-            player21 = User.query.filter_by(id_user=id_player21).first()
-            player22 = User.query.filter_by(id_user=id_player22).first()
+        match = Match(datetime.now(), score_e1, score_e2,
+                      player11, player12, player21, player22)
 
-            match = Match(datetime.now(), score_e1, score_e2,
-                          player11, player12, player21, player22)
+        db.session.add(match)
+        db.session.commit()
 
-            db.session.add(match)
-            db.session.commit()
+        success = "Match was successfully added "
 
-            success = "Match was successfully added "
-            
-        except:
-            error = 'Please give integer values for score'
 
     return render_template('add_match.html', success=success,
                            error=error, users=users)
