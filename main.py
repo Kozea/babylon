@@ -24,7 +24,10 @@ def matchs():
 
 @app.route('/ranking')
 def ranking():
-    """Querying for the ranking"""
+    """
+        Querying for the ranking and reaching informations for
+        the different chart.
+    """
     unordered_ranking = compute_ranking()
 
     for user in unordered_ranking:
@@ -47,6 +50,7 @@ def ranking():
 
 @app.route('/addOneTournament')
 def addOneTournament():
+    """ Add one player for the tournament view."""
     global player_tournament
     player_tournament += 1
     return redirect('/tournament')
@@ -74,7 +78,9 @@ def tournament():
 
 @app.route('/ranking_graph')
 def ranking_graph():
-
+    """
+        Draw the ranking chart with a monthly evolution.
+    """
     now = datetime.now()
     if now.month-5 != 0:
         date = now.replace(month=now.month-5)
@@ -240,7 +246,10 @@ def allowed_file(filename):
 
 
 def compute_ranking():
-    """ To be completed"""
+    """
+        This method return a list of users with theirs attributes score
+        according to the matchs in the database.
+    """
 
     users = User.query.all()
     for user in users:
@@ -253,12 +262,14 @@ def compute_ranking():
         elo(match.player11, match.player12, match.player21, match.player22,
             match.score_e1, match.score_e2)
 
-    # users = User.query.all()
-
     return users
 
 
 def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
+    """
+        This method update the ranking of each players in parameters
+        with the socre of the match.
+    """
     # Create fictive player1
     if my_friend is None:
         elo1 = me.ranking
@@ -317,6 +328,10 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
 
 
 def chooseK(number_of_match, elo):
+    """
+        Choose the coefficient K, to know if the player is a new player
+        or an expert.
+    """
     if(number_of_match < 40):
         return 40
     elif(elo < 2400):
@@ -326,6 +341,7 @@ def chooseK(number_of_match, elo):
 
 
 def chooseG(score_e1, score_e2):
+    """ Choose the correct G (goal difference) coefficient. """
     diff = abs(score_e1 - score_e2)
     if(diff < 2):
         G = 1
@@ -339,10 +355,12 @@ def chooseG(score_e1, score_e2):
 
 
 def chooseW(score_e1, score_e2):
+    """ Choose W coefficient. (Winner or not)"""
     return 1 if score_e1 > score_e2 else 0
 
 
 def p(i):
+    """ Helper method for elo scoring."""
     return 1/(1+10**(-i/400))
 
 
@@ -396,6 +414,9 @@ def generate_tournament(participants):
 
 
 def all_pairs(lst):
+    """
+        Give all pairs possible with the list.
+    """
     if len(lst) < 2:
         yield lst
         return
