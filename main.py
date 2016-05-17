@@ -1,13 +1,24 @@
 # all the imports
-from flask import request, render_template
+from flask import request, render_template, redirect
 from PIL import Image
 from resizeimage import resizeimage
 from datetime import datetime
 from Model import User, Match
 from database import db, app, ALLOWED_EXTENSIONS
+
 from sqlalchemy import func, or_
 import pygal
 from pygal.style import DarkSolarizedStyle
+
+import math
+from sqlalchemy.sql.expression import func
+from itertools import groupby
+from operator import itemgetter
+from copy import deepcopy
+
+
+
+player_tournament = 2
 
 @app.route('/')
 def matchs():
@@ -34,18 +45,44 @@ def ranking():
                              key = lambda user: -user.ranking)
     return render_template('ranking.html', users = ordered_ranking)
 
+@app.route('/addOneTournament')
+def addOneTournament():
+    global player_tournament
+    player_tournament += 1
+    #~ return render_template('tournament.html', users = users, nb_select = player_tournament)
+    return redirect('/tournament')
+        
+@app.route('/tournament', methods=['GET','POST'])
+def tournament():
+    users = compute_ranking()
+    if request.method == 'POST':
+        players = []
+        for i in range(player_tournament):
+            idp = 'id_player'+str(i+1)
+            id_player = request.form[idp]
+            user = User.query.filter_by(id_user=id_player).first()
+            players.append(user)
+    
+        tournament = generate_tournament(players)
+        
+        return render_template('tournament.html', users = users, nb_select = player_tournament, tournament = tournament)
+    return render_template('tournament.html', users = users, nb_select = player_tournament)
 
 @app.route('/ranking_graph')
 def ranking_graph():
-    
-    users = User.query.all()
+
+    now = datetime.now()
+    new_month = (now.month-5)%12 if now.month-5 != 0 else 12
+    date = now.replace(month = new_month)
+    date_score = get_ranking_at_timet(new_month)
     
     title = 'Daily Ranking Evolution'
     line_chart = pygal.Line(title = title, fill = True)
-    line_chart.x_labels = map(str, range(2002, 2013))
+    line_chart.x_labels = date_score.keys()
     
-    for user in users:
-        line_chart.add(user.surname, [None, None,    0, 16.6,   25,   31, 36.4, 45.5, 46.3, 42.8, 37.1])
+    for date, users in date_score.items():
+        for user in users:
+            
     
     return render_template('ranking_graph.html', line_chart = line_chart)
     
@@ -207,7 +244,7 @@ def compute_ranking():
         elo(match.player11, match.player12, match.player21, match.player22,
             match.score_e1, match.score_e2)
 
-    users = User.query.all()
+    #~ users = User.query.all()
 
     return users
 
@@ -298,8 +335,103 @@ def chooseW(score_e1, score_e2):
 
 def p(i):
     return 1/(1+10**(-i/400))
+   
+def generate_tournament(participants):
+    number_of_participants = len(participants)
+    if(number_of_participants%2 != 0):
+        raise Exception("You must be a power of 2 !")
+                
+    #get the list of all players
+    players = participants
+    
+    # ordered the list of all players
+    players = sorted(players, key=lambda player: player.ranking)  
+    
+    # create the team
+    teams = [(players[i], players[len(players)-1-i]) 
+                for i in range(math.floor(len(players)/2))]    
+        
+    # ordered the team
+    teams = sorted(teams, key=lambda team: (team[0].ranking+team[1].ranking)/2)
+    
+    index = 1
+    for team in teams:
+        index += 1
 
+    tournament_head = []
+    tournament_queue = []
+    first = True
+    # create the tournament to make distance between contenders
+    for i in range(math.floor(len(teams)/2)):
+        if(first):
+            tournament_head.append(((teams[i]),teams[len(teams)-1-i]))
+        else:
+            tournament_queue.insert(0,((teams[i]),teams[len(teams)-1-i]))
+        first = not first
+        
+    tournament = tournament_head + tournament_queue
+    print("TOURNAMENT")
+    for (team1, team2) in tournament:
+        print(team1[0].name, team1[0].ranking)
+        print(team1[1].name, team1[1].ranking)
+        print((team1[0].ranking+team1[1].ranking)/2)        
+        print(team2[0].name, team2[0].ranking)
+        print(team2[1].name, team2[1].ranking)
+        print((team2[0].ranking+team2[1].ranking)/2)        
+        print()
+    return tournament
 
+        
+def all_pairs(lst):
+    if len(lst) < 2:
+        yield lst
+        return
+    a = lst[0]
+    for i in range(1,len(lst)):
+        pair = (a,lst[i])
+        for rest in all_pairs(lst[1:i]+lst[i+1:]):
+            yield [pair] + rest
+    
+def build_avg_temp(pairs, participants):
+    s = []
+    for pair in pairs:
+        temp_avg = (participants[pair[0]].ranking+participants[pair[1]].ranking)/2
+        s.append(temp_avg)
+    return s
+     
+def get_ranking_at_timet(date):
+    
+    date_score = {}
+    
+    # Compute the elo at time date
+    users = User.query.all()
+    for user in users:
+        user.set_ranking(1000)
+        user.set_number_of_matchs()
+
+    matchs = Match.query.filter(Match.date < date).all()
+
+    for match in matchs:
+        elo(match.player11, match.player12, match.player21, match.player22,
+            match.score_e1, match.score_e2)
+    
+    date_score[date] = deepcopy(users)
+
+    # Get the match per month
+    matchs = Match.query.filter(Match.date >= date).all()
+        
+    groups_match = groupby(matchs, key=lambda x: x.date.timetuple().tm_mon)
+    
+    for month, match_per_month in groups_match:
+        date = date.replace(month=(date.month+1) if date.month<12 else 1)
+        for match in match_per_month:
+            elo(match.player11, match.player12, match.player21, match.player22,
+                match.score_e1, match.score_e2)
+        date_score[date] = deepcopy(users)
+        
+    return date_score
+
+    
 def init_db():
     db.create_all()
 
