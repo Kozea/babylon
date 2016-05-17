@@ -48,22 +48,11 @@ class User(db.Model):
         self.number_of_match = 0
         self.nb_victories = 0
         self.nb_defeats = 0
+        self.ratio_gauge = None
 
     def get_full_name(self):
         """ Return the full name of a user"""
         return self.surname+" "+self.name
-
-    def get_name(self):
-        """ Return the name of a user"""
-        return self.name
-
-    def get_photo(self):
-        """ Return the photo of a user"""
-        return self.photo
-
-    def get_nickname(self):
-        """ Return the nickname of a user"""
-        return self.nickname
 
     def set_ranking(self, ranking):
         """ Set the ranking of a user"""
@@ -72,21 +61,4 @@ class User(db.Model):
     def set_number_of_matchs(self):
         """ Init the number of match."""
         self.number_of_match = 0
-
-    def get_number_of_matchs(self):
-        """ Init the number of match."""
-        return self.number_of_match 
-        
-    def get_ranking(self):
-        """ Return the ranking of a user"""
-        return self.ranking
-        
-    def get_nb_victories(self):
-        """ Return the ranking of a user"""
-        return self.nb_victories
-        
-    def get_nb_defeats(self):
-        """ Return the ranking of a user"""
-        return self.nb_defeats
-        
-        
+ 
