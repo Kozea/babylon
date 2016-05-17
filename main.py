@@ -268,7 +268,11 @@ def compute_ranking():
 def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
     """
         This method update the ranking of each players in parameters
-        with the socre of the match.
+        with the socre of the match with the following formula :
+
+        Rn = Ro + KG(W-We)
+
+        @link : https://fr.wikipedia.org/wiki/Classement_mondial_de_football_Elo
     """
     # Create fictive player1
     if my_friend is None:
