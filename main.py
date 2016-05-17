@@ -9,6 +9,7 @@ from itertools import groupby
 from copy import deepcopy
 from collections import OrderedDict
 from flask_sqlalchemy import SQLAlchemy
+import urllib, hashlib
 
 
 # configuration
@@ -59,7 +60,7 @@ class User(db.Model):
     surname = db.Column(db.String(100))
     name = db.Column(db.String(100))
     nickname = db.Column(db.String(100), unique=True)
-    photo = db.Column(db.String(200))
+    photo = db.Column(db.String(400))
 
     def __init__(self, surname, name, nickname, photo):
         self.surname = surname
@@ -131,6 +132,12 @@ def ranking():
     return render_template('ranking.html', users=ordered_ranking)
 
 
+def get_gravatar_url(email):
+    # construct the url
+    gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(photo.lower()).hexdigest() + "?"
+    gravatar_url += urllib.parse.urlencode({'d':default, 's':str(size)})
+    return gravatar_url
+    
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
     """
@@ -266,21 +273,11 @@ def add_player():
         name = request.form['name']
         nickname = request.form['nickname']
 
-        filename = ""
         # Get user photo and work on it
-        photo = request.files['photo']
-        if photo and allowed_file(photo.filename):
-            nickname = nickname.replace(" ", "")
-            nickname = nickname.replace("/", "")
-            nickname = nickname.replace("\\", "")
-            filename = (
-                app.config['UPLOAD_FOLDER'] + "/" +
-                nickname + get_extension_file(photo.filename))
-            photo.save(filename)
-            with open(filename, 'r+b') as f:
-                with Image.open(f) as image:
-                    cover = resizeimage.resize_contain(image, [200, 100])
-                    cover.save(filename, image.format)
+        photo = request.form['photo']
+        photo = photo.encode('utf-8')
+        default = "http://www.corsaire-editions.com/pub/fond-ecran-chaton.jpg"
+        size = 40   
 
         # If some field are empty
         if surname == "" or name == "" or nickname == "":
@@ -294,7 +291,7 @@ def add_player():
                 error = "This nickname is already used !"
             else:
                 # Add the new user to the database
-                new_user = User(surname, name, nickname, filename)
+                new_user = User(surname, name, nickname, photo)
 
                 db.session.add(new_user)
                 db.session.commit()
