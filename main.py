@@ -89,7 +89,7 @@ def ranking_graph():
     date_score = get_ranking_at_timet(date)
     date_score = OrderedDict(sorted(date_score.items(), key=lambda t: t[0]))
     title = 'Monthly Ranking Evolution'
-    line_chart = pygal.Line(title=title, fill=True)
+    line_chart = pygal.Line(title=title)
     line_chart.x_labels = [str(date)[0:7] for date in date_score.keys()]
 
     users_base = User.query.all()
