@@ -92,20 +92,11 @@ def ranking_graph():
     
     users_base = User.query.all()
     
-    for k,v in date_score.items():
-        print(k)
-        for u in v:
-            print(u)
-    
     for user_base in users_base:
-        print('1')
         user_array = []
         for date, users in date_score.items():
-            print('2')
             for user in users:
-                print('3')
                 if(user.id_user == user_base.id_user):
-                    print('4')
                     user_array.append(user.ranking)
         line_chart.add(user_base.nickname, user_array)
 
@@ -426,7 +417,6 @@ def build_avg_temp(pairs, participants):
      
 def get_ranking_at_timet(date):
     
-    print("DATE DEPART ",date)
     date_score = {}
     
     # Compute the elo at time date
@@ -445,24 +435,18 @@ def get_ranking_at_timet(date):
 
     # Get the match per month
     matchs = Match.query.filter(Match.date >= date).all()
-    for match in matchs:
-        print(match.date.timetuple().tm_mon)
         
     groups_match = groupby(matchs, key=lambda x: x.date.timetuple().tm_mon)
     
     
     for month, match_per_month in groups_match:
         if(date.month > month):
-            print("MONTH")
             date = date.replace(year = date.year+1)
         date = date.replace(month = month)
-        print(date)
         for match in match_per_month:
-            print("j")
             elo(match.player11, match.player12, match.player21, match.player22,
                 match.score_e1, match.score_e2)
         date_score[date] = deepcopy(users)
-    print('FIN')
     return date_score
 
 @app.route('/coucou')
