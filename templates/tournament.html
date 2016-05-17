@@ -1,3 +1,5 @@
+{% extends "layout.html" %}
+{% block body %} 
 
 <form action="{{ url_for('tournament') }}" method=post class=add-entry>
     
@@ -8,11 +10,13 @@
     {% endfor %}
     </select>
     {% endfor %}
-    <a href="/addOneTournament">Add a player</a>
+    <a href="{{ url_for('addOneTournament') }}">Add a player</a>
     
     <input type=submit value='Create Tournament'>
     
-    <ul>
+</form>
+
+<ul>
     {% for (team1,team2) in tournament %}
     <li>
     <ul>
@@ -48,6 +52,6 @@
     </ul>
     </li>
     {% endfor %}
-    </ul>
+</ul>
 
-</form>
+{% endblock %}

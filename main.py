@@ -1,5 +1,5 @@
 # all the imports
-from flask import request, render_template, redirect
+from flask import request, render_template, redirect, url_for
 from PIL import Image
 from resizeimage import resizeimage
 from datetime import datetime
@@ -64,7 +64,8 @@ def addOneTournament():
     """ Add one player for the tournament view."""
     global player_tournament
     player_tournament += 1
-    return redirect('/tournament')
+    return redirect(url_for("tournament"))
+    
 
 
 @app.route('/tournament', methods=['GET', 'POST'])

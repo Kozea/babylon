@@ -49,13 +49,12 @@
                         Defeats
                     {% endif %}
                 </h4>
-                
-                
                 <h4>
                     Ratio : {{(user.nb_victories/user.number_of_match)*100}} %
                 </h4>
-                
+                <svg>
                 {{ user.ratio_gauge.render()|safe }}
+                </svg>
                 {% else %}
                 <h4>
                     Hasn't played yet

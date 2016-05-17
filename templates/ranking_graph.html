@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
- 
-    {{ line_chart.render()|safe }}
 
+    <svg>
+    {{ line_chart.render()|safe }}
+    </svg>
 {% endblock %}
