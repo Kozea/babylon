@@ -61,4 +61,3 @@ class User(db.Model):
     def set_number_of_matchs(self):
         """ Init the number of match."""
         self.number_of_match = 0
- 
