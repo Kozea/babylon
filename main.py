@@ -131,14 +131,6 @@ def ranking():
     return render_template('ranking.html', users=ordered_ranking)
 
 
-@app.route('/add_one_tournament')
-def add_one_tournament():
-    """ Add one player for the tournament view."""
-    global player_tournament
-    player_tournament += 1
-    return redirect(url_for("tournament"))
-
-
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
     """
@@ -147,20 +139,16 @@ def tournament():
     users = compute_ranking()
     if request.method == 'POST':
         players = []
-        for i in range(player_tournament):
-            idp = 'id_player'+str(i+1)
-            id_player = request.form[idp]
-            user = User.query.filter_by(id_user=id_player).first()
-            players.append(user)
-
+        ids_player = request.form.getlist('selectionField')
+        for id_player in ids_player:
+            players.append(users[int(id_player)])
         tournament = generate_tournament(players)
 
         return render_template(
-            'tournament.html', users=users, nb_select=player_tournament,
-            tournament=tournament)
+            'tournament.html', users=users, tournament=tournament)
 
     return render_template(
-        'tournament.html', users=users, nb_select=player_tournament)
+        'tournament.html', users=users)
 
 
 @app.route('/ranking_graph')

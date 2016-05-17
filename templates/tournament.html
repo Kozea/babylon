@@ -3,15 +3,11 @@
 
 <form action="{{ url_for('tournament') }}" method=post class=add-entry>
     
-    {% for i in range(nb_select) %}      
-     <select name=id_player{{loop.index}}>
+    <select size={{users|length}} name="selectionField" multiple="yes" >
     {% for user in users %}
-        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
+      <option value={{user.id_user}} >{{user.get_full_name()}}</option>
     {% endfor %}
-    </select>
-    {% endfor %}
-    <a href="{{ url_for('add_one_tournament') }}">Add a player</a>
-    
+    </select>    
     <input type=submit value='Create Tournament'>
     
 </form>
