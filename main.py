@@ -15,7 +15,7 @@ from sqlalchemy.sql.expression import func
 from itertools import groupby
 from operator import itemgetter
 from copy import deepcopy
-
+from collections import OrderedDict
 
 
 player_tournament = 2
@@ -72,17 +72,34 @@ def tournament():
 def ranking_graph():
 
     now = datetime.now()
-    new_month = (now.month-5)%12 if now.month-5 != 0 else 12
-    date = now.replace(month = new_month)
-    date_score = get_ranking_at_timet(new_month)
-    
-    title = 'Daily Ranking Evolution'
+    if(now.month-5 != 0):
+        date = now.replace(month = now.month-5)
+    else:
+        date = now.replace(month =12).replace(year = now.year-1)
+    date_score = get_ranking_at_timet(date)
+    date_score = OrderedDict(sorted(date_score.items(), key=lambda t: t[0]))
+    title = 'Monthly Ranking Evolution'
     line_chart = pygal.Line(title = title, fill = True)
-    line_chart.x_labels = date_score.keys()
+    line_chart.x_labels = [ str(date)[0:7] for date in date_score.keys() ]
     
-    for date, users in date_score.items():
-        for user in users:
-            
+    users_base = User.query.all()
+    
+    for k,v in date_score.items():
+        print(k)
+        for u in v:
+            print(u)
+    
+    for user_base in users_base:
+        print('1')
+        user_array = []
+        for date, users in date_score.items():
+            print('2')
+            for user in users:
+                print('3')
+                if(user.id_user == user_base.id_user):
+                    print('4')
+                    user_array.append(user.ranking)
+        line_chart.add(user_base.nickname, user_array)
     
     return render_template('ranking_graph.html', line_chart = line_chart)
     
@@ -401,6 +418,7 @@ def build_avg_temp(pairs, participants):
      
 def get_ranking_at_timet(date):
     
+    print("DATE DEPART ",date)
     date_score = {}
     
     # Compute the elo at time date
@@ -419,18 +437,31 @@ def get_ranking_at_timet(date):
 
     # Get the match per month
     matchs = Match.query.filter(Match.date >= date).all()
+    for match in matchs:
+        print(match.date.timetuple().tm_mon)
         
     groups_match = groupby(matchs, key=lambda x: x.date.timetuple().tm_mon)
     
+    
     for month, match_per_month in groups_match:
-        date = date.replace(month=(date.month+1) if date.month<12 else 1)
+        if(date.month > month):
+            print("MONTH")
+            date = date.replace(year = date.year+1)
+        date = date.replace(month = month)
+        print(date)
         for match in match_per_month:
+            print("j")
             elo(match.player11, match.player12, match.player21, match.player22,
                 match.score_e1, match.score_e2)
         date_score[date] = deepcopy(users)
-        
+    print('FIN')
     return date_score
 
+@app.route('/coucou')
+def coucou():
+    date = datetime.now()
+    get_ranking_at_timet(date)
+    return "j"
     
 def init_db():
     db.create_all()
