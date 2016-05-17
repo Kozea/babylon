@@ -427,15 +427,6 @@ def generate_tournament(participants):
         first = not first
 
     tournament = tournament_head + tournament_queue
-    print("TOURNAMENT")
-    for (team1, team2) in tournament:
-        print(team1[0].name, team1[0].ranking)
-        print(team1[1].name, team1[1].ranking)
-        print((team1[0].ranking+team1[1].ranking)/2)
-        print(team2[0].name, team2[0].ranking)
-        print(team2[1].name, team2[1].ranking)
-        print((team2[0].ranking+team2[1].ranking)/2)
-        print()
     return tournament
 
 
