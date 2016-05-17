@@ -1,16 +1,88 @@
 # all the imports
-from flask import request, render_template, redirect, url_for
+from flask import request, render_template, redirect, url_for, Flask
 from PIL import Image
 from resizeimage import resizeimage
 from datetime import datetime
-from Model import User, Match
-from database import db, app, ALLOWED_EXTENSIONS
 import pygal
 import math
 from itertools import groupby
 from copy import deepcopy
 from collections import OrderedDict
+from flask_sqlalchemy import SQLAlchemy
 
+
+# configuration
+DATABASE = '/tmp/babylone.db'
+DEBUG = True
+SECRET_KEY = 'development key'
+UPLOAD_FOLDER = './static/image_flask'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+# create our little application :)
+app = Flask(__name__)
+app.config.from_object(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/babylone.db'
+db = SQLAlchemy(app)
+
+
+class Match(db.Model):
+    """This class represents a match in database."""
+    id_match = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime)
+    score_e1 = db.Column(db.Integer)
+    score_e2 = db.Column(db.Integer)
+    player11_id = db.Column(db.Integer, db.ForeignKey('user.id_user'))
+    player11 = db.relationship('User', foreign_keys=[player11_id])
+    player12_id = db.Column(db.Integer, db.ForeignKey('user.id_user'))
+    player12 = db.relationship('User', foreign_keys=[player12_id])
+    player21_id = db.Column(db.Integer, db.ForeignKey('user.id_user'))
+    player21 = db.relationship('User', foreign_keys=[player21_id])
+    player22_id = db.Column(db.Integer, db.ForeignKey('user.id_user'))
+    player22 = db.relationship('User', foreign_keys=[player22_id])
+
+    def __init__(self, date, score_e1, score_e2, player11,
+                 player12, player21, player22):
+
+        self.date = date
+        self.score_e1 = score_e1
+        self.score_e2 = score_e2
+        self.player11 = player11
+        self.player12 = player12
+        self.player21 = player21
+        self.player22 = player22
+
+
+class User(db.Model):
+    """ This class represent a user in data with some others attributes."""
+    id_user = db.Column(db.Integer, primary_key=True)
+    surname = db.Column(db.String(100))
+    name = db.Column(db.String(100))
+    nickname = db.Column(db.String(100), unique=True)
+    photo = db.Column(db.String(200))
+
+    def __init__(self, surname, name, nickname, photo):
+        self.surname = surname
+        self.name = name
+        self.nickname = nickname
+        self.photo = photo
+        self.ranking = -1
+        self.number_of_match = 0
+        self.nb_victories = 0
+        self.nb_defeats = 0
+        self.ratio_gauge = None
+
+    def get_full_name(self):
+        """ Return the full name of a user"""
+        return self.surname+" "+self.name
+
+    def set_ranking(self, ranking):
+        """ Set the ranking of a user"""
+        self.ranking = ranking
+
+    def set_number_of_matchs(self):
+        """ Init the number of match."""
+        self.number_of_match = 0
 
 player_tournament = 2
 
@@ -59,8 +131,8 @@ def ranking():
     return render_template('ranking.html', users=ordered_ranking)
 
 
-@app.route('/addOneTournament')
-def addOneTournament():
+@app.route('/add_one_tournament')
+def add_one_tournament():
     """ Add one player for the tournament view."""
     global player_tournament
     player_tournament += 1
@@ -173,7 +245,7 @@ def new_match():
     elif not score_e2:
         error = 'Add a score for Team 2'
 
-    elif not(score_e1.isdigit()) or not(score_e2.isdigit()):
+    elif not score_e1.isdigit() or not score_e2.isdigit():
         error = 'Please give integer values for score !'
 
     else:
@@ -223,14 +295,14 @@ def add_player():
                     cover.save(filename, image.format)
 
         # If some field are empty
-        if(surname == "" or name == "" or nickname == ""):
+        if surname == "" or name == "" or nickname == "":
             error = "Some fields are empty !"
 
         else:
             # Check if user already exists
             cur = User.query.filter_by(
                 nickname=request.form['nickname']).first()
-            if(cur):
+            if cur:
                 error = "This nickname is already used !"
             else:
                 # Add the new user to the database
@@ -312,16 +384,16 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
 
     # Score for player1
     We1 = p(my_score-opponent_score)
-    K = chooseK(number_match1, elo1)
-    G = chooseG(my_score, opponent_score)
-    W = chooseW(my_score, opponent_score)
+    K = choose_k(number_match1, elo1)
+    G = choose_g(my_score, opponent_score)
+    W = choose_w(my_score, opponent_score)
     score_p1 = K*G*(W-We1)
 
     # Score for player2
     We2 = 1 - We1
-    K = chooseK(number_match2, elo2)
-    G = chooseG(opponent_score, my_score)
-    W = chooseW(opponent_score, my_score)
+    K = choose_k(number_match2, elo2)
+    G = choose_g(opponent_score, my_score)
+    W = choose_w(opponent_score, my_score)
     score_p2 = K*G*(W-We2)
 
     # Get points to real users
@@ -338,7 +410,7 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
             int(round((my_friend.ranking/sum_ranking)*score_p1, 0)))
         my_friend.number_of_match += 1
 
-    if(my_ennemy2 is None):
+    if my_ennemy2 is None:
         my_ennemy1.ranking += int(round((score_p2), 0))
         my_ennemy1.number_of_match += 1
     else:
@@ -353,34 +425,34 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
         my_ennemy2.number_of_match += 1
 
 
-def chooseK(number_of_match, elo):
+def choose_k(number_of_match, elo):
     """
         Choose the coefficient K, to know if the player is a new player
         or an expert.
     """
-    if(number_of_match < 40):
+    if number_of_match < 40:
         return 40
-    elif(elo < 2400):
+    elif elo < 2400:
         return 20
     else:
         return 10
 
 
-def chooseG(score_e1, score_e2):
+def choose_g(score_e1, score_e2):
     """ Choose the correct G (goal difference) coefficient. """
     diff = abs(score_e1 - score_e2)
-    if(diff < 2):
+    if diff < 2:
         G = 1
-    elif(diff == 2):
+    elif diff == 2:
         G = 1+1/2
-    elif(diff == 3):
+    elif diff == 3:
         G = 1+3/4
     else:
         G = 1+3/4+(diff-3)/8
     return G
 
 
-def chooseW(score_e1, score_e2):
+def choose_w(score_e1, score_e2):
     """ Choose W coefficient. (Winner or not)"""
     return 1 if score_e1 > score_e2 else 0
 
@@ -395,7 +467,7 @@ def generate_tournament(participants):
         Create a tournament with the participants given in parameter.
     """
     number_of_participants = len(participants)
-    if(number_of_participants % 2 != 0):
+    if number_of_participants % 2 != 0:
         raise Exception("You must be a power of 2 !")
 
     # get the list of all players
@@ -420,7 +492,7 @@ def generate_tournament(participants):
     first = True
     # create the tournament to make distance between contenders
     for i in range(math.floor(len(teams)/2)):
-        if(first):
+        if first:
             tournament_head.append(((teams[i]), teams[len(teams)-1-i]))
         else:
             tournament_queue.insert(0, ((teams[i]), teams[len(teams)-1-i]))
@@ -484,7 +556,7 @@ def get_ranking_at_timet(date):
     groups_match = groupby(matchs, key=lambda x: x.date.timetuple().tm_mon)
 
     for month, match_per_month in groups_match:
-        if(date.month > month):
+        if date.month > month:
             date = date.replace(year=date.year+1)
         date = date.replace(month=month)
         for match in match_per_month:
