@@ -65,7 +65,6 @@ def addOneTournament():
     global player_tournament
     player_tournament += 1
     return redirect(url_for("tournament"))
-    
 
 
 @app.route('/tournament', methods=['GET', 'POST'])
