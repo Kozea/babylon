@@ -48,6 +48,7 @@ class User(db.Model):
         self.number_of_match = 0
         self.nb_victories = 0
         self.nb_defeats = 0
+        self.ratio_gauge = None
 
     def get_full_name(self):
         """ Return the full name of a user"""

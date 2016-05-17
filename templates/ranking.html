@@ -53,6 +53,7 @@
                     Ratio : {{(user.get_nb_victories()/user.get_number_of_matchs())*100}} %
                 </h4>
                 
+                {{ user.ratio_gauge.render()|safe }}
                 {% else %}
                 <h4>
                     Hasn't played yet
