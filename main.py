@@ -86,7 +86,9 @@ def tournament():
         return render_template(
             'tournament.html', users=users, nb_select=player_tournament,
             tournament=tournament)
-    return render_template('tournament.html', users=users, nb_select=player_tournament)
+
+    return render_template(
+        'tournament.html', users=users, nb_select=player_tournament)
 
 
 @app.route('/ranking_graph')
@@ -211,7 +213,9 @@ def add_player():
             nickname = nickname.replace(" ", "")
             nickname = nickname.replace("/", "")
             nickname = nickname.replace("\\", "")
-            filename = app.config['UPLOAD_FOLDER']+"/"+nickname+get_extension_file(photo.filename)
+            filename = (
+                app.config['UPLOAD_FOLDER'] + "/" +
+                nickname + get_extension_file(photo.filename))
             photo.save(filename)
             with open(filename, 'r+b') as f:
                 with Image.open(f) as image:
@@ -224,7 +228,8 @@ def add_player():
 
         else:
             # Check if user already exists
-            cur = User.query.filter_by(nickname=request.form['nickname']).first()
+            cur = User.query.filter_by(
+                nickname=request.form['nickname']).first()
             if(cur):
                 error = "This nickname is already used !"
             else:
@@ -285,7 +290,8 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
 
         Rn = Ro + KG(W-We)
 
-        @link : https://fr.wikipedia.org/wiki/Classement_mondial_de_football_Elo
+        @link : https://fr.wikipedia.org
+                /wiki/Classement_mondial_de_football_Elo
     """
     # Create fictive player1
     if my_friend is None:
@@ -328,7 +334,8 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
         me.ranking += int(round((me.ranking/sum_ranking)*score_p1, 0))
         me.number_of_match += 1
         # update my friend score
-        my_friend.ranking += int(round((my_friend.ranking/sum_ranking)*score_p1, 0))
+        my_friend.ranking += (
+            int(round((my_friend.ranking/sum_ranking)*score_p1, 0)))
         my_friend.number_of_match += 1
 
     if(my_ennemy2 is None):
@@ -337,10 +344,12 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
     else:
         sum_ranking = my_ennemy1.ranking+my_ennemy2.ranking
         # update my score
-        my_ennemy1.ranking += int(round((my_ennemy1.ranking/sum_ranking)*score_p2, 0))
+        my_ennemy1.ranking += (
+            int(round((my_ennemy1.ranking/sum_ranking)*score_p2, 0)))
         my_ennemy1.number_of_match += 1
         # update my friend score
-        my_ennemy2.ranking += int(round((my_ennemy2.ranking/sum_ranking)*score_p2, 0))
+        my_ennemy2.ranking += (
+            int(round((my_ennemy2.ranking/sum_ranking)*score_p2, 0)))
         my_ennemy2.number_of_match += 1
 
 
@@ -450,7 +459,8 @@ def build_avg_temp(pairs, participants):
     """
     avg_array = []
     for pair in pairs:
-        temp_avg = (participants[pair[0]].ranking+participants[pair[1]].ranking)/2
+        temp_avg = (
+            (participants[pair[0]].ranking+participants[pair[1]].ranking)/2)
         avg_array.append(temp_avg)
     return avg_array
 
