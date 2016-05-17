@@ -6,6 +6,11 @@ from datetime import datetime
 from Model import User, Match
 from database import db, app, ALLOWED_EXTENSIONS
 import math
+from sqlalchemy.sql.expression import func
+from itertools import groupby
+from operator import itemgetter
+from copy import deepcopy
+
 
 player_tournament = 2
 
@@ -358,6 +363,9 @@ def build_avg_temp(pairs, participants):
     return s
      
 def get_ranking_at_timet(date):
+    
+    date_score = {}
+    
     # Compute the elo at time date
     users = User.query.all()
     for user in users:
@@ -369,13 +377,23 @@ def get_ranking_at_timet(date):
     for match in matchs:
         elo(match.player11, match.player12, match.player21, match.player22,
             match.score_e1, match.score_e2)
-
-    # Get the match per week
-    matchs = Match.query.group_by(Match.date).filter(Match.data >= date)
-    print(matchs)
     
+    date_score[date] = deepcopy(users)
 
-    return users
+    # Get the match per month
+    matchs = Match.query.filter(Match.date >= date).all()
+        
+    groups_match = groupby(matchs, key=lambda x: x.date.timetuple().tm_mon)
+    
+    for month, match_per_month in groups_match:
+        date = date.replace(month=(date.month+1) if date.month<12 else 1)
+        for match in match_per_month:
+            elo(match.player11, match.player12, match.player21, match.player22,
+                match.score_e1, match.score_e2)
+        date_score[date] = deepcopy(users)
+        
+    return date_score
+
     
 def init_db():
     db.create_all()
