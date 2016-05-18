@@ -110,7 +110,7 @@ class MatchCreateForm(Form):
     score_team2 = IntegerField('Score Team 2')
     submit = SubmitField('Validate')
     
-    def fill_selects (self):      
+    def __init__(self, *args, **kwargs):      
         users = User.query.all()
         user_pairs = []
         
@@ -118,12 +118,8 @@ class MatchCreateForm(Form):
             user_tuple = (user.id_user, user.name + ' ' + user.surname)
             user_pairs.append(user_tuple)
             
-        player11 = SelectField('Player 1 Team 1', choices = user_pairs)
-        player12 = SelectField('Player 2 Team 1', choices = user_pairs)
-        player21 = SelectField('Player 1 Team 2', choices = user_pairs)
-        player22 = SelectField('Player 2 Team 2', choices = user_pairs)
-        score_team1 = IntegerField('Score Team 1')
-        score_team2 = IntegerField('Score Team 2')
+        self.player11.kwargs['choices'] = user_pairs
+        Form.__init__(self, *args, **kwargs)
             
             
 player_tournament = 2
@@ -245,7 +241,6 @@ def add_match():
                                 user=True)
                                 
     form = MatchCreateForm(request.form)
-    form.fill_selects()
     error = None
     success = None
 
