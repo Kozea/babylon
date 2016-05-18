@@ -1,4 +1,4 @@
-from main import *
+from run_server import *
 import os
 
 os.remove('/tmp/babylone.db')
