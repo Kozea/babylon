@@ -7,7 +7,7 @@ from itertools import groupby
 from copy import deepcopy
 from collections import OrderedDict
 from flask_sqlalchemy import SQLAlchemy
-from plainform import  *
+from plainform import *
 import urllib
 import hashlib
 
@@ -85,6 +85,7 @@ class User(db.Model):
         """ Init the number of match."""
         self.number_of_match = 0
 
+
 class UserSubscribeForm(Form):
     """This class implements forms for registering new users"""
     surname = StringField('Surname')
@@ -92,54 +93,45 @@ class UserSubscribeForm(Form):
     nickname = StringField('Nickname')
     photo = StringField('Photo')
     submit = SubmitField('Validate')
-    
+
     def validate_name(form, field):
         # Check if user already exists
             cur = User.query.filter_by(nickname=field.data)
             if cur:
-                raise ValidationErr("This user already exists, please choose another nickname")
-    
+                raise ValidationErr("""This user already exists,
+                                    please choose another nickname""")
+
+
 class MatchCreateForm(Form):
     """This class implement forms for creating new matches"""
-      
-    player11 = SelectField('Player 1 Team 1', choices = [])
-    player12 = SelectField('Player 2 Team 1', choices = [])
-    player21 = SelectField('Player 1 Team 2', choices = [])
-    player22 = SelectField('Player 2 Team 2', choices = [])
+
+    player11 = SelectField('Player 1 Team 1', choices=[])
+    player12 = SelectField('Player 2 Team 1', choices=[])
+    player21 = SelectField('Player 1 Team 2', choices=[])
+    player22 = SelectField('Player 2 Team 2', choices=[])
     score_team1 = StringField('Score Team 1')
     score_team2 = StringField('Score Team 2')
     submit = SubmitField('Validate')
-    
-    def __init__(self, *args, **kwargs):      
+
+    def __init__(self, *args, **kwargs):
         users = User.query.all()
         user_pairs = []
-        
+
         for user in users:
             user_tuple = (user.id_user, user.name + ' ' + user.surname)
             user_pairs.append(user_tuple)
-            
+
         self.player11.kwargs['choices'] = user_pairs
         self.player12.kwargs['choices'] = user_pairs
         self.player21.kwargs['choices'] = user_pairs
         self.player22.kwargs['choices'] = user_pairs
         Form.__init__(self, *args, **kwargs)
-            
-            
+
+
 class TournamentForm(Form):
     """ This class implements forms for creating tournament."""
-    players = SelectMultipleField('Players', choices = [])
+    players = SelectMultipleField('Players', choices=[])
     submit = SubmitField('Validate')
-    
-    #~ def __init__(self, *args, **kwargs):      
-        #~ users = User.query.all()
-        #~ user_pairs = []
-        
-        #~ for user in users:
-            #~ user_tuple = (user.id_user, user.name + ' ' + user.surname)
-            #~ user_pairs.append(user_tuple)
-            
-        #~ self.players.kwargs['choices'] = user_pairs
-        #~ Form.__init__(self, *args, **kwargs)
 
 
 @app.route('/')
@@ -199,9 +191,7 @@ def get_gravatar_url(email):
 
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
-    """
-        Called when trying to create a tournament.
-    """
+    """Called when trying to create a tournament."""
 
     form = TournamentForm(request.form)
     users = compute_ranking()
@@ -210,7 +200,7 @@ def tournament():
         user_tuple = (user.id_user, user.name + ' ' + user.surname)
         user_pairs.append(user_tuple)
     form.players.choices = user_pairs
-    
+
     if request.method == 'POST':
         players = []
         for id_player in form.players.data:
@@ -252,56 +242,28 @@ def ranking_graph():
     return render_template('ranking_graph.html', line_chart=line_chart)
 
 
-@app.route('/add_match', methods=['GET','POST'])
+@app.route('/add_match', methods=['GET', 'POST'])
 def add_match():
     """Creates a new match using values given to the add_match form"""
     users = User.query.all()
     if len(users) == 0:
         success = "There are no players yet !"
         return render_template('add_match.html', success=success,
-                                user=True)
-                                
+                               user=True)
+
     form = MatchCreateForm(request.form)
     error = None
     success = None
-
-    #~ # Check if some players are missing
-    #~ if not id_player11:
-        #~ error = 'Add a player 1 to team 1'
-
-    #~ elif not id_player21:
-        #~ error = 'Add a player 1 to team 2'
-
-    #~ # Check if some users appear twice
-    #~ elif ((id_player11 == id_player12) or
-          #~ (id_player11 == id_player21) or
-          #~ (id_player11 == id_player22) or
-          #~ (id_player12 == id_player21) or
-          #~ (id_player12 == id_player22 and (id_player12)) or
-          #~ (id_player21 == id_player22)):
-        #~ error = 'Please select different users'
-
-    #~ elif not score_e1:
-        #~ error = 'Add a score for Team 1'
-
-    #~ elif not score_e2:
-        #~ error = 'Add a score for Team 2'
-
-    #~ elif not score_e1.isdigit() or not score_e2.isdigit():
-        #~ error = 'Please give integer values for score !'
-
-    #~ else:
 
     player11 = User.query.filter_by(id_user=form.player11.data).first()
     player12 = User.query.filter_by(id_user=form.player12.data).first()
     player21 = User.query.filter_by(id_user=form.player21.data).first()
     player22 = User.query.filter_by(id_user=form.player22.data).first()
-    
-    
 
     if request.method == 'POST' and form.validate:
-        match = Match(datetime.now(), form.score_team1.data, form.score_team2.data,
-                      player11, player12, player21, player22)
+        match = Match(datetime.now(), form.score_team1.data,
+                      form.score_team2.data, player11, player12,
+                      player21, player22)
 
         db.session.add(match)
         db.session.commit()
@@ -309,7 +271,7 @@ def add_match():
         success = "Match was successfully added "
 
     return render_template('add_match.html', success=success,
-                               error=error, form=form())
+                           error=error, form=form())
 
 
 @app.route('/add_player', methods=['GET', 'POST'])
@@ -317,9 +279,7 @@ def add_player():
     """Creates a new user using values given in the add_player form"""
 
     form = UserSubscribeForm(request.form)
-    
     if request.method == 'POST' and form.validate:
-        
         new_user = User(form.surname.data, form.name.data, form.nickname.data,
                         form.photo.data)
 
