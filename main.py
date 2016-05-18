@@ -101,25 +101,34 @@ class UserSubscribeForm(Form):
     
 class MatchCreateForm(Form):
     """This class implement forms for creating new matches"""
-    player11 = SelectField('Player 1 Team 1', choices = [])
-    player12 = SelectField('Player 2 Team 1', choices = [])
-    player21 = SelectField('Player 1 Team 2', choices = [])
-    player22 = SelectField('Player 2 Team 2', choices = [])
+    users = User.query.all()
+    user_pairs = []
+    
+    for user in users:
+        user_tuple = (user.id_user, user.name + ' ' + user.surname)
+        user_pairs.append(user_tuple)
+    player11 = SelectField('Player 1 Team 1', choices = user_pairs)
+    player12 = SelectField('Player 2 Team 1', choices = user_pairs)
+    player21 = SelectField('Player 1 Team 2', choices = user_pairs)
+    player22 = SelectField('Player 2 Team 2', choices = user_pairs)
     score_team1 = IntegerField('Score Team 1')
     score_team2 = IntegerField('Score Team 2')
+    submit = SubmitField('Validate')
     
-    def fill_selects(self)  :
-        users = User.query.all()
-        user_pairs = []
+    #~ def __init__(self, request):      
+        #~ users = User.query.all()
+        #~ user_pairs = []
         
-        for user in users:
-            user_tuple = (user.id_user, user.name + ' ' + user.surname)
-            user_pairs.append(user_tuple)
+        #~ for user in users:
+            #~ user_tuple = (user.id_user, user.name + ' ' + user.surname)
+            #~ user_pairs.append(user_tuple)
             
-        self.player11 = SelectField('Player 1 Team 1', choices = user_pairs)
-        self.player12 = SelectField('Player 2 Team 1', choices = user_pairs)
-        self.player21 = SelectField('Player 1 Team 2', choices = user_pairs)
-        self.player22 = SelectField('Player 2 Team 2', choices = user_pairs)
+        #~ self.player11 = SelectField('Player 1 Team 1', choices = user_pairs)
+        #~ self.player12 = SelectField('Player 2 Team 1', choices = user_pairs)
+        #~ self.player21 = SelectField('Player 1 Team 2', choices = user_pairs)
+        #~ self.player22 = SelectField('Player 2 Team 2', choices = user_pairs)
+        #~ score_team1 = IntegerField('Score Team 1')
+        #~ score_team2 = IntegerField('Score Team 2')
             
             
 player_tournament = 2
@@ -241,7 +250,6 @@ def add_match():
                                 user=True)
                                 
     form = MatchCreateForm(request.form)
-    form.fill_selects()
     error = None
     success = None
 
@@ -287,7 +295,7 @@ def add_match():
         success = "Match was successfully added "
 
     return render_template('add_match.html', success=success,
-                            error=error, form=form())
+                               error=error, form=form())
 
 
 @app.route('/add_player', methods=['GET', 'POST'])
