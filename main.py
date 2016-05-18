@@ -1,7 +1,5 @@
 # all the imports
-from flask import request, render_template, redirect, url_for, Flask
-from PIL import Image
-from resizeimage import resizeimage
+from flask import request, render_template, Flask
 from datetime import datetime
 import pygal
 import math
@@ -10,6 +8,8 @@ from copy import deepcopy
 from collections import OrderedDict
 from flask_sqlalchemy import SQLAlchemy
 from plainform import  *
+import urllib
+import hashlib
 
 
 # configuration
@@ -60,7 +60,7 @@ class User(db.Model):
     surname = db.Column(db.String(100))
     name = db.Column(db.String(100))
     nickname = db.Column(db.String(100), unique=True)
-    photo = db.Column(db.String(200))
+    photo = db.Column(db.String(400))
 
     def __init__(self, surname, name, nickname, photo):
         self.surname = surname
@@ -74,11 +74,11 @@ class User(db.Model):
         self.ratio_gauge = None
 
     def get_full_name(self):
-        """ Return the full name of a user"""
+        """ Return the full name of a user."""
         return self.surname+" "+self.name
 
     def set_ranking(self, ranking):
-        """ Set the ranking of a user"""
+        """ Set the ranking of a user."""
         self.ranking = ranking
 
     def set_number_of_matchs(self):
@@ -127,35 +127,32 @@ class MatchCreateForm(Form):
             
 class TournamentForm(Form):
     """ This class implements forms for creating tournament."""
-    players = SelectField('Players', choices = [])
+    players = SelectMultipleField('Players', choices = [])
     submit = SubmitField('Validate')
     
-    def __init__(self, *args, **kwargs):      
-        users = User.query.all()
-        user_pairs = []
+    #~ def __init__(self, *args, **kwargs):      
+        #~ users = User.query.all()
+        #~ user_pairs = []
         
-        for user in users:
-            user_tuple = (user.id_user, user.name + ' ' + user.surname)
-            user_pairs.append(user_tuple)
+        #~ for user in users:
+            #~ user_tuple = (user.id_user, user.name + ' ' + user.surname)
+            #~ user_pairs.append(user_tuple)
             
-        self.players.kwargs['choices'] = user_pairs
-        Form.__init__(self, *args, **kwargs)
-    
+        #~ self.players.kwargs['choices'] = user_pairs
+        #~ Form.__init__(self, *args, **kwargs)
 
 
 @app.route('/')
 def matchs():
-    """Querying for all matchs in the database"""
+    """Querying for all matchs in the database."""
     matchs = Match.query.order_by(-Match.id_match).all()
-    return render_template('match.html', matchs=matchs)
+    return render_template('match.html', matchs=matchs,
+                           get_gravatar_url=get_gravatar_url)
 
 
 @app.route('/ranking')
 def ranking():
-    """
-        Querying for the ranking and reaching informations for
-        the different chart.
-    """
+    """ Querying for the ranking informations for the different chart. """
     unordered_ranking = compute_ranking()
 
     for user in unordered_ranking:
@@ -184,15 +181,20 @@ def ranking():
 
     ordered_ranking = sorted(
         unordered_ranking, key=lambda user: -user.ranking)
-    return render_template('ranking.html', users=ordered_ranking)
+
+    return render_template('ranking.html', users=ordered_ranking,
+                           get_gravatar_url=get_gravatar_url)
 
 
-@app.route('/add_one_tournament')
-def add_one_tournament():
-    """ Add one player for the tournament view."""
-    global player_tournament
-    player_tournament += 1
-    return redirect(url_for("tournament"))
+def get_gravatar_url(email):
+    """Return the gravatar url for the email in parameter."""
+    photo = email
+    default = "http://urlz.fr/3z9I"
+    size = 150
+    gravatar_url = ("http://www.gravatar.com/avatar/" +
+                    hashlib.md5(photo.lower()).hexdigest() + "?")
+    gravatar_url += urllib.parse.urlencode({'d': default, 's': str(size)})
+    return gravatar_url
 
 
 @app.route('/tournament', methods=['GET', 'POST'])
@@ -203,19 +205,21 @@ def tournament():
 
     form = TournamentForm(request.form)
     users = compute_ranking()
+    user_pairs = []
+    for user in users:
+        user_tuple = (user.id_user, user.name + ' ' + user.surname)
+        user_pairs.append(user_tuple)
+    form.players.choices = user_pairs
+    
     if request.method == 'POST':
         players = []
-        for i in range(player_tournament):
-            idp = 'id_player'+str(i+1)
-            id_player = request.form[idp]
-            user = User.query.filter_by(id_user=id_player).first()
-            players.append(user)
-
+        for id_player in form.players.data:
+            players.append(users[int(id_player)-1])
         tournament = generate_tournament(players)
 
         return render_template(
-            'tournament.html', users=users,
-            tournament=tournament, form=form())
+            'tournament.html', users=users, tournament=tournament,
+            get_gravatar_url=get_gravatar_url, form=form())
 
     return render_template(
         'tournament.html', users=users, form=form())
@@ -223,9 +227,7 @@ def tournament():
 
 @app.route('/ranking_graph')
 def ranking_graph():
-    """
-        Draw the ranking chart with a monthly evolution.
-    """
+    """Draw the ranking chart with a monthly evolution."""
     now = datetime.now()
     if now.month-5 != 0:
         date = now.replace(month=now.month-5)
@@ -253,7 +255,6 @@ def ranking_graph():
 @app.route('/add_match', methods=['GET','POST'])
 def add_match():
     """Creates a new match using values given to the add_match form"""
-    
     users = User.query.all()
     if len(users) == 0:
         success = "There are no players yet !"
@@ -330,11 +331,10 @@ def add_player():
 
 
 def get_extension_file(filename):
-    """
-        Return the extension of a file
+    """Return the extension of a file.
 
-        :param filename: The full name of the file
-        :return: The extension of the file
+    Keyword argument:
+    filename -- The full name of the file
     """
 
     index = filename.rfind('.')
@@ -342,16 +342,14 @@ def get_extension_file(filename):
 
 
 def allowed_file(filename):
-    """ Test to know if a file has a correct extension.  """
-
+    """ Test to know if a file has a correct extension. s"""
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
 def compute_ranking():
-    """
-        This method return a list of users with theirs attributes score
-        according to the matchs in the database.
+    """This method return a list of users with theirs attributes score
+    according to the matchs in the database.
     """
 
     users = User.query.all()
@@ -369,15 +367,22 @@ def compute_ranking():
 
 
 def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
-    """
-        This method update the ranking of each players in parameters
-        with the socre of the match with the following formula :
+    """Update the ranking of each players in parameters.
 
-        Rn = Ro + KG(W-We)
+    with the socre of the match with the following formula :
+    Rn = Ro + KG(W-We)
+    @link : https://fr.wikipedia.org
+            /wiki/Classement_mondial_de_football_Elo
 
-        @link : https://fr.wikipedia.org
-                /wiki/Classement_mondial_de_football_Elo
+    Keyword arguments:
+    me -- the user 1 of team 1
+    my_friend -- the user 2 of team1 (perhaps None)
+    my_ennemy1 -- the user 1 of team2
+    my_ennemy2 -- the user 2 of team2 (perhaps None)
+    my_score -- the score of team1
+    opponent_score -- the score of team2
     """
+
     # Create fictive player1
     if my_friend is None:
         elo1 = me.ranking
@@ -439,10 +444,10 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
 
 
 def choose_k(number_of_match, elo):
+    """Choose the coefficient K, to know if the player is a new player
+    or an expert.
     """
-        Choose the coefficient K, to know if the player is a new player
-        or an expert.
-    """
+
     if number_of_match < 40:
         return 40
     elif elo < 2400:
@@ -466,7 +471,7 @@ def choose_g(score_e1, score_e2):
 
 
 def choose_w(score_e1, score_e2):
-    """ Choose W coefficient. (Winner or not)"""
+    """ Choose W coefficient. (Winner or not)."""
     return 1 if score_e1 > score_e2 else 0
 
 
@@ -476,9 +481,7 @@ def p(i):
 
 
 def generate_tournament(participants):
-    """
-        Create a tournament with the participants given in parameter.
-    """
+    """Create a tournament with the participants given in parameter."""
     number_of_participants = len(participants)
     if number_of_participants % 2 != 0:
         raise Exception("You must be a power of 2 !")
@@ -516,9 +519,7 @@ def generate_tournament(participants):
 
 
 def all_pairs(lst):
-    """
-        Give all pairs possible with the list.
-    """
+    """Give all pairs possible with the list."""
     if len(lst) < 2:
         yield lst
         return
@@ -530,9 +531,7 @@ def all_pairs(lst):
 
 
 def build_avg_temp(pairs, participants):
-    """
-        Create a array with the average elo for each team
-    """
+    """Create a array with the average elo for each team."""
     avg_array = []
     for pair in pairs:
         temp_avg = (
@@ -542,11 +541,16 @@ def build_avg_temp(pairs, participants):
 
 
 def get_ranking_at_timet(date):
+    """Generate data for ranking chart.
+
+    This method generate a dict with date as key and list of user
+    as values. Use this method to generate a chart of the ranking
+    evolution.
+
+    Keyword argument:
+    date -- the starting date of the chart
     """
-        This method generate a dict with date as key and list of user
-        as values. Use this method to generate a chart of the ranking
-        evolution.
-    """
+
     date_score = {}
 
     # Compute the elo at time date

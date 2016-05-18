@@ -4,88 +4,50 @@
 <h1>Ranking</h1>
 {% if users %}
 <a href="{{ url_for('ranking_graph')}}">Watch monthly ranking evolution</a>
-{% endif %}
 <table>
+    <thead>
+        <tr>
+            <th>Color</th>
+            <th>Team</th>
+            <th>Elo</th>
+            <th>Victories</th>
+            <th>Defeats</th>
+            <th>Ratio</th>
+        </tr>
+    </thead>
+    <tbody>
+{% endif %}
 {% for user in users %}
-<tr>
-    <th>
-        <figure>
-            <img src={{user.photo}}>
-            <figcaption>
-                
-                <h2>
-                    {{loop.index}}
-                </h2>
-                
-                <h3>
-                    {{user.get_full_name()}}
-                </h3>
-                
-                {% if user.nickname %}
-                <h4>
-                    {{user.nickname}}
-                </h4>
-                {% endif %}
-                
-                {% if user.number_of_match != 0 %}
-                <h4>
-                    {{user.nb_victories}} 
-                    
-                    {% if user.nb_victories==1 %}
-                        Victory
-                    {% else %}
-                        Victories
-                    {% endif %}
-                </h4>
-                
-                
-                <h4>
-                    
-                    {{user.nb_defeats}}
-                    
-                    {% if user.nb_defeats==1 %}
-                        Defeat
-                    {% else %}
-                        Defeats
-                    {% endif %}
-                </h4>
-                <h4>
-                    Ratio : {{(user.nb_victories/user.number_of_match)*100}} %
-                </h4>
-                <svg>
-                {{ user.ratio_gauge.render()|safe }}
-                </svg>
-                {% else %}
-                <h4>
-                    Hasn't played yet
-                </h4>
-                
-                {% endif %}
-                
-            </figcaption>
-        </figure>
-    </th>
-    <th>
-        {{user.ranking}}
-    </th>
-    
-    <th>
-
-    </th>
-    
-    <th>
-
-    </th>
-    
-    <th>
-
-    </th>
-
-        
-</tr>
+        <tr>
+            {% if loop.index<3 %}
+            <td>Green</td>
+            {% elif loop.index>users|length -2 %}
+            <td>Red</td>
+            {% else %}
+            <td>Invisible</td>
+            {% endif %}
+            <td>
+                <img src="{{get_gravatar_url(user.photo)}}">
+                {{user.get_full_name()}}
+            </td>
+            <td>{{user.ranking}}</td>
+            {% if user.number_of_match != 0 %}
+            <td>{{user.nb_victories}}</td>
+            <td>{{user.nb_defeats}}</td>
+            <td>{{(user.nb_victories/user.number_of_match)*100}}
+            <svg>"{{ user.ratio_gauge.render()|safe}}"</svg>
+            </td>
+            {% else %}
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            {% endif %}
+        </tr>
 {% else %}
 There is no scores yet ! 
 {% endfor %}
+    </tbody>
 </table>
 
 {% endblock %}

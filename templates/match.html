@@ -2,26 +2,25 @@
 {% block body %} 
 
 <h1>Matchs</h1>
-<ul>
 {% for match in matchs %}
-<li>
+<section>
     <ul>
         <li>
-            <time>
+            <time datetime ="{{match.date}}">
                 {{match.date}}
             </time>
         </li>
         
         <li>
             <figure>
-                <img src={{match.player11.photo}}>
+                <img src={{get_gravatar_url(match.player11.photo)}}>
                 <figcaption>
                     {{match.player11.get_full_name()}}
                 </figcaption>
             </figure>
             {% if match.player12 %}
             <figure>
-                <img src={{match.player12.photo}}>
+                <img src={{get_gravatar_url(match.player12.photo)}}>
                 <figcaption>
                     {{match.player12.get_full_name()}}
                 </figcaption>
@@ -34,14 +33,14 @@
         
         <li>
             <figure>
-                  <img src={{match.player21.photo}}>
+                  <img src={{get_gravatar_url(match.player21.photo)}}>
                 <figcaption>
                     {{match.player21.get_full_name()}}
                 </figcaption>
             </figure>
             {% if match.player22 %}
             <figure>
-                <img src={{match.player22.photo}}>
+                <img src={{get_gravatar_url(match.player22.photo)}}>
                 <figcaption>
                     {{match.player22.get_full_name()}}
                 </figcaption>
@@ -53,10 +52,9 @@
         </li>
 
     </ul>
-</li>
+</section>
 {% else %}
 There is no matches yet !
 {% endfor %}
-</ul>
 
 {% endblock %}
