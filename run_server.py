@@ -92,22 +92,22 @@ class UserSubscribeForm(Form):
         # Check if user already exists
             cur = User.query.filter_by(nickname=field.data)
             if cur:
-                raise ValidationError("This user already exists, please choose another nickname")
+                raise ValidationError("""This user already exists,
+                                      please choose another nickname""")
     """This class implements forms for registering new users"""
     surname = StringField('Surname', [InputRequired()])
     name = StringField('Name', [InputRequired()])
-    nickname = StringField('Nickname',[InputRequired(),validate_nickname])
+    nickname = StringField('Nickname', [InputRequired(), validate_nickname])
     photo = StringField('Photo')
     submit = SubmitField('Validate')
 
-    
+
 class MatchCreateForm(Form):
     """This class implement forms for creating new matches"""
-      
-    player11 = SelectField('Player 1 Team 1', choices = [])
-    player12 = SelectField('Player 2 Team 1', choices = [])
-    player21 = SelectField('Player 1 Team 2', choices = [])
-    player22 = SelectField('Player 2 Team 2', choices = [])
+    player11 = SelectField('Player 1 Team 1', choices=[])
+    player12 = SelectField('Player 2 Team 1', choices=[])
+    player21 = SelectField('Player 1 Team 2', choices=[])
+    player22 = SelectField('Player 2 Team 2', choices=[])
     score_team1 = StringField('Score Team 1', [InputRequired()])
     score_team2 = StringField('Score Team 2', [InputRequired()])
     submit = SubmitField('Validate')
@@ -191,7 +191,6 @@ def get_gravatar_url(email):
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
     """Called when trying to create a tournament."""
-
     form = TournamentForm(request.form)
     users = compute_ranking()
     user_pairs = []
@@ -276,7 +275,6 @@ def add_match():
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
     """Creates a new user using values given in the add_player form"""
-
     form = UserSubscribeForm(request.form)
     if request.method == 'POST' and form.validate:
         new_user = User(form.surname.data, form.name.data, form.nickname.data,
