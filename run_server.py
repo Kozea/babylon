@@ -14,16 +14,12 @@ import hashlib
 
 
 # configuration
-DATABASE = '/tmp/babylone.db'
 DEBUG = True
 SECRET_KEY = 'development key'
-UPLOAD_FOLDER = './static/image_flask'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 # create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/babylone.db'
 db = SQLAlchemy(app)
 
@@ -45,7 +41,6 @@ class Match(db.Model):
 
     def __init__(self, date, score_e1, score_e2, player11,
                  player12, player21, player22):
-
         self.date = date
         self.score_e1 = score_e1
         self.score_e2 = score_e2
@@ -56,7 +51,7 @@ class Match(db.Model):
 
 
 class User(db.Model):
-    """ This class represent a user in data with some others attributes."""
+    """ This class represent a user in database with some attributes."""
     id_user = db.Column(db.Integer, primary_key=True)
     surname = db.Column(db.String(100))
     name = db.Column(db.String(100))
@@ -88,13 +83,13 @@ class User(db.Model):
 
 
 class UserSubscribeForm(Form):
+    """This class implements forms for registering new users."""
     def validate_nickname(form, field):
         # Check if user already exists
             cur = User.query.filter_by(nickname=field.data)
             if cur:
                 raise ValidationError("""This user already exists,
                                       please choose another nickname""")
-    """This class implements forms for registering new users"""
     surname = StringField('Surname', [InputRequired()])
     name = StringField('Name', [InputRequired()])
     nickname = StringField('Nickname', [InputRequired(), validate_nickname])
@@ -115,11 +110,9 @@ class MatchCreateForm(Form):
     def __init__(self, *args, **kwargs):
         users = User.query.all()
         user_pairs = []
-
         for user in users:
             user_tuple = (user.id_user, user.name + ' ' + user.surname)
             user_pairs.append(user_tuple)
-
         self.player11.kwargs['choices'] = user_pairs
         self.player12.kwargs['choices'] = user_pairs
         self.player21.kwargs['choices'] = user_pairs
@@ -180,6 +173,7 @@ def ranking():
 def get_gravatar_url(email):
     """Return the gravatar url for the email in parameter."""
     photo = email
+    # If there is encoding problem here, it's YOUR fault."
     default = "http://urlz.fr/3z9I"
     size = 150
     gravatar_url = ("http://www.gravatar.com/avatar/" +
@@ -242,7 +236,7 @@ def ranking_graph():
 
 @app.route('/add_match', methods=['GET', 'POST'])
 def add_match():
-    """Creates a new match using values given to the add_match form"""
+    """Creates a new match using values given to the add_match form."""
     users = User.query.all()
     if len(users) == 0:
         success = "There are no players yet !"
@@ -324,7 +318,7 @@ def compute_ranking():
 def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
     """Update the ranking of each players in parameters.
 
-    with the socre of the match with the following formula :
+    with the score of the match according to the following formula :
     Rn = Ro + KG(W-We)
     @link : https://fr.wikipedia.org
             /wiki/Classement_mondial_de_football_Elo
