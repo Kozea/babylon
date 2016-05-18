@@ -8,6 +8,8 @@ from copy import deepcopy
 from collections import OrderedDict
 from flask_sqlalchemy import SQLAlchemy
 from plainform import *
+from wtforms.validators import (
+    InputRequired, ValidationError)
 import urllib
 import hashlib
 
@@ -87,30 +89,28 @@ class User(db.Model):
 
 
 class UserSubscribeForm(Form):
-    """This class implements forms for registering new users"""
-    surname = StringField('Surname')
-    name = StringField('Name')
-    nickname = StringField('Nickname')
-    photo = StringField('Photo')
-    submit = SubmitField('Validate')
-
-    def validate_name(form, field):
+    def validate_nickname(form, field):
         # Check if user already exists
             cur = User.query.filter_by(nickname=field.data)
             if cur:
-                raise ValidationErr("""This user already exists,
-                                    please choose another nickname""")
+                raise ValidationError("This user already exists, please choose another nickname")
+    """This class implements forms for registering new users"""
+    surname = StringField('Surname', [InputRequired()])
+    name = StringField('Name', [InputRequired()])
+    nickname = StringField('Nickname',[InputRequired(),validate_nickname])
+    photo = StringField('Photo')
+    submit = SubmitField('Validate')
 
-
+    
 class MatchCreateForm(Form):
     """This class implement forms for creating new matches"""
-
-    player11 = SelectField('Player 1 Team 1', choices=[])
-    player12 = SelectField('Player 2 Team 1', choices=[])
-    player21 = SelectField('Player 1 Team 2', choices=[])
-    player22 = SelectField('Player 2 Team 2', choices=[])
-    score_team1 = StringField('Score Team 1')
-    score_team2 = StringField('Score Team 2')
+      
+    player11 = SelectField('Player 1 Team 1', choices = [])
+    player12 = SelectField('Player 2 Team 1', choices = [])
+    player21 = SelectField('Player 1 Team 2', choices = [])
+    player22 = SelectField('Player 2 Team 2', choices = [])
+    score_team1 = StringField('Score Team 1', [InputRequired()])
+    score_team2 = StringField('Score Team 2', [InputRequired()])
     submit = SubmitField('Validate')
 
     def __init__(self, *args, **kwargs):
@@ -282,8 +282,6 @@ def add_player():
     if request.method == 'POST' and form.validate:
         new_user = User(form.surname.data, form.name.data, form.nickname.data,
                         form.photo.data)
-
-        form.validate_name(form.nickname)
         db.session.add(new_user)
         db.session.commit()
 
