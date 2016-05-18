@@ -272,7 +272,7 @@ def add_player():
     form = UserSubscribeForm(request.form)
     if request.method == 'POST' and form.validate:
         new_user = User(form.surname.data, form.name.data, form.nickname.data,
-                        form.photo.data)
+                        form.photo.data.encode("utf-8"))
         db.session.add(new_user)
         db.session.commit()
 
