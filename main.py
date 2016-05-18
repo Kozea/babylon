@@ -92,7 +92,8 @@ player_tournament = 2
 def matchs():
     """Querying for all matchs in the database"""
     matchs = Match.query.order_by(-Match.id_match).all()
-    return render_template('match.html', matchs=matchs)
+    return render_template('match.html', matchs=matchs,
+                            get_gravatar_url=get_gravatar_url)
 
 
 @app.route('/ranking')
