@@ -9,6 +9,7 @@ from itertools import groupby
 from copy import deepcopy
 from collections import OrderedDict
 from flask_sqlalchemy import SQLAlchemy
+from plainform import  *
 
 
 # configuration
@@ -83,6 +84,20 @@ class User(db.Model):
     def set_number_of_matchs(self):
         """ Init the number of match."""
         self.number_of_match = 0
+
+class UserSubscribeForm(Form):
+    surname = StringField('Surname', validators = [validators.input_required()])
+    name = StringField('Name', validators = [validators.input_required()])
+    nickname = StringField('Nickname', validators = [validators.input_required()])
+    photo = FileField('Photo', validators = [validators.input_required()])
+    submit = SubmitField('Validate')
+    
+    def validate_name(form, field):
+        # Check if user already exists
+            cur = User.query.filter_by(nickname=field.data)
+            if cur:
+                raise ValidationError("This user already exists, please choose another nickname")
+    
 
 player_tournament = 2
 
