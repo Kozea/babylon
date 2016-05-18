@@ -31,8 +31,10 @@ class Unique(object):
         if not message:
             message = u'this user already exists'
         self.message = message
+        
 
     def __call__(self, form, field):
+        print("BOULET")
         if field.object_data == field.data:
             return
         check = DBSession.query(model).filter(field == data).first()
@@ -97,19 +99,25 @@ class User(db.Model):
         self.number_of_match = 0
        
 class UserSubscribeForm(Form):
-
     """This class implements forms for registering new users"""
+
+    def validate_nickname(form, field):
+        print("HELO")
+        users = User.query.all()
+        for user in users:
+            if user.nickname == field.data:
+                raise ValidationError('Nickname already exists !')
+                
     surname = StringField('Surname', [InputRequired()])
     name = StringField('Name', [InputRequired()])
-    nickname = StringField('Nickname',[InputRequired(), Unique(User.nickname)])
+    nickname = StringField('Nickname',[validate_nickname, InputRequired()])
     photo = StringField('Photo')
     submit = SubmitField('Validate')
 
 
+
 class MatchCreateForm(Form):
-    """This class implement forms for creating new matches"""
-<<<<<<< HEAD:main.py
-    
+    """This class implement forms for creating new matches"""   
     def validate(self):
         if not Form.validate(self):
             return False
@@ -293,9 +301,10 @@ def add_match():
 def add_player():
     """Creates a new user using values given in the add_player form"""
     form = UserSubscribeForm(request.form)
-    if request.method == 'POST' and form.validate:
+    if request.method == 'POST' and form.validate():
         new_user = User(form.surname.data, form.name.data, form.nickname.data,
                         form.photo.data.encode("utf-8"))
+        print("DEBUG", form.nickname.data)
         db.session.add(new_user)
         db.session.commit()
 
