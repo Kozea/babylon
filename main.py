@@ -29,7 +29,22 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/babylone.db'
 db = SQLAlchemy(app)
 
+class Unique(object):
+    """ validator that checks field uniqueness """
+    def __init__(self, model, field, message=None):
+        self.model = model
+        self.field = field
+        if not message:
+            message = u'this user already exists'
+        self.message = message
 
+    def __call__(self, form, field):
+        if field.object_data == field.data:
+            return
+        check = DBSession.query(model).filter(field == data).first()
+        if check:
+            raise ValidationError(self.message)
+            
 class Match(db.Model):
     """This class represents a match in database."""
     id_match = db.Column(db.Integer, primary_key=True)
@@ -88,16 +103,20 @@ class User(db.Model):
         """ Init the number of match."""
         self.number_of_match = 0
 
+
+def validate_nickname(form, field):
+# Check if user already exists
+    cur = User.query.filter_by(nickname=field.data)
+    print ("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP" + field.data)
+    if cur:
+        raise ValidationError("This user already exists, please choose another nickname")
+        
 class UserSubscribeForm(Form):
-    def validate_nickname(form, field):
-    # Check if user already exists
-        cur = User.query.filter_by(nickname=field.data)
-        if cur:
-            raise ValidationError("This user already exists, please choose another nickname")
+
     """This class implements forms for registering new users"""
     surname = StringField('Surname', [InputRequired()])
     name = StringField('Name', [InputRequired()])
-    nickname = StringField('Nickname',[InputRequired(),validate_nickname])
+    nickname = StringField('Nickname',[InputRequired(), Unique(User.nickname)])
     photo = StringField('Photo')
     submit = SubmitField('Validate')
     
@@ -105,11 +124,24 @@ class UserSubscribeForm(Form):
     
 class MatchCreateForm(Form):
     """This class implement forms for creating new matches"""
+    
+    def validate(self):
+        if not Form.validate(self):
+            return False
+        result = True
+        seen = set()
+        for field in [self.player11, self.player12, self.player21, self.player22]:
+            if field.data in seen:
+                field.errors.append('Please select different players')
+                result = False
+            else:
+                seen.add(field.data)
+            return result
       
-    player11 = SelectField('Player 1 Team 1', choices = [])
-    player12 = SelectField('Player 2 Team 1', choices = [])
-    player21 = SelectField('Player 1 Team 2', choices = [])
-    player22 = SelectField('Player 2 Team 2', choices = [])
+    player11 = SelectField('Player 1 Team 1', [validate], choices = [])
+    player12 = SelectField('Player 2 Team 1', [validate], choices = [])
+    player21 = SelectField('Player 1 Team 2', [validate], choices = [])
+    player22 = SelectField('Player 2 Team 2', [validate], choices = [])
     score_team1 = StringField('Score Team 1', [InputRequired()])
     score_team2 = StringField('Score Team 2', [InputRequired()])
     submit = SubmitField('Validate')
@@ -127,6 +159,10 @@ class MatchCreateForm(Form):
         self.player21.kwargs['choices'] = user_pairs
         self.player22.kwargs['choices'] = user_pairs
         Form.__init__(self, *args, **kwargs)
+        
+
+
+            
             
             
 class TournamentForm(Form):
