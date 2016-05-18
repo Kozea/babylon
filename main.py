@@ -106,8 +106,8 @@ class MatchCreateForm(Form):
     player12 = SelectField('Player 2 Team 1', choices = [])
     player21 = SelectField('Player 1 Team 2', choices = [])
     player22 = SelectField('Player 2 Team 2', choices = [])
-    score_team1 = IntegerField('Score Team 1')
-    score_team2 = IntegerField('Score Team 2')
+    score_team1 = StringField('Score Team 1')
+    score_team2 = StringField('Score Team 2')
     submit = SubmitField('Validate')
     
     def __init__(self, *args, **kwargs):      
@@ -119,6 +119,9 @@ class MatchCreateForm(Form):
             user_pairs.append(user_tuple)
             
         self.player11.kwargs['choices'] = user_pairs
+        self.player12.kwargs['choices'] = user_pairs
+        self.player21.kwargs['choices'] = user_pairs
+        self.player22.kwargs['choices'] = user_pairs
         Form.__init__(self, *args, **kwargs)
             
             
@@ -271,14 +274,16 @@ def add_match():
 
     #~ else:
 
-    #~ player11 = User.query.filter_by(id_user=id_player11).first()
-    #~ player12 = User.query.filter_by(id_user=id_player12).first()
-    #~ player21 = User.query.filter_by(id_user=id_player21).first()
-    #~ player22 = User.query.filter_by(id_user=id_player22).first()
+    player11 = User.query.filter_by(id_user=form.player11.data).first()
+    player12 = User.query.filter_by(id_user=form.player12.data).first()
+    player21 = User.query.filter_by(id_user=form.player21.data).first()
+    player22 = User.query.filter_by(id_user=form.player22.data).first()
+    
+    
 
     if request.method == 'POST' and form.validate:
         match = Match(datetime.now(), form.score_team1.data, form.score_team2.data,
-                      form.player11.data, form.player12.data, form.player21.data, form.player22.data)
+                      player11, player12, player21, player22)
 
         db.session.add(match)
         db.session.commit()
