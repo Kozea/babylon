@@ -130,15 +130,18 @@ def ranking():
 
     ordered_ranking = sorted(
         unordered_ranking, key=lambda user: -user.ranking)
+
     return render_template('ranking.html', users=ordered_ranking,
                             get_gravatar_url=get_gravatar_url)
 
 
 def get_gravatar_url(email):
     # construct the url
+    #~ photo = email.encode('utf-8') #TODO DELETE THIS AFTER DEBUG
+    photo = email
     default = "http://urlz.fr/3z9I"
     size = 150   
-    gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(email.lower()).hexdigest() + "?"
+    gravatar_url = "http://www.gravatar.com/avatar/" + hashlib.md5(photo.lower()).hexdigest() + "?"
     gravatar_url += urllib.parse.urlencode({'d':default, 's':str(size)})
     return gravatar_url
     
