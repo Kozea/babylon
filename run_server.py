@@ -101,14 +101,14 @@ class UserSubscribeForm(Form):
     """This class implements forms for registering new users"""
     surname = StringField('Surname', [InputRequired()])
     name = StringField('Name', [InputRequired()])
-    nickname = StringField('Nickname',[InputRequired(), Unique(User.nickname)])
+    nickname = StringField('Nickname',[InputRequired()])
     photo = StringField('Photo')
     submit = SubmitField('Validate')
 
 
 class MatchCreateForm(Form):
     """This class implement forms for creating new matches"""
-<<<<<<< HEAD:main.py
+
     
     def validate(self):
         if not Form.validate(self):

@@ -5,52 +5,76 @@
 {% for match in matchs %}
 <section>
     <ul>
-        <li>
-            <time datetime ="{{match.date}}">
-                {{match.date}}
-            </time>
-        </li>
-        
-        <li>
-            <figure>
-                <img src={{get_gravatar_url(match.player11.photo)}}>
-                <figcaption>
-                    {{match.player11.get_full_name()}}
-                </figcaption>
-            </figure>
-            {% if match.player12 %}
-            <figure>
-                <img src={{get_gravatar_url(match.player12.photo)}}>
-                <figcaption>
-                    {{match.player12.get_full_name()}}
-                </figcaption>
-            </figure>
-            {% endif %}
-            <h3>
-                {{match.score_e1}}
-            </h3>
-        </li>
-        
-        <li>
-            <figure>
-                  <img src={{get_gravatar_url(match.player21.photo)}}>
-                <figcaption>
-                    {{match.player21.get_full_name()}}
-                </figcaption>
-            </figure>
-            {% if match.player22 %}
-            <figure>
-                <img src={{get_gravatar_url(match.player22.photo)}}>
-                <figcaption>
-                    {{match.player22.get_full_name()}}
-                </figcaption>
-            </figure>
-            {% endif %}
-            <h3>
-                {{match.score_e2}}
-            </h3>
-        </li>
-
+        <table>
+            <thead>
+                <h3>
+                    <time datetime ="{{match.date}}">
+                        {{match.date}}
+                    </time>
+                </h3>      
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td>
+                        <figure>
+                            <img src={{get_gravatar_url(match.player11.photo)}}>
+                            <figcaption>
+                                {{match.player11.get_full_name()}}
+                            </figcaption>
+                        </figure>
+                    </td>
+                    
+                    {% if match.player12 %}
+                    <td>
+                        <figure>
+                            <img src={{get_gravatar_url(match.player12.photo)}}>
+                            <figcaption>
+                                {{match.player12.get_full_name()}}
+                            </figcaption>
+                        </figure>
+                    </td>
+                    {% endif %}
+                </tr>
+                
+                <tr>
+                    <td>
+                        {{match.score_e1}}
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <figure>
+                            <img src={{get_gravatar_url(match.player21.photo)}}>
+                            <figcaption>
+                                {{match.player21.get_full_name()}}
+                            </figcaption>
+                        </figure>
+                    </td>
+                    
+                    {% if match.player22 %}
+                    <td>
+                        <figure>
+                            <img src={{get_gravatar_url(match.player22.photo)}}>
+                            <figcaption>
+                                {{match.player22.get_full_name()}}
+                            </figcaption>
+                        </figure>
+                    </td>
+                    {% endif %}
+                </tr>
+                
+                <tr>
+                    <td>
+                        {{match.score_e2}}
+                    </td>
+                </tr>
+                   
+            </tbody>
+               
+        </table>
+            
     </ul>
 </section>
 {% else %}
