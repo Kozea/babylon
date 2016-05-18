@@ -7,25 +7,19 @@ from itertools import groupby
 from copy import deepcopy
 from collections import OrderedDict
 from flask_sqlalchemy import SQLAlchemy
-from plainform import  *
-from wtforms.validators import (
-    InputRequired, ValidationError)
+from plainform import *
+from wtforms.validators import InputRequired, ValidationError
 import urllib
 import hashlib
 
 
-
 # configuration
-DATABASE = '/tmp/babylone.db'
 DEBUG = True
 SECRET_KEY = 'development key'
-UPLOAD_FOLDER = './static/image_flask'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 # create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/babylone.db'
 db = SQLAlchemy(app)
 
@@ -62,7 +56,6 @@ class Match(db.Model):
 
     def __init__(self, date, score_e1, score_e2, player11,
                  player12, player21, player22):
-
         self.date = date
         self.score_e1 = score_e1
         self.score_e2 = score_e2
@@ -73,7 +66,7 @@ class Match(db.Model):
 
 
 class User(db.Model):
-    """ This class represent a user in data with some others attributes."""
+    """ This class represent a user in database with some attributes."""
     id_user = db.Column(db.Integer, primary_key=True)
     surname = db.Column(db.String(100))
     name = db.Column(db.String(100))
@@ -102,15 +95,7 @@ class User(db.Model):
     def set_number_of_matchs(self):
         """ Init the number of match."""
         self.number_of_match = 0
-
-
-def validate_nickname(form, field):
-# Check if user already exists
-    cur = User.query.filter_by(nickname=field.data)
-    print ("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP" + field.data)
-    if cur:
-        raise ValidationError("This user already exists, please choose another nickname")
-        
+       
 class UserSubscribeForm(Form):
 
     """This class implements forms for registering new users"""
@@ -119,11 +104,11 @@ class UserSubscribeForm(Form):
     nickname = StringField('Nickname',[InputRequired(), Unique(User.nickname)])
     photo = StringField('Photo')
     submit = SubmitField('Validate')
-    
 
-    
+
 class MatchCreateForm(Form):
     """This class implement forms for creating new matches"""
+<<<<<<< HEAD:main.py
     
     def validate(self):
         if not Form.validate(self):
@@ -145,41 +130,23 @@ class MatchCreateForm(Form):
     score_team1 = StringField('Score Team 1', [InputRequired()])
     score_team2 = StringField('Score Team 2', [InputRequired()])
     submit = SubmitField('Validate')
-    
-    def __init__(self, *args, **kwargs):      
+
+    def __init__(self, *args, **kwargs):
         users = User.query.all()
         user_pairs = []
-        
         for user in users:
             user_tuple = (user.id_user, user.name + ' ' + user.surname)
             user_pairs.append(user_tuple)
-            
         self.player11.kwargs['choices'] = user_pairs
         self.player12.kwargs['choices'] = user_pairs
         self.player21.kwargs['choices'] = user_pairs
         self.player22.kwargs['choices'] = user_pairs
         Form.__init__(self, *args, **kwargs)
-        
 
-
-            
-            
-            
 class TournamentForm(Form):
     """ This class implements forms for creating tournament."""
-    players = SelectMultipleField('Players', choices = [])
+    players = SelectMultipleField('Players', choices=[])
     submit = SubmitField('Validate')
-    
-    #~ def __init__(self, *args, **kwargs):      
-        #~ users = User.query.all()
-        #~ user_pairs = []
-        
-        #~ for user in users:
-            #~ user_tuple = (user.id_user, user.name + ' ' + user.surname)
-            #~ user_pairs.append(user_tuple)
-            
-        #~ self.players.kwargs['choices'] = user_pairs
-        #~ Form.__init__(self, *args, **kwargs)
 
 
 @app.route('/')
@@ -229,6 +196,7 @@ def ranking():
 def get_gravatar_url(email):
     """Return the gravatar url for the email in parameter."""
     photo = email
+    # If there is encoding problem here, it's YOUR fault."
     default = "http://urlz.fr/3z9I"
     size = 150
     gravatar_url = ("http://www.gravatar.com/avatar/" +
@@ -239,10 +207,7 @@ def get_gravatar_url(email):
 
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
-    """
-        Called when trying to create a tournament.
-    """
-
+    """Called when trying to create a tournament."""
     form = TournamentForm(request.form)
     users = compute_ranking()
     user_pairs = []
@@ -250,7 +215,7 @@ def tournament():
         user_tuple = (user.id_user, user.name + ' ' + user.surname)
         user_pairs.append(user_tuple)
     form.players.choices = user_pairs
-    
+
     if request.method == 'POST':
         players = []
         for id_player in form.players.data:
@@ -292,56 +257,28 @@ def ranking_graph():
     return render_template('ranking_graph.html', line_chart=line_chart)
 
 
-@app.route('/add_match', methods=['GET','POST'])
+@app.route('/add_match', methods=['GET', 'POST'])
 def add_match():
-    """Creates a new match using values given to the add_match form"""
+    """Creates a new match using values given to the add_match form."""
     users = User.query.all()
     if len(users) == 0:
         success = "There are no players yet !"
         return render_template('add_match.html', success=success,
-                                user=True)
-                                
+                               user=True)
+
     form = MatchCreateForm(request.form)
     error = None
     success = None
-
-    #~ # Check if some players are missing
-    #~ if not id_player11:
-        #~ error = 'Add a player 1 to team 1'
-
-    #~ elif not id_player21:
-        #~ error = 'Add a player 1 to team 2'
-
-    #~ # Check if some users appear twice
-    #~ elif ((id_player11 == id_player12) or
-          #~ (id_player11 == id_player21) or
-          #~ (id_player11 == id_player22) or
-          #~ (id_player12 == id_player21) or
-          #~ (id_player12 == id_player22 and (id_player12)) or
-          #~ (id_player21 == id_player22)):
-        #~ error = 'Please select different users'
-
-    #~ elif not score_e1:
-        #~ error = 'Add a score for Team 1'
-
-    #~ elif not score_e2:
-        #~ error = 'Add a score for Team 2'
-
-    #~ elif not score_e1.isdigit() or not score_e2.isdigit():
-        #~ error = 'Please give integer values for score !'
-
-    #~ else:
 
     player11 = User.query.filter_by(id_user=form.player11.data).first()
     player12 = User.query.filter_by(id_user=form.player12.data).first()
     player21 = User.query.filter_by(id_user=form.player21.data).first()
     player22 = User.query.filter_by(id_user=form.player22.data).first()
-    
-    
 
     if request.method == 'POST' and form.validate:
-        match = Match(datetime.now(), form.score_team1.data, form.score_team2.data,
-                      player11, player12, player21, player22)
+        match = Match(datetime.now(), form.score_team1.data,
+                      form.score_team2.data, player11, player12,
+                      player21, player22)
 
         db.session.add(match)
         db.session.commit()
@@ -349,17 +286,14 @@ def add_match():
         success = "Match was successfully added "
 
     return render_template('add_match.html', success=success,
-                               error=error, form=form())
+                           error=error, form=form())
 
 
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
     """Creates a new user using values given in the add_player form"""
-
     form = UserSubscribeForm(request.form)
-    
     if request.method == 'POST' and form.validate:
-        
         new_user = User(form.surname.data, form.name.data, form.nickname.data,
                         form.photo.data)
         db.session.add(new_user)
@@ -407,7 +341,7 @@ def compute_ranking():
 def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
     """Update the ranking of each players in parameters.
 
-    with the socre of the match with the following formula :
+    with the score of the match according to the following formula :
     Rn = Ro + KG(W-We)
     @link : https://fr.wikipedia.org
             /wiki/Classement_mondial_de_football_Elo

@@ -1,5 +1,0 @@
-rm /tmp/babylone.db 1>/dev/null 2>/dev/null 
-
-python init_db.py 1>/dev/null 2> /dev/null
-
-rm ./static/image_flask/* 1>/dev/null 2>/dev/null
