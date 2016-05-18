@@ -148,11 +148,12 @@ def tournament():
         players = []
         ids_player = request.form.getlist('selectionField')
         for id_player in ids_player:
-            players.append(users[int(id_player)])
+            players.append(users[int(id_player)-1])
         tournament = generate_tournament(players)
 
         return render_template(
-            'tournament.html', users=users, tournament=tournament)
+            'tournament.html', users=users, tournament=tournament,
+            get_gravatar_url=get_gravatar_url)
 
     return render_template(
         'tournament.html', users=users)
