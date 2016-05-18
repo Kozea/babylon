@@ -125,7 +125,22 @@ class MatchCreateForm(Form):
         Form.__init__(self, *args, **kwargs)
             
             
-player_tournament = 2
+class TournamentForm(Form):
+    """ This class implements forms for creating tournament."""
+    players = SelectField('Players', choices = [])
+    submit = SubmitField('Validate')
+    
+    def __init__(self, *args, **kwargs):      
+        users = User.query.all()
+        user_pairs = []
+        
+        for user in users:
+            user_tuple = (user.id_user, user.name + ' ' + user.surname)
+            user_pairs.append(user_tuple)
+            
+        self.players.kwargs['choices'] = user_pairs
+        Form.__init__(self, *args, **kwargs)
+    
 
 
 @app.route('/')
@@ -185,6 +200,8 @@ def tournament():
     """
         Called when trying to create a tournament.
     """
+
+    form = TournamentForm(request.form)
     users = compute_ranking()
     if request.method == 'POST':
         players = []
@@ -197,11 +214,11 @@ def tournament():
         tournament = generate_tournament(players)
 
         return render_template(
-            'tournament.html', users=users, nb_select=player_tournament,
-            tournament=tournament)
+            'tournament.html', users=users,
+            tournament=tournament, form=form())
 
     return render_template(
-        'tournament.html', users=users, nb_select=player_tournament)
+        'tournament.html', users=users, form=form())
 
 
 @app.route('/ranking_graph')
