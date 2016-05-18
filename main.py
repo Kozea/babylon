@@ -8,8 +8,7 @@ from copy import deepcopy
 from collections import OrderedDict
 from flask_sqlalchemy import SQLAlchemy
 from plainform import *
-from wtforms.validators import (
-    InputRequired, ValidationError)
+from wtforms.validators import InputRequired, ValidationError
 import urllib
 import hashlib
 
