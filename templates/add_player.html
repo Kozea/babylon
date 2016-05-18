@@ -1,29 +1,9 @@
 {% extends "layout.html" %}
 {% block body %} 
 
-{% if error %}
-<strong>
-    {{error}}
-</strong>
-{% endif %}
-
-<form action="{{ url_for('add_player') }}" method=post class=add-entry enctype="multipart/form-data">
-    
-          
-        <label>Surname:</label>
-        <input type=integer size=30 name=surname>
-        
-        <label>Name:</label>
-        <input type=integer size=30 name=name>
-        
-        <label>Nickname</label>
-        <input type=integer size=30 name=nickname>
-        
-        <label>Photo</label>
-        <input type=file size=30 name=photo>
-        
-        <input type=submit value=Create>
-
+    <main>
+      {{ form }}
+    </main>
     
 {% endblock %}
 

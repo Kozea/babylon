@@ -86,17 +86,17 @@ class User(db.Model):
         self.number_of_match = 0
 
 class UserSubscribeForm(Form):
-    surname = StringField('Surname', validators = [validators.input_required()])
-    name = StringField('Name', validators = [validators.input_required()])
-    nickname = StringField('Nickname', validators = [validators.input_required()])
-    photo = FileField('Photo', validators = [validators.input_required()])
+    surname = StringField('Surname')
+    name = StringField('Name')
+    nickname = StringField('Nickname')
+    photo = StringField('Photo')
     submit = SubmitField('Validate')
     
     def validate_name(form, field):
         # Check if user already exists
             cur = User.query.filter_by(nickname=field.data)
             if cur:
-                raise ValidationError("This user already exists, please choose another nickname")
+                raise ValidationErr("This user already exists, please choose another nickname")
     
 
 player_tournament = 2
@@ -286,49 +286,18 @@ def new_match():
 def add_player():
     """Creates a new user using values given in the add_player form"""
 
-    error = None
-    if request.method == 'POST':
-        # Get user infos
-        surname = request.form['surname']
-        name = request.form['name']
-        nickname = request.form['nickname']
+    form = UserSubscribeForm(request.form)
+    
+    if request.method == 'POST' and form.validate:
+        
+        new_user = User(form.surname.data, form.name.data, form.nickname.data,
+                        form.photo.data)
 
-        filename = ""
-        # Get user photo and work on it
-        photo = request.files['photo']
-        if photo and allowed_file(photo.filename):
-            nickname = nickname.replace(" ", "")
-            nickname = nickname.replace("/", "")
-            nickname = nickname.replace("\\", "")
-            filename = (
-                app.config['UPLOAD_FOLDER'] + "/" +
-                nickname + get_extension_file(photo.filename))
-            photo.save(filename)
-            with open(filename, 'r+b') as f:
-                with Image.open(f) as image:
-                    cover = resizeimage.resize_contain(image, [200, 100])
-                    cover.save(filename, image.format)
+        form.validate_name(form.nickname)
+        db.session.add(new_user)
+        db.session.commit()
 
-        # If some field are empty
-        if surname == "" or name == "" or nickname == "":
-            error = "Some fields are empty !"
-
-        else:
-            # Check if user already exists
-            cur = User.query.filter_by(
-                nickname=request.form['nickname']).first()
-            if cur:
-                error = "This nickname is already used !"
-            else:
-                # Add the new user to the database
-                new_user = User(surname, name, nickname, filename)
-
-                db.session.add(new_user)
-                db.session.commit()
-
-                error = "Let's play !"
-
-    return render_template('add_player.html', error=error)
+    return render_template('add_player.html', form=form())
 
 
 def get_extension_file(filename):
