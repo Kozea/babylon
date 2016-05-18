@@ -86,6 +86,7 @@ class User(db.Model):
         self.number_of_match = 0
 
 class UserSubscribeForm(Form):
+    """This class implements forms for registering new users"""
     surname = StringField('Surname')
     name = StringField('Name')
     nickname = StringField('Nickname')
@@ -98,7 +99,29 @@ class UserSubscribeForm(Form):
             if cur:
                 raise ValidationErr("This user already exists, please choose another nickname")
     
-
+class MatchCreateForm(Form):
+    """This class implement forms for creating new matches"""
+    player11 = SelectField('Player 1 Team 1', choices = [])
+    player12 = SelectField('Player 2 Team 1', choices = [])
+    player21 = SelectField('Player 1 Team 2', choices = [])
+    player22 = SelectField('Player 2 Team 2', choices = [])
+    score_team1 = IntegerField('Score Team 1')
+    score_team2 = IntegerField('Score Team 2')
+    
+    def fill_selects(self)  :
+        users = User.query.all()
+        user_pairs = []
+        
+        for user in users:
+            user_tuple = (user.id_user, user.name + ' ' + user.surname)
+            user_pairs.append(user_tuple)
+            
+        self.player11 = SelectField('Player 1 Team 1', choices = user_pairs)
+        self.player12 = SelectField('Player 2 Team 1', choices = user_pairs)
+        self.player21 = SelectField('Player 1 Team 2', choices = user_pairs)
+        self.player22 = SelectField('Player 2 Team 2', choices = user_pairs)
+            
+            
 player_tournament = 2
 
 
@@ -207,71 +230,56 @@ def ranking_graph():
     return render_template('ranking_graph.html', line_chart=line_chart)
 
 
-@app.route('/add_match')
+@app.route('/add_match', methods=['GET','POST'])
 def add_match():
-    """Allows user to access the match adding form."""
-
+    """Creates a new match using values given to the add_match form"""
+    
     users = User.query.all()
-
     if len(users) == 0:
         success = "There are no players yet !"
         return render_template('add_match.html', success=success,
-                               user=True)
-
-    return render_template('add_match.html', users=users)
-
-
-@app.route('/new_match', methods=['POST'])
-def new_match():
-    """Creates a new match using values given to the add_match form"""
-
-    users = User.query.all()
-
+                                user=True)
+                                
+    form = MatchCreateForm(request.form)
+    form.fill_selects()
     error = None
     success = None
 
-    id_player11 = request.form['id_player11']
-    id_player12 = request.form['id_player12']
-    id_player21 = request.form['id_player21']
-    id_player22 = request.form['id_player22']
+    #~ # Check if some players are missing
+    #~ if not id_player11:
+        #~ error = 'Add a player 1 to team 1'
 
-    score_e1 = request.form['score_e1']
-    score_e2 = request.form['score_e2']
+    #~ elif not id_player21:
+        #~ error = 'Add a player 1 to team 2'
 
-    # Check if some players are missing
-    if not id_player11:
-        error = 'Add a player 1 to team 1'
+    #~ # Check if some users appear twice
+    #~ elif ((id_player11 == id_player12) or
+          #~ (id_player11 == id_player21) or
+          #~ (id_player11 == id_player22) or
+          #~ (id_player12 == id_player21) or
+          #~ (id_player12 == id_player22 and (id_player12)) or
+          #~ (id_player21 == id_player22)):
+        #~ error = 'Please select different users'
 
-    elif not id_player21:
-        error = 'Add a player 1 to team 2'
+    #~ elif not score_e1:
+        #~ error = 'Add a score for Team 1'
 
-    # Check if some users appear twice
-    elif ((id_player11 == id_player12) or
-          (id_player11 == id_player21) or
-          (id_player11 == id_player22) or
-          (id_player12 == id_player21) or
-          (id_player12 == id_player22 and (id_player12)) or
-          (id_player21 == id_player22)):
-        error = 'Please select different users'
+    #~ elif not score_e2:
+        #~ error = 'Add a score for Team 2'
 
-    elif not score_e1:
-        error = 'Add a score for Team 1'
+    #~ elif not score_e1.isdigit() or not score_e2.isdigit():
+        #~ error = 'Please give integer values for score !'
 
-    elif not score_e2:
-        error = 'Add a score for Team 2'
+    #~ else:
 
-    elif not score_e1.isdigit() or not score_e2.isdigit():
-        error = 'Please give integer values for score !'
+    #~ player11 = User.query.filter_by(id_user=id_player11).first()
+    #~ player12 = User.query.filter_by(id_user=id_player12).first()
+    #~ player21 = User.query.filter_by(id_user=id_player21).first()
+    #~ player22 = User.query.filter_by(id_user=id_player22).first()
 
-    else:
-
-        player11 = User.query.filter_by(id_user=id_player11).first()
-        player12 = User.query.filter_by(id_user=id_player12).first()
-        player21 = User.query.filter_by(id_user=id_player21).first()
-        player22 = User.query.filter_by(id_user=id_player22).first()
-
-        match = Match(datetime.now(), score_e1, score_e2,
-                      player11, player12, player21, player22)
+    if request.method == 'POST' and form.validate:
+        match = Match(datetime.now(), form.score_team1.data, form.score_team2.data,
+                      form.player11.data, form.player12.data, form.player21.data, form.player22.data)
 
         db.session.add(match)
         db.session.commit()
@@ -279,7 +287,7 @@ def new_match():
         success = "Match was successfully added "
 
     return render_template('add_match.html', success=success,
-                           error=error, users=users)
+                            error=error, form=form())
 
 
 @app.route('/add_player', methods=['GET', 'POST'])

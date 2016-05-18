@@ -12,54 +12,11 @@
 {% endif %}
 
 {% if not user %}
-<form action="{{ url_for('new_match') }}" method=post class=add-entry>
-    
           
-    <label>Player 1 Team 1:</label>
-     <select name=id_player11>
-    {% for user in users %}
-        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
-    {% endfor %}
-    </select>
-
+    <main>
+      {{ form }}
+    </main>
     
-    <label>Player 2 Team 1:</label>
-     <select name=id_player12>
-    <option value=""></option>
-    {% for user in users %}
-        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
-    {% endfor %}
-    </select>
-    
-    
-    
-    <label>Player 1 Team 2:</label> 
-     <select name=id_player21>
-    {% for user in users %}
-        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
-    {% endfor %}
-    </select>
-    
-    
-    
-    <label>Player 2 Team 2:</label>
-     <select name=id_player22>
-    <option value=""></option>
-    {% for user in users %}
-        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
-    {% endfor %}
-    </select>
-    
-    
-    <label>Score Team 1:</label>
-    <input type=integer size=30 name=score_e1>
-    
-    <label>Score Team 2:</label>
-    <input type=integer size=30 name=score_e2 >
-    
-    <input type=submit value=Valider>
-
-</form>
 {% endif %}
 
 {% endblock %}
