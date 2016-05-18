@@ -1,33 +1,22 @@
 {% extends "layout.html" %}
 {% block body %} 
 
-<form action="{{ url_for('tournament') }}" method=post class=add-entry>
-    
-    {% for i in range(nb_select) %}      
-     <select name=id_player{{loop.index}}>
-    {% for user in users %}
-        <option value = {{user.id_user}}> {{user.name + ' ' + user.surname}} </option>
-    {% endfor %}
-    </select>
-    {% endfor %}
-    <a href="{{ url_for('add_one_tournament') }}">Add a player</a>
-    
-    <input type=submit value='Create Tournament'>
-    
-</form>
 
-<ul>
+<main>
+  {{ form }}
+</main>
+
+<section>
     {% for (team1,team2) in tournament %}
-    <li>
     <ul>
         <li>
             <figure>
-                <img src={{team1[0].photo}}>
+                <img src={{get_gravatar_url(team1[0].photo)}}>
                 <figcaption>
                     {{team1[0].get_full_name()}}
                 </figcaption>
                 <h3>{{team1[0].ranking}}</h3>
-                <img src={{team1[1].photo}}>
+                <img src={{get_gravatar_url(team1[1].photo)}}>
                 <figcaption>
                     {{team1[1].get_full_name()}}
                 </figcaption>
@@ -37,12 +26,12 @@
         
         <li>
             <figure>
-                <img src={{team2[0].photo}}>
+                <img src={{get_gravatar_url(team2[0].photo)}}>
                 <figcaption>
                     {{team2[0].get_full_name()}}
                 </figcaption>
                 <h3>{{team2[0].ranking}}</h3>
-                <img src={{team2[1].photo}}>
+                <img src={{get_gravatar_url(team2[1].photo)}}>
                 <figcaption>
                     {{team2[1].get_full_name()}}
                 </figcaption>
@@ -50,8 +39,7 @@
             </figure>
         </li>
     </ul>
-    </li>
     {% endfor %}
-</ul>
+</section>
 
 {% endblock %}
