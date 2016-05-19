@@ -118,23 +118,28 @@ class UserSubscribeForm(Form):
 
 class MatchCreateForm(Form):
     """This class implement forms for creating new matches"""   
-    def validate(self):
-        if not Form.validate(self):
-            return False
-        result = True
-        seen = set()
-        for field in [self.player11, self.player12, self.player21, self.player22]:
-            if field.data in seen:
-                field.errors.append('Please select different players')
-                result = False
-            else:
-                seen.add(field.data)
-            return result
-      
-    player11 = SelectField('Player 1 Team 1', [validate], choices = [])
-    player12 = SelectField('Player 2 Team 1', [validate], choices = [])
-    player21 = SelectField('Player 1 Team 2', [validate], choices = [])
-    player22 = SelectField('Player 2 Team 2', [validate], choices = [])
+
+    def validate_player12(form, field):
+        if(field.data == form.player11.data):
+            raise ValidationError("Please select different users")
+            
+            
+    def validate_player21(form, field):
+        if(field.data == form.player11.data or
+           field.data == form.player12.data):
+            raise ValidationError("Please select different users")
+            
+    def validate_player22(form, field):
+        if(field.data == form.player11.data or
+           field.data == form.player12.data or
+           field.data == form.player21.data):
+            raise ValidationError("Please select different users")
+
+
+    player11 = SelectField('Player 1 Team 1', choices = [])
+    player12 = SelectField('Player 2 Team 1', [validate_player12], choices = [])
+    player21 = SelectField('Player 1 Team 2', [validate_player21], choices = [])
+    player22 = SelectField('Player 2 Team 2', [validate_player22], choices = [])
     score_team1 = StringField('Score Team 1', [InputRequired()])
     score_team2 = StringField('Score Team 2', [InputRequired()])
     submit = SubmitField('Validate')
@@ -149,6 +154,7 @@ class MatchCreateForm(Form):
         self.player12.kwargs['choices'] = user_pairs
         self.player21.kwargs['choices'] = user_pairs
         self.player22.kwargs['choices'] = user_pairs
+
         Form.__init__(self, *args, **kwargs)
 
 class TournamentForm(Form):
@@ -283,7 +289,7 @@ def add_match():
     player21 = User.query.filter_by(id_user=form.player21.data).first()
     player22 = User.query.filter_by(id_user=form.player22.data).first()
 
-    if request.method == 'POST' and form.validate:
+    if request.method == 'POST' and form.validate():
         match = Match(datetime.now(), form.score_team1.data,
                       form.score_team2.data, player11, player12,
                       player21, player22)
