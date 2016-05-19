@@ -124,24 +124,31 @@ class MatchCreateForm(Form):
     def validate_player12(form, field):
         if(field.data == form.player11.data):
             raise ValidationError("Please select different users")
+        else:
+            print (1)
             
             
     def validate_player21(form, field):
         if(field.data == form.player11.data or
            field.data == form.player12.data):
             raise ValidationError("Please select different users")
+        else:
+            print (2)
             
     def validate_player22(form, field):
         if(field.data == form.player11.data or
            field.data == form.player12.data or
            field.data == form.player21.data):
             raise ValidationError("Please select different users")
+            
+        else:
+            print (3)
 
 
-    player11 = SelectField('Player 1 Team 1', choices = [])
-    player12 = SelectField('Player 2 Team 1', [validate_player12], choices = [])
-    player21 = SelectField('Player 1 Team 2', [validate_player21], choices = [])
-    player22 = SelectField('Player 2 Team 2', [validate_player22], choices = [])
+    player11 = SelectField('Player 1 Team 1', choices = [], coerce = int)
+    player12 = SelectField('Player 2 Team 1', [validate_player12], coerce = int, choices = [])
+    player21 = SelectField('Player 1 Team 2', [validate_player21], coerce = int, choices = [])
+    player22 = SelectField('Player 2 Team 2', [validate_player22], coerce = int, choices = [])
     score_team1 = StringField('Score Team 1', [InputRequired()])
     score_team2 = StringField('Score Team 2', [InputRequired()])
     submit = SubmitField('Validate')
