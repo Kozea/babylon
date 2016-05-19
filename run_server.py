@@ -111,7 +111,7 @@ class UserSubscribeForm(Form):
     surname = StringField('Surname', [InputRequired()])
     name = StringField('Name', [InputRequired()])
     nickname = StringField('Nickname', [validate_nickname, InputRequired()])
-    photo = StringField('Photo')
+    photo = StringField('Gravatar email')
     submit = SubmitField('Validate')
 
 
