@@ -297,7 +297,8 @@ def ranking_graph():
                     user_array.append(user.ranking)
         line_chart.add(user_base.nickname, user_array)
 
-    return render_template('ranking_graph.html', line_chart=line_chart.render())
+    return render_template('ranking_graph.html',
+                           line_chart=line_chart.render())
 
 
 @app.route('/add_match', methods=['GET', 'POST'])
@@ -351,9 +352,9 @@ def add_player():
                         form.photo.data.encode("utf-8"))
         db.session.add(new_user)
         db.session.commit()
-        
-        success = form.name.data + " " + form.surname.data + " was successfully registered ! "
-        
+
+        success = (form.name.data + " " +
+                   form.surname.data + " was successfully registered !")
 
     return render_template('add_player.html', success=success, form=form())
 
