@@ -35,7 +35,7 @@
             <td>{{user.nb_victories}}</td>
             <td>{{user.nb_defeats}}</td>
             <td>{{(user.nb_victories/user.number_of_match)*100}}
-            <svg>"{{ user.ratio_gauge.render()|safe}}"</svg>
+            <img src="{{ url_for('svg_victory', id_player=user.id_user)}}"></img>
             </td>
             {% else %}
             <td>-</td>

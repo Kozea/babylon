@@ -1,5 +1,5 @@
 # all the imports
-from flask import request, render_template, Flask
+from flask import request, render_template, Flask, make_response
 from datetime import datetime
 import pygal
 import math
@@ -163,6 +163,40 @@ def matchs():
     matchs = Match.query.order_by(-Match.id_match).all()
     return render_template('match.html', matchs=matchs,
                            get_gravatar_url=get_gravatar_url)
+
+
+@app.route('/svg_victory/<int:id_player>')
+def svg_victory(id_player):
+    """ Querying for the ranking informations for the different chart. """
+    unordered_ranking = compute_ranking()
+
+    user = User.query.filter(User.id_user == id_player).one()
+    victories_as_team1 = (
+        db.session.query(Match.id_match)
+        .filter((Match.player11 == user) | (Match.player12 == user))
+        .filter(Match.score_e1 > Match.score_e2)
+        .count())
+    victories_as_team2 = (
+        db.session.query(Match.id_match)
+        .filter((Match.player21 == user) | (Match.player22 == user))
+        .filter(Match.score_e1 < Match.score_e2)
+        .count())
+
+    user.nb_victories = victories_as_team1 + victories_as_team2
+    user.nb_defeats = user.number_of_match - user.nb_victories
+
+    if user.number_of_match != 0:
+        gauge = pygal.SolidGauge(inner_radius=0.70, show_legend=False)
+        gauge.value_formatter = lambda x: '{:.10g}%'.format(x)
+        gauge.add(
+            'Ratio', [{
+                'value': (user.nb_victories/user.number_of_match)*100,
+                'max_value': 100}])
+        user.ratio_gauge = gauge
+    svg = user.ratio_gauge.render()
+    response = make_response(svg)
+    response.content_type = 'image/svg+xml'
+    return response
 
 
 @app.route('/ranking')
