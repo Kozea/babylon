@@ -1,5 +1,14 @@
 {% extends "layout.html" %}
+
+
+
 {% block body %} 
+
+{% if success %}
+    <p class=success>
+        <strong>Info:</strong> {{ success }}
+{% endif %}
+
     <main>
       {{ form }}
     </main>

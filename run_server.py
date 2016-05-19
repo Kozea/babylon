@@ -103,7 +103,6 @@ class UserSubscribeForm(Form):
     """This class implements forms for registering new users"""
 
     def validate_nickname(form, field):
-        print("HELO")
         users = User.query.all()
         for user in users:
             if user.nickname == field.data:
@@ -346,14 +345,17 @@ def add_match():
 def add_player():
     """Creates a new user using values given in the add_player form"""
     form = UserSubscribeForm(request.form)
+    success = None
     if request.method == 'POST' and form.validate():
         new_user = User(form.surname.data, form.name.data, form.nickname.data,
                         form.photo.data.encode("utf-8"))
-        print("DEBUG", form.nickname.data)
         db.session.add(new_user)
         db.session.commit()
+        
+        success = form.name.data + " " + form.surname.data + " was successfully registered ! "
+        
 
-    return render_template('add_player.html', form=form())
+    return render_template('add_player.html', success=success, form=form())
 
 
 def get_extension_file(filename):
