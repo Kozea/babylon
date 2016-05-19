@@ -117,56 +117,25 @@ class UserSubscribeForm(Form):
 
 
 class MatchCreateForm(Form):
-
     """This class implement forms for creating new matches"""
-    
-    def validate_team1(form,field):
+    def validate_team1(form, field):
         if len(field.data) > 2 or len(field.data) == 0:
             raise ValidationError("Please select 1 or 2 players")
-            
-                    
-    def validate_team2(form,field):
+
+    def validate_team2(form, field):
         if len(field.data) > 2 or len(field.data) == 0:
             raise ValidationError("Please select 1 or 2 players")
-            
+
         for player_team2 in field.data:
             for player_team1 in form.team1.data:
                 if player_team2 == player_team1:
                     raise ValidationError("Please select different users")
 
-    #~ def validate_player12(form, field):
-        #~ if(field.data == form.player11.data):
-            #~ raise ValidationError("Please select different users")
-        #~ else:
-            #~ print (1)
-            
-            
-    #~ def validate_player21(form, field):
-        #~ if(field.data == form.player11.data or
-           #~ field.data == form.player12.data):
-            #~ raise ValidationError("Please select different users")
-        #~ else:
-            #~ print (2)
-            
-    #~ def validate_player22(form, field):
-        #~ if(field.data == form.player11.data or
-           #~ field.data == form.player12.data or
-           #~ field.data == form.player21.data):
-            #~ raise ValidationError("Please select different users")
-            
-        #~ else:
-            #~ print (3)
+    team1 = SelectMultipleField('Team 1', [validate_team1],
+                                coerce=int, choices=[])
+    team2 = SelectMultipleField('Team 2', [validate_team2],
+                                coerce=int, choices=[])
 
-
-    #~ player11 = SelectField('Player 1 Team 1', choices = [], coerce = int)
-    #~ player12 = SelectField('Player 2 Team 1', [validate_player12], allow_blank = True, coerce = int, choices = [])
-    #~ player21 = SelectField('Player 1 Team 2', [validate_player21], coerce = int, choices = [])
-    #~ player22 = SelectField('Player 2 Team 2', [validate_player22], allow_blank = True, coerce = int, choices = [])
-    
-    team1 = SelectMultipleField('Team 1', [validate_team1], coerce = int, choices = [])
-    team2 = SelectMultipleField('Team 2', [validate_team2], coerce = int, choices = [])
-    
-    
     score_team1 = StringField('Score Team 1', [InputRequired()])
     score_team2 = StringField('Score Team 2', [InputRequired()])
     submit = SubmitField('Validate')
@@ -179,12 +148,6 @@ class MatchCreateForm(Form):
             user_pairs.append(user_tuple)
         self.team1.kwargs['choices'] = user_pairs
         self.team2.kwargs['choices'] = user_pairs
-        
-        #~ user_pairs_none=copy.deepcopy(user_pairs)
-        #~ user_pairs_none.insert(0, (0,'No player'))
-        
-        #~ self.player12.kwargs['choices'] = user_pairs
-        #~ self.player22.kwargs['choices'] = user_pairs
 
         Form.__init__(self, *args, **kwargs)
 
@@ -350,26 +313,22 @@ def add_match():
     form = MatchCreateForm(request.form)
     error = None
     success = None
-    
+
     if request.method == 'POST' and form.validate():
-    
         player11 = User.query.filter_by(id_user=form.team1.data[0]).first()
-        
+
         if len(form.team1.data) == 2:
             player12 = User.query.filter_by(id_user=form.team1.data[1]).first()
-            
         else:
             player12 = None
-            
+
         player21 = User.query.filter_by(id_user=form.team2.data[0]).first()
 
         if len(form.team2.data) == 2:
             player22 = User.query.filter_by(id_user=form.team2.data[1]).first()
-            
         else:
             player22 = None
 
-    if request.method == 'POST' and form.validate():
         match = Match(datetime.now(), form.score_team1.data,
                       form.score_team2.data, player11, player12,
                       player21, player22)
