@@ -297,7 +297,7 @@ def ranking_graph():
                     user_array.append(user.ranking)
         line_chart.add(user_base.nickname, user_array)
 
-    return render_template('ranking_graph.html', line_chart=line_chart)
+    return render_template('ranking_graph.html', line_chart=line_chart.render())
 
 
 @app.route('/add_match', methods=['GET', 'POST'])
