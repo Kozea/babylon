@@ -146,9 +146,9 @@ class MatchCreateForm(Form):
 
 
     player11 = SelectField('Player 1 Team 1', choices = [], coerce = int)
-    player12 = SelectField('Player 2 Team 1', [validate_player12], coerce = int, choices = [])
+    player12 = SelectField('Player 2 Team 1', [validate_player12], allow_blank = True, blank_text='No Player', coerce = int, choices = [])
     player21 = SelectField('Player 1 Team 2', [validate_player21], coerce = int, choices = [])
-    player22 = SelectField('Player 2 Team 2', [validate_player22], coerce = int, choices = [])
+    player22 = SelectField('Player 2 Team 2', [validate_player22], allow_blank = True, blank_text='No Player', coerce = int, choices = [])
     score_team1 = StringField('Score Team 1', [InputRequired()])
     score_team2 = StringField('Score Team 2', [InputRequired()])
     submit = SubmitField('Validate')
@@ -160,8 +160,12 @@ class MatchCreateForm(Form):
             user_tuple = (user.id_user, user.name + ' ' + user.surname)
             user_pairs.append(user_tuple)
         self.player11.kwargs['choices'] = user_pairs
-        self.player12.kwargs['choices'] = user_pairs
         self.player21.kwargs['choices'] = user_pairs
+        
+        #~ user_pairs_none=copy.deepcopy(user_pairs)
+        #~ user_pairs_none.insert(0, (0,'No player'))
+        
+        self.player12.kwargs['choices'] = user_pairs
         self.player22.kwargs['choices'] = user_pairs
 
         Form.__init__(self, *args, **kwargs)
