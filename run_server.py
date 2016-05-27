@@ -175,6 +175,11 @@ def matchs():
     return render_template('match.html', matchs=matchs,
                            get_gravatar_url=get_gravatar_url)
 
+@app.route('/profile/<int:id_player>')
+def profile(id_player):
+    user = User.query.filter(User.id_user == id_player).one()
+    return user.name
+    
 
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):

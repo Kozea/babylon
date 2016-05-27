@@ -112,7 +112,7 @@
     <div id="divdrag{{user.id_user}}" class="div-drag" draggable="true" ondragstart="OnDragStart(this, event);">
         <img src={{get_gravatar_url(user.photo)}} ondragstart="OnDragStart(this, event);">
         <figcaption>
-            {{user.get_full_name()}}
+            <a href="{{ url_for('profile', id_player=user.id_user)}}">{{user.get_full_name()}}</a>
         </figcaption>
     </div>
 {% endfor %}
