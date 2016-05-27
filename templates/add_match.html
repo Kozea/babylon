@@ -61,12 +61,12 @@
             return;
         }
 
-        if(isNaN(document.getElementById("scoret1").value)){
-            alert("Bad score for team 1 is missing ! ");
+        if(isNaN(document.getElementById("scoret1").value) || document.getElementById("scoret1").value == ""){
+            alert("Bad score for team 1 ! ");
             return;
         }
-        if(isNaN(document.getElementById("scoret2").value)){
-            alert("Bad score for team 2 is missing ! ");
+        if(isNaN(document.getElementById("scoret2").value) || document.getElementById("scoret2").value == ""){
+            alert("Bad score for team 2 ! ");
             return;
         }
 
