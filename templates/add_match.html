@@ -1,4 +1,87 @@
 {% extends "layout.html" %}
+
+{% block head %}
+<script type="text/javascript">
+    //<![CDATA[
+
+    function post(path, params, method) {
+        method = method || "post"; // Set method to post by default if not specified.
+
+        // The rest of this code assumes you are not using a library.
+        // It can be made less wordy if you use one.
+        var form = document.createElement("form");
+        form.setAttribute("id","form_hidden");
+        form.setAttribute("method", method);
+        form.setAttribute("action", path);
+
+        for (var [key, value] of params.entries()) {
+            console.log(key+" "+value);
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", value);
+
+            form.appendChild(hiddenField);
+
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(document.getElementById("form_hidden"));
+    }
+
+    function OnDragStart (target, evt){
+       evt.dataTransfer.setData("IdElement", target.id);
+    }
+    
+    function OnDropTarget (target, evt) {
+        if(document.getElementById(target.id).children.length < 2 || target.id == "players"){
+            var id = evt.dataTransfer.getData("IdElement");
+            target.appendChild(document.getElementById(id));
+            evt.preventDefault();
+        }
+        else{
+            alert("Too many people in "+target.id)
+        }
+
+    }
+
+    function add_match(){
+        var team1 = document.getElementById("team1");
+        var team2 = document.getElementById("team2");
+
+        if(team1.children.length == 0){
+            alert("There must be at least one player in team1 !");
+        }
+        
+        if(team2.children.length == 0){
+            alert("There must be at least one player in team2 !");
+        }
+
+        var param = new Map();
+
+        for (var i = 0; i < team1.children.length; i++) {
+            param.set("j1"+(i+1), team1.children[i].id);
+        }
+        
+        for (var i = 0; i < team2.children.length; i++) {
+            param.set("j2"+(i+1), team2.children[i].id);
+        }
+
+        for (var [key, value] of param.entries()) {
+          console.log(key + " = " + value);
+        }
+
+        param.set("scoret1", document.getElementById("scoret1").value)
+        param.set("scoret2", document.getElementById("scoret2").value)
+        
+        post("{{url_for("add_match")}}", param);
+    }
+    
+    //]]> 
+</script>
+{% endblock %}
+
 {% block body %} 
 
 {% if error %}
@@ -11,10 +94,32 @@
         <strong>Info:</strong> {{ success }}
 {% endif %}
 
-{% if not user %}
-    <main>
-      {{ form }}
-    </main>
+{% if users|length > 0 %}
+<div id="players" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false" ondrop="OnDropTarget(this, event);">
+{% for user in users %}
+    <div id="divdrag{{user.id_user}}" class="div-drag" draggable="true" ondragstart="OnDragStart(this, event);">
+        <img src={{get_gravatar_url(user.photo)}} ondragstart="OnDragStart(this, event);">
+        <figcaption>
+            {{user.get_full_name()}}
+        </figcaption>
+    </div>
+{% endfor %}
+</div>
+
+<div id="team1" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false" ondrop="OnDropTarget(this, event);">
+
+</div>
+
+<div id="team2" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false" ondrop="OnDropTarget(this, event);">
+
+</div>
+
+<label>Score team 1 :</label>
+<input id="scoret1" type="integer">
+<label>Score team 2 :</label>
+<input id="scoret2" type="integer">
+
+<button name="add_match_button" onclick="add_match()" >Add match !</button>
 {% endif %}
 
 {% endblock %}

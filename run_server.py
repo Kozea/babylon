@@ -156,6 +156,17 @@ class TournamentForm(Form):
     players = SelectMultipleField('Players', choices=[])
     submit = SubmitField('Validate')
 
+def get_gravatar_url(email):
+    """Return the gravatar url for the email in parameter."""
+    photo = email
+    # If there is encoding problem here, it's YOUR fault."
+    default = "http://urlz.fr/3z9I"
+    size = 150
+    gravatar_url = ("http://www.gravatar.com/avatar/" +
+                    hashlib.md5(photo.lower()).hexdigest() + "?")
+    gravatar_url += urllib.parse.urlencode({'d': default, 's': str(size)})
+    return gravatar_url
+
 
 @app.route('/')
 def matchs():
@@ -236,17 +247,6 @@ def ranking():
                            get_gravatar_url=get_gravatar_url)
 
 
-def get_gravatar_url(email):
-    """Return the gravatar url for the email in parameter."""
-    photo = email
-    # If there is encoding problem here, it's YOUR fault."
-    default = "http://urlz.fr/3z9I"
-    size = 150
-    gravatar_url = ("http://www.gravatar.com/avatar/" +
-                    hashlib.md5(photo.lower()).hexdigest() + "?")
-    gravatar_url += urllib.parse.urlencode({'d': default, 's': str(size)})
-    return gravatar_url
-
 
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
@@ -308,29 +308,35 @@ def add_match():
     if len(users) == 0:
         success = "There are no players yet !"
         return render_template('add_match.html', success=success,
-                               user=True)
+                               users=users, get_gravatar_url=get_gravatar_url)
 
-    form = MatchCreateForm(request.form)
     error = None
     success = None
 
-    if request.method == 'POST' and form.validate():
-        player11 = User.query.filter_by(id_user=form.team1.data[0]).first()
+    if request.method == 'POST':
+        param_list = request.form.to_dict().keys()
+                
+        id_player11 = request.form["j11"][7:]
+        print(id_player11)
+        player11 = User.query.filter_by(id_user=id_player11).first()
 
-        if len(form.team1.data) == 2:
-            player12 = User.query.filter_by(id_user=form.team1.data[1]).first()
+        if "j12" in param_list:
+            id_player12 = request.form["j12"][7:]
+            player12 = User.query.filter_by(id_user=id_player12).first()
         else:
             player12 = None
 
-        player21 = User.query.filter_by(id_user=form.team2.data[0]).first()
+        id_player21 = request.form["j21"][7:]
+        player21 = User.query.filter_by(id_user=id_player21).first()
 
-        if len(form.team2.data) == 2:
-            player22 = User.query.filter_by(id_user=form.team2.data[1]).first()
+        if "j22" in param_list:
+            id_player22 = request.form["j22"][7:]
+            player22 = User.query.filter_by(id_user=id_player22).first()
         else:
             player22 = None
 
-        match = Match(datetime.now(), form.score_team1.data,
-                      form.score_team2.data, player11, player12,
+        match = Match(datetime.now(), request.form["scoret1"],
+                      request.form["scoret2"], player11, player12,
                       player21, player22)
 
         db.session.add(match)
@@ -338,8 +344,8 @@ def add_match():
 
         success = "Match was successfully added "
 
-    return render_template('add_match.html', success=success,
-                           error=error, form=form())
+    return render_template('add_match.html', users=users, success=success,
+                           error=error, get_gravatar_url=get_gravatar_url)
 
 
 @app.route('/add_player', methods=['GET', 'POST'])
