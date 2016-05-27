@@ -35,13 +35,14 @@
     }
     
     function OnDropTarget (target, evt) {
+        evt.preventDefault();
         if(document.getElementById(target.id).children.length < 2 || target.id == "players"){
             var id = evt.dataTransfer.getData("IdElement");
             target.appendChild(document.getElementById(id));
-            evt.preventDefault();
         }
         else{
             alert("Too many people in "+target.id)
+            return;
         }
 
     }
@@ -52,10 +53,21 @@
 
         if(team1.children.length == 0){
             alert("There must be at least one player in team1 !");
+            return;
         }
-        
+
         if(team2.children.length == 0){
             alert("There must be at least one player in team2 !");
+            return;
+        }
+
+        if(isNaN(document.getElementById("scoret1").value)){
+            alert("Bad score for team 1 is missing ! ");
+            return;
+        }
+        if(isNaN(document.getElementById("scoret2").value)){
+            alert("Bad score for team 2 is missing ! ");
+            return;
         }
 
         var param = new Map();
@@ -106,11 +118,11 @@
 {% endfor %}
 </div>
 
-<div id="team1" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false" ondrop="OnDropTarget(this, event);">
+<div id="team1" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false;" ondrop="OnDropTarget(this, event);">
 
 </div>
 
-<div id="team2" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false" ondrop="OnDropTarget(this, event);">
+<div id="team2" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false;" ondrop="OnDropTarget(this, event);">
 
 </div>
 
