@@ -35,14 +35,14 @@
             <td>
                 <img src="{{ get_gravatar_url(user.photo) }}">
                 
-                <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.get_full_name()}}</a>
+                <a href="{{ url_for('profile', id_player=user.id_user) }}">{{ user.get_full_name() }}</a>
             </td>
             <td>{{user.ranking}}</td>
             {% if user.number_of_match != 0 %}
             <td>{{user.nb_victories}}</td>
             <td>{{user.nb_defeats}}</td>
             <td>{{100*(user.nb_victories/user.number_of_match)| round(2)}}
-            <img src="{{ url_for('svg_victory', id_player=user.id_user)}}"></img>
+            <img src="{{ url_for('svg_victory', id_player=user.id_user) }}"></img>
             </td>
             {% else %}
             <td>-</td>
