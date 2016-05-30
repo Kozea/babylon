@@ -616,6 +616,7 @@ def build_avg_temp(pairs, participants):
 
 
 def get_matchs(player):
+    """Returns a list of all matchs involving a player"""
     matchs = Match.query.filter((Match.player11 == player) |
                                 (Match.player12 == player) |
                                 (Match.player21 == player) |
@@ -625,6 +626,7 @@ def get_matchs(player):
 
 
 def get_nemesis(player):
+    """Returns a list of players who defeated the most one player """
     matchs = get_matchs(player)
     opponents = {}
 
@@ -665,6 +667,9 @@ def get_nemesis(player):
 
 
 def get_best_teammate(player):
+    """Returns a player's best teammates. A player is another player's
+        best teammate when he won the most with him, while playing as a team"""
+
     matchs = get_matchs(player)
     teammates = {}
 
@@ -708,6 +713,8 @@ def get_best_teammate(player):
 
 
 def get_worst_teammate(player):
+    """Returns a player's worst teammates. A player is another player's
+    worst teammate when he lost the most with him, while playing as a team"""
     matchs = get_matchs(player)
     teammates = {}
 
