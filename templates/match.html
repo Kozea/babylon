@@ -16,14 +16,14 @@
             <figure>
                 <img src={{ get_gravatar_url(match.team_1_player_1.email) }}>
                 <figcaption>
-                    <a href="{{ url_for('profile', id_player=match.team_1_player_1.id_user) }}">{{ match.team_1_player_1.get_full_name() }}</a>
+                    <a href="{{ url_for('profile', id_player=match.team_1_player_1.id_user) }}">{{ match.team_1_player_1.full_name }}</a>
                 </figcaption>
             </figure>
             {% if match.team_1_player_2 %}
             <figure>
                 <img src={{ get_gravatar_url(match.team_1_player_2.email) }}>
                 <figcaption>
-                    <a href="{{ url_for('profile', id_player=match.team_1_player_2.id_user) }}">{{ match.team_1_player_2.get_full_name() }}</a>
+                    <a href="{{ url_for('profile', id_player=match.team_1_player_2.id_user) }}">{{ match.team_1_player_2.full_name }}</a>
                 </figcaption>
             </figure>
             {% endif %}
@@ -33,14 +33,14 @@
             <figure>
                 <img src={{ get_gravatar_url(match.team_2_player_1.email) }}>
                 <figcaption>
-                    <a href="{{ url_for('profile', id_player=match.team_2_player_1.id_user) }}">{{ match.team_2_player_1.get_full_name() }}</a>
+                    <a href="{{ url_for('profile', id_player=match.team_2_player_1.id_user) }}">{{ match.team_2_player_1.full_name }}</a>
                 </figcaption>
             </figure>
             {% if match.team_2_player_2 %}
             <figure>
                 <img src={{ get_gravatar_url(match.team_2_player_2.email) }}>
                 <figcaption>
-                    <a href="{{ url_for('profile', id_player=match.team_2_player_2.id_user) }}">{{ match.team_2_player_2.get_full_name() }}</a>
+                    <a href="{{ url_for('profile', id_player=match.team_2_player_2.id_user) }}">{{ match.team_2_player_2.full_name }}</a>
                 </figcaption>
             </figure>
             {% endif %}

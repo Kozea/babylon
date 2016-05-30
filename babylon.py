@@ -78,17 +78,10 @@ class User(db.Model):
         self.nb_defeats = 0
         self.ratio_gauge = None
 
-    def get_full_name(self):
-        """ Return the full name of a user."""
-        return self.surname+" "+self.name
-
-    def set_ranking(self, ranking):
-        """ Set the ranking of a user."""
-        self.ranking = ranking
-
-    def set_number_of_matchs(self):
-        """ Init the number of match."""
-        self.number_of_match = 0
+    @property
+    def full_name(self):
+        """Full name of the user."""
+        return "{} {}".format(self.surname, self.name)
 
 
 class UserSubscribeForm(Form):
@@ -382,8 +375,8 @@ def compute_ranking():
 
     users = User.query.all()
     for user in users:
-        user.set_ranking(1000)
-        user.set_number_of_matchs()
+        user.ranking = 1000
+        user.number_of_match = 0
 
     matchs = Match.query.all()
 
@@ -730,8 +723,8 @@ def get_ranking_at_timet(date):
     # Compute the elo at time date
     users = User.query.all()
     for user in users:
-        user.set_ranking(1000)
-        user.set_number_of_matchs()
+        user.ranking = 1000
+        user.number_of_match = 0
 
     matchs = Match.query.filter(Match.date < date).all()
 

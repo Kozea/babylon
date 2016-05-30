@@ -35,7 +35,7 @@
             <td>
                 <img src="{{ get_gravatar_url(user.email) }}">
                 
-                <a href="{{ url_for('profile', id_player=user.id_user) }}">{{ user.get_full_name() }}</a>
+                <a href="{{ url_for('profile', id_player=user.id_user) }}">{{ user.full_name }}</a>
             </td>
             <td>{{user.ranking}}</td>
             {% if user.number_of_match != 0 %}
