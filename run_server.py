@@ -193,9 +193,9 @@ def profile(id_player):
     unordered_ranking = compute_ranking()
 
     user = User.query.filter(User.id_user == id_player).one()
-    nemesis = get_nemesis(user)
-    best_teammate = get_best_teammate(user)
-    worst_teammate = get_worst_teammate(user)
+    nemesis, nemesis_coeff = get_nemesis(user)
+    best_teammate, best_teammate_coeff = get_best_teammate(user)
+    worst_teammate, worst_teammate_coeff = get_worst_teammate(user)
     matchs = get_matchs(user)
 
     victories_as_team1 = (
@@ -223,8 +223,12 @@ def profile(id_player):
 
     return render_template('profile.html', user=user,
                            get_gravatar_url=get_gravatar_url, nemesis=nemesis,
+                           nemesis_coeff=nemesis_coeff,
                            best_teammate=best_teammate,
-                           worst_teammate=worst_teammate, matchs=matchs)
+                           worst_teammate=worst_teammate,
+                           best_teammate_coeff=best_teammate_coeff,
+                           worst_teammate_coeff=worst_teammate_coeff,
+                           matchs=matchs)
 
 
 @app.route('/svg_victory/<int:id_player>')
@@ -689,7 +693,7 @@ def get_nemesis(player):
             score_temp = score
         elif(score_temp == score):
             nemesis.append(player)
-    return nemesis
+    return nemesis, score_temp
 
 
 def get_best_teammate(player):
@@ -736,7 +740,7 @@ def get_best_teammate(player):
             score_temp = score
         elif(score_temp == score):
             teammate.append(player)
-    return teammate
+    return teammate, score_temp
 
 
 def get_worst_teammate(player):
@@ -784,7 +788,7 @@ def get_worst_teammate(player):
             score_temp = score
         elif(score_temp == score):
             teammate.append(player)
-    return teammate
+    return teammate, score_temp
 
 
 def get_ranking_at_timet(date):
