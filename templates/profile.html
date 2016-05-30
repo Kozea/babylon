@@ -19,10 +19,10 @@
         <p><strong>Victories :</strong>  {{user.nb_victories}}</p>   
         <p><strong>Defeats :</strong> {{user.nb_defeats}}</p>
         
-        <p>
-            <strong>Ratio :</strong> {{100*(user.nb_victories/user.number_of_match)| round(2)}}
+        <figure>
+            <figcaption><strong>Ratio :</strong> {{100*(user.nb_victories/user.number_of_match)| round(2)}}</figcaption>
            <img src="{{ url_for('svg_victory', id_player=user.id_user) }}"></img>
-        </p>
+        </figure>
     </section>
     
     
