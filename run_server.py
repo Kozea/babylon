@@ -159,7 +159,7 @@ class TournamentForm(Form):
 
 def get_gravatar_url(email):
     """Returns the gravatar url for the email in parameter.
-        
+
     Keyword arguments :
     email -- Email associated to a gravatar picture
     """
@@ -184,7 +184,7 @@ def matchs():
 @app.route('/profile/<int:id_player>')
 def profile(id_player):
     """Querying for detailled informations about one player
-        
+
     Keyword arguments:
     id_player -- id for target player
     """
@@ -229,8 +229,8 @@ def profile(id_player):
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):
     """Querying for the ranking informations for the different chart.
-        
-    Keyword arguments: 
+
+    Keyword arguments:
     id_player -- id for target player
     """
     # Never NEVER delete this line because it update score and number of match.
@@ -562,7 +562,7 @@ def choose_g(score_e1, score_e2):
 
 def choose_w(score_e1, score_e2):
     """Choose W coefficient. (Winner or not).
-    
+
     Keyword arguments:
     score_e1 -- Score form team 1
     score_e2 -- Score form team 2
@@ -577,7 +577,7 @@ def p(i):
 
 def generate_tournament(participants):
     """Create a tournament with the participants given in parameter.
-    
+
     Keyword arguments:
     participants -- Players participating to the tournament.
     """
