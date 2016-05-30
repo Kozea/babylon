@@ -472,38 +472,19 @@ def get_goal_difference_coefficient(score_team_1, score_team_2):
         return  1.75 + (diff - 3) / 8
 
 
-def generate_tournament(participants):
-    """Create a tournament with the given participants."""
-    number_of_participants = len(participants)
-    if number_of_participants % 2 != 0:
-        raise Exception("You must be a power of 2 !")
+def generate_tournament(players):
+    """Create a tournament with the given players."""
+    if len(players) < 4 or bin(len(players)).count('1') != 1:
+        raise ValueError('The number of players must be a power of 2')
 
-    # ordered the list of all players
-    players = sorted(participants, key=lambda player: player.ranking)
-
-    # create the team
-    teams = [(players[i], players[len(players)-1-i])
-             for i in range(math.floor(len(players)/2))]
-
-    # ordered the team
-    teams = sorted(teams, key=lambda team: (team[0].ranking+team[1].ranking)/2)
-
-    index = 1
-    for team in teams:
-        index += 1
-
-    tournament_head = []
-    tournament_queue = []
-    first = True
-    # create the tournament to make distance between contenders
-    for i in range(math.floor(len(teams)/2)):
-        if first:
-            tournament_head.append(((teams[i]), teams[len(teams)-1-i]))
-        else:
-            tournament_queue.insert(0, ((teams[i]), teams[len(teams)-1-i]))
-        first = not first
-
-    tournament = tournament_head + tournament_queue
+    players.sort(key=lambda player: player.ranking)
+    teams = []
+    while players:
+        teams.append([players.pop(0), players.pop(-1)])
+    teams.sort(key=lambda team: team[0].ranking + team[1].ranking)
+    tournament = []
+    while teams:
+        tournament.append([teams.pop(0), teams.pop(-1)])
     return tournament
 
 
