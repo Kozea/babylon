@@ -1,28 +1,6 @@
 {% extends "layout.html" %}
 
 {% block head %}
-<link rel="stylesheet" href="{{url_for('static', filename='ranking.css')}}">
-<script>
-    window.onload = on_load_ranking;
-    
-    function on_load_ranking(){
-        var trs = document.getElementsByTagName('tr');
-        for(var i = 1;i <trs.length; i++){
-            console.log(trs[i].childNodes[1].firstChild.data);
-            if(trs[i].childNodes[1].firstChild.data == "Green"){
-                trs[i].childNodes[1].style.backgroundColor = "greenyellow";
-            }
-            else if(trs[i].childNodes[1].firstChild.data == "Red"){
-                trs[i].childNodes[1].style.backgroundColor = "red";
-            }
-            else{
-
-            }
-            trs[i].childNodes[1].firstChild.data = i+"";
-        }
-        
-    }
-</script>
 {% endblock %}
 
 {% block body %} 

@@ -1,16 +1,16 @@
-# all the imports
-from flask import request, render_template, Flask, make_response
+""" The aim of this module is to launch our server."""
 from datetime import datetime
-import pygal
-import math
+import urllib
 from itertools import groupby
 from copy import deepcopy
+import math
 from collections import OrderedDict
+import hashlib
+from flask import request, render_template, Flask, make_response
+import pygal
 from flask_sqlalchemy import SQLAlchemy
 from wtforms.validators import InputRequired, ValidationError
 from plainform import Form, StringField, SubmitField, SelectMultipleField
-import urllib
-import hashlib
 
 
 # configuration
@@ -85,6 +85,7 @@ class User(db.Model):
 class UserSubscribeForm(Form):
     """This class implements forms for registering new users"""
     def validate_nickname(form, field):
+        """Validate the uniqueness of the nickname."""
         users = User.query.all()
         for user in users:
             if user.nickname == field.data:
@@ -95,42 +96,6 @@ class UserSubscribeForm(Form):
     nickname = StringField('Nickname', [validate_nickname, InputRequired()])
     photo = StringField('Gravatar email')
     submit = SubmitField('Create Player !')
-
-
-class MatchCreateForm(Form):
-    """This class implement forms for creating new matches"""
-    def validate_team1(form, field):
-        if len(field.data) > 2 or len(field.data) == 0:
-            raise ValidationError("Please select 1 or 2 players")
-
-    def validate_team2(form, field):
-        if len(field.data) > 2 or len(field.data) == 0:
-            raise ValidationError("Please select 1 or 2 players")
-
-        for player_team2 in field.data:
-            for player_team1 in form.team1.data:
-                if player_team2 == player_team1:
-                    raise ValidationError("Please select different users")
-
-    team1 = SelectMultipleField('Team 1', [validate_team1],
-                                coerce=int, choices=[])
-    team2 = SelectMultipleField('Team 2', [validate_team2],
-                                coerce=int, choices=[])
-
-    score_team1 = StringField('Score Team 1', [InputRequired()])
-    score_team2 = StringField('Score Team 2', [InputRequired()])
-    submit = SubmitField('Validate')
-
-    def __init__(self, *args, **kwargs):
-        users = User.query.all()
-        user_pairs = []
-        for user in users:
-            user_tuple = (user.id_user, user.name + ' ' + user.surname)
-            user_pairs.append(user_tuple)
-        self.team1.kwargs['choices'] = user_pairs
-        self.team2.kwargs['choices'] = user_pairs
-
-        Form.__init__(self, *args, **kwargs)
 
 
 class TournamentForm(Form):
@@ -359,7 +324,6 @@ def add_match():
         param_list = request.form.to_dict().keys()
 
         id_player11 = request.form["j11"][7:]
-        print(id_player11)
         player11 = User.query.filter_by(id_user=id_player11).first()
 
         if "j12" in param_list:
@@ -600,18 +564,6 @@ def generate_tournament(participants):
     return tournament
 
 
-def all_pairs(lst):
-    """Give all pairs possible with the list."""
-    if len(lst) < 2:
-        yield lst
-        return
-    a = lst[0]
-    for i in range(1, len(lst)):
-        pair = (a, lst[i])
-        for rest in all_pairs(lst[1:i]+lst[i+1:]):
-            yield [pair] + rest
-
-
 def build_avg_temp(pairs, participants):
     """Create a array with the average elo for each team."""
     avg_array = []
@@ -640,23 +592,23 @@ def get_nemesis(player):
     for match in matchs:
         if player == match.player11 or player == match.player12:
             if match.score_e1 < match.score_e2:
-                if(match.player21 in opponents.keys()):
+                if match.player21 in opponents.keys():
                     opponents[match.player21] += 1
                 else:
                     opponents[match.player21] = 1
-                if(match.player22 is not None):
-                    if(match.player22 in opponents.keys()):
+                if match.player22 is not None:
+                    if match.player22 in opponents.keys():
                         opponents[match.player22] += 1
                     else:
                         opponents[match.player22] = 1
         else:
             if match.score_e1 > match.score_e2:
-                if(match.player11 in opponents.keys()):
+                if match.player11 in opponents.keys():
                     opponents[match.player11] += 1
                 else:
                     opponents[match.player11] = 1
-                if(match.player12 is not None):
-                    if(match.player12 in opponents.keys()):
+                if match.player12 is not None:
+                    if match.player12 in opponents.keys():
                         opponents[match.player12] += 1
                     else:
                         opponents[match.player12] = 1
@@ -664,11 +616,11 @@ def get_nemesis(player):
     score_temp = 0
     nemesis = []
     for player, score in opponents.items():
-        if(score_temp < score):
+        if score_temp < score:
             nemesis = []
             nemesis.append(player)
             score_temp = score
-        elif(score_temp == score):
+        elif score_temp == score:
             nemesis.append(player)
     return nemesis, score_temp
 
@@ -683,39 +635,39 @@ def get_best_teammate(player):
 
     for match in matchs:
         if player == match.player11 and match.score_e1 > match.score_e2:
-            if(match.player12 is not None):
-                if(match.player12 in teammates.keys()):
+            if match.player12 is not None:
+                if match.player12 in teammates.keys():
                     teammates[match.player12] += 1
                 else:
                     teammates[match.player12] = 1
 
         elif player == match.player12 and match.score_e1 > match.score_e2:
-                if(match.player11 in teammates.keys()):
-                    teammates[match.player11] += 1
-                else:
-                    teammates[match.player11] = 1
+            if match.player11 in teammates.keys():
+                teammates[match.player11] += 1
+            else:
+                teammates[match.player11] = 1
 
         elif player == match.player21 and match.score_e2 > match.score_e1:
-            if(match.player22 is not None):
-                if(match.player22 in teammates.keys()):
+            if match.player22 is not None:
+                if match.player22 in teammates.keys():
                     teammates[match.player22] += 1
                 else:
                     teammates[match.player22] = 1
 
         elif player == match.player22 and match.score_e2 > match.score_e1:
-                if(match.player21 in teammates.keys()):
-                    teammates[match.player21] += 1
-                else:
-                    teammates[match.player21] = 1
+            if match.player21 in teammates.keys():
+                teammates[match.player21] += 1
+            else:
+                teammates[match.player21] = 1
 
     score_temp = 0
     teammate = []
     for player, score in teammates.items():
-        if(score_temp < score):
+        if score_temp < score:
             teammate = []
             teammate.append(player)
             score_temp = score
-        elif(score_temp == score):
+        elif score_temp == score:
             teammate.append(player)
     return teammate, score_temp
 
@@ -731,39 +683,39 @@ def get_worst_teammate(player):
     for match in matchs:
 
         if player == match.player11 and match.score_e1 < match.score_e2:
-            if(match.player12 is not None):
-                if(match.player12 in teammates.keys()):
+            if match.player12 is not None:
+                if match.player12 in teammates.keys():
                     teammates[match.player12] += 1
                 else:
                     teammates[match.player12] = 1
 
         elif player == match.player12 and match.score_e1 < match.score_e2:
-                if(match.player11 in teammates.keys()):
-                    teammates[match.player11] += 1
-                else:
-                    teammates[match.player11] = 1
+            if match.player11 in teammates.keys():
+                teammates[match.player11] += 1
+            else:
+                teammates[match.player11] = 1
 
         elif player == match.player21 and match.score_e2 < match.score_e1:
-            if(match.player22 is not None):
-                if(match.player22 in teammates.keys()):
+            if match.player22 is not None:
+                if match.player22 in teammates.keys():
                     teammates[match.player22] += 1
                 else:
                     teammates[match.player22] = 1
 
         elif player == match.player22 and match.score_e2 < match.score_e1:
-                if(match.player21 in teammates.keys()):
-                    teammates[match.player21] += 1
-                else:
-                    teammates[match.player21] = 1
+            if match.player21 in teammates.keys():
+                teammates[match.player21] += 1
+            else:
+                teammates[match.player21] = 1
 
     score_temp = 0
     teammate = []
     for player, score in teammates.items():
-        if(score_temp < score):
+        if score_temp < score:
             teammate = []
             teammate.append(player)
             score_temp = score
-        elif(score_temp == score):
+        elif score_temp == score:
             teammate.append(player)
     return teammate, score_temp
 
