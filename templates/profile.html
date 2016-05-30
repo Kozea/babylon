@@ -9,7 +9,7 @@
     </header>
     
     <section>
-        <p><img src="{{get_gravatar_url(user.photo)}}"></p>
+        <p><img src="{{ get_gravatar_url(user.photo) }}"></p>
     </section>
     
     {% if user.number_of_match != 0 %}
@@ -21,7 +21,7 @@
         
         <p>
             <strong>Ratio :</strong> {{100*(user.nb_victories/user.number_of_match)| round(2)}}
-           <img src="{{ url_for('svg_victory', id_player=user.id_user)}}"></img>
+           <img src="{{ url_for('svg_victory', id_player=user.id_user) }}"></img>
         </p>
     </section>
     
@@ -30,7 +30,7 @@
         <p>
             <strong>Best Teammate(s) : </strong>
             {% for user in best_teammate %}
-            <a href="{{ url_for('profile', id_player=user.id_user)}}">{{user.get_full_name()}}</a>
+            <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.get_full_name()}}</a>
             {% else %}
             No best Teammate.
             {% endfor %}
@@ -40,7 +40,7 @@
         <p>
             <strong>Worst Teammate(s) : </strong>
             {% for user in worst_teammate %}
-            <a href="{{ url_for('profile', id_player=user.id_user)}}">{{user.get_full_name()}}</a>
+            <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.get_full_name()}}</a>
             {% else %}
             No Worst Teammate.
             {% endfor %}
@@ -49,7 +49,7 @@
         <p>
             <strong>Nemesis : </strong>
             {% for user in nemesis %}
-            <a href="{{ url_for('profile', id_player=user.id_user)}}">{{user.get_full_name()}}</a>
+            <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.get_full_name()}}</a>
             {% else %}
             No nemesis.
             {% endfor %}
@@ -62,7 +62,7 @@
         {% for match in matchs %}
         <article>
                 <h2>
-                    <time datetime ="{{match.date}}">{{match.date}}</time>
+                    <time datetime ="{{ match.date }}">{{match.date}}</time>
                 </h2>
                 
                 <section>
@@ -77,7 +77,7 @@
                     <figure>
                         <img src={{get_gravatar_url(match.player12.photo)}}>
                         <figcaption>
-                            <a href="{{ url_for('profile', id_player=match.player12.id_user)}}">{{match.player12.get_full_name()}}</a>
+                            <a href="{{ url_for('profile', id_player=match.player12.id_user) }}">{{match.player12.get_full_name()}}</a>
                         </figcaption>
                     </figure>
                     {% endif %}
@@ -88,14 +88,14 @@
                     <figure>
                         <img src={{get_gravatar_url(match.player21.photo)}}>
                         <figcaption>
-                            <a href="{{ url_for('profile', id_player=match.player21.id_user)}}">{{match.player21.get_full_name()}}</a>
+                            <a href="{{ url_for('profile', id_player=match.player21.id_user) }}">{{match.player21.get_full_name()}}</a>
                         </figcaption>
                     </figure>
                     {% if match.player22 %}
                     <figure>
                         <img src={{get_gravatar_url(match.player22.photo)}}>
                         <figcaption>
-                            <a href="{{ url_for('profile', id_player=match.player22.id_user)}}">{{match.player22.get_full_name()}}</a>
+                            <a href="{{ url_for('profile', id_player=match.player22.id_user) }}">{{match.player22.get_full_name()}}</a>
                         </figcaption>
                     </figure>
                     {% endif %}
