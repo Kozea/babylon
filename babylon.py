@@ -22,7 +22,6 @@ from plainform import Form, StringField, SubmitField, SelectMultipleField
 from wtforms.validators import InputRequired, ValidationError
 
 
-DEBUG = True
 SECRET_KEY = 'development key'
 
 app = Flask(__name__)
@@ -764,4 +763,4 @@ def init_db():
     db.create_all()
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
