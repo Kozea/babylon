@@ -14,14 +14,14 @@
         <section>
             <h3>{{ match.score_e1 }}</h3>
             <figure>
-                <img src={{ get_gravatar_url(match.player11.photo) }}>
+                <img src={{ get_gravatar_url(match.player11.email) }}>
                 <figcaption>
                     <a href="{{ url_for('profile', id_player=match.player11.id_user) }}">{{ match.player11.get_full_name() }}</a>
                 </figcaption>
             </figure>
             {% if match.player12 %}
             <figure>
-                <img src={{ get_gravatar_url(match.player12.photo) }}>
+                <img src={{ get_gravatar_url(match.player12.email) }}>
                 <figcaption>
                     <a href="{{ url_for('profile', id_player=match.player12.id_user) }}">{{ match.player12.get_full_name() }}</a>
                 </figcaption>
@@ -31,14 +31,14 @@
         </section>
             <h3>{{ match.score_e2 }}</h3>
             <figure>
-                <img src={{ get_gravatar_url(match.player21.photo) }}>
+                <img src={{ get_gravatar_url(match.player21.email) }}>
                 <figcaption>
                     <a href="{{ url_for('profile', id_player=match.player21.id_user) }}">{{ match.player21.get_full_name() }}</a>
                 </figcaption>
             </figure>
             {% if match.player22 %}
             <figure>
-                <img src={{ get_gravatar_url(match.player22.photo) }}>
+                <img src={{ get_gravatar_url(match.player22.email) }}>
                 <figcaption>
                     <a href="{{ url_for('profile', id_player=match.player22.id_user) }}">{{ match.player22.get_full_name() }}</a>
                 </figcaption>

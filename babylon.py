@@ -60,13 +60,13 @@ class User(db.Model):
     surname = db.Column(db.String(100))
     name = db.Column(db.String(100))
     nickname = db.Column(db.String(100), unique=True)
-    photo = db.Column(db.String(400))
+    email = db.Column(db.String(400))
 
-    def __init__(self, surname, name, nickname, photo):
+    def __init__(self, surname, name, nickname, email):
         self.surname = surname
         self.name = name
         self.nickname = nickname
-        self.photo = photo
+        self.email = email
         self.ranking = -1
         self.number_of_match = 0
         self.nb_victories = 0
@@ -98,7 +98,7 @@ class UserSubscribeForm(Form):
     surname = StringField('Surname', [InputRequired()])
     name = StringField('Name', [InputRequired()])
     nickname = StringField('Nickname', [validate_nickname, InputRequired()])
-    photo = StringField('Gravatar email')
+    email = StringField('Gravatar email')
     submit = SubmitField('Create Player !')
 
 
@@ -114,13 +114,11 @@ def get_gravatar_url(email):
     Keyword arguments :
     email -- Email associated to a gravatar picture
     """
-
-    photo = email
     # If there is encoding problem here, it's YOUR fault."
     default = "http://urlz.fr/3z9I"
     size = 150
     gravatar_url = ("http://www.gravatar.com/avatar/" +
-                    hashlib.md5(photo.lower()).hexdigest() + "?")
+                    hashlib.md5(email.lower()).hexdigest() + "?")
     gravatar_url += urllib.parse.urlencode({'d': default, 's': str(size)})
     return gravatar_url
 
@@ -365,7 +363,7 @@ def add_player():
     success = None
     if request.method == 'POST' and form.validate():
         new_user = User(form.surname.data, form.name.data, form.nickname.data,
-                        form.photo.data.encode("utf-8"))
+                        form.email.data.encode("utf-8"))
         db.session.add(new_user)
         db.session.commit()
 
