@@ -182,6 +182,7 @@ def profile(id_player):
     
     user = User.query.filter(User.id_user == id_player).one()
     nemesis = get_nemesis(user)
+    matchs = get_matchs(user)
         
     victories_as_team1 = (
         db.session.query(Match.id_match)
@@ -207,7 +208,7 @@ def profile(id_player):
         user.ratio_gauge = gauge
         
     return render_template('profile.html', user=user,
-                           get_gravatar_url=get_gravatar_url, nemesis=nemesis)
+                           get_gravatar_url=get_gravatar_url, nemesis=nemesis, matchs=matchs)
 
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):
@@ -606,9 +607,15 @@ def build_avg_temp(pairs, participants):
             (participants[pair[0]].ranking+participants[pair[1]].ranking)/2)
         avg_array.append(temp_avg)
     return avg_array
-
-def get_nemesis(player):
+    
+    
+def get_matchs(player):
     matchs = Match.query.filter((Match.player11==player) | (Match.player12==player) | (Match.player21==player) | (Match.player22==player)).all()
+    return matchs
+    
+    
+def get_nemesis(player):
+    matchs = get_matchs(player)
     opponents = {}
 
     for match in matchs:
