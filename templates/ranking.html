@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{url_for('static', filename='ranking.css')}}">
+{% endblock %}
+
 {% block body %} 
 
-<h1>Ranking</h1>
 {% if users %}
 <a href="{{ url_for('ranking_graph')}}">Watch monthly ranking evolution</a>
 <table>

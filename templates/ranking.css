@@ -1,0 +1,22 @@
+table tbody {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table tbody td, table tbody th {
+    border: 1px solid #ddd;
+    text-align: left;
+    padding: 8px;
+}
+
+table tbody tr:nth-child(even){background-color: #f2f2f2}
+
+table tbody tr:hover {background-color: #ddd;}
+
+table tbody th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #4CAF50;
+    color: white;
+}

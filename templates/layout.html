@@ -3,20 +3,24 @@
 
 <head>
     <title>Babylone</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='layout.css')}}">
     {% block head %}{% endblock %}
 </head>
 
 <body>
 
-<nav>
-    <ul>
-        <li><a href="{{ url_for('matchs')}}">Matchs</a></li>
-        <li><a href="{{ url_for('ranking')}}">Ranking</a></li>
-        <li><a href="{{ url_for('add_match')}}">Add a Match</a></li>
-        <li><a href="{{ url_for('add_player')}}">Add a player</a></li>
-        <li><a href="{{ url_for('tournament')}}">Tournament</a></li>
-    </ul>
-</nav>
+<header>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('matchs')}}">Matchs</a></li>
+            <li><a href="{{ url_for('ranking')}}">Ranking</a></li>
+            <li><a href="{{ url_for('add_match')}}">Add a Match</a></li>
+            <li><a href="{{ url_for('add_player')}}">Add a player</a></li>
+            <li><a href="{{ url_for('tournament')}}">Tournament</a></li>
+        </ul>
+    </nav>
+</header>
+
 {% block body %}{% endblock %}
 </body>
 
