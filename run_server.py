@@ -101,7 +101,6 @@ class User(db.Model):
 
 class UserSubscribeForm(Form):
     """This class implements forms for registering new users"""
-
     def validate_nickname(form, field):
         users = User.query.all()
         for user in users:
@@ -163,6 +162,7 @@ def get_gravatar_url(email):
     Keyword arguments :
     email -- Email associated to a gravatar picture
     """
+
     photo = email
     # If there is encoding problem here, it's YOUR fault."
     default = "http://urlz.fr/3z9I"
@@ -188,6 +188,7 @@ def profile(id_player):
     Keyword arguments:
     id_player -- id for target player
     """
+
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
 
@@ -233,6 +234,7 @@ def svg_victory(id_player):
     Keyword arguments:
     id_player -- id for target player
     """
+
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
 
@@ -430,9 +432,7 @@ def get_extension_file(filename):
 
 
 def allowed_file(filename):
-    """ Test to know if a file has a correct extension.
-    K
-    """
+    """ Test to know if a file has a correct extension."""
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
@@ -567,6 +567,7 @@ def choose_w(score_e1, score_e2):
     score_e1 -- Score form team 1
     score_e2 -- Score form team 2
     """
+
     return 1 if score_e1 > score_e2 else 0
 
 
@@ -581,6 +582,7 @@ def generate_tournament(participants):
     Keyword arguments:
     participants -- Players participating to the tournament.
     """
+
     number_of_participants = len(participants)
     if number_of_participants % 2 != 0:
         raise Exception("You must be a power of 2 !")
@@ -650,7 +652,7 @@ def get_matchs(player):
 
 
 def get_nemesis(player):
-    """Returns a list of players who defeated one player the most  """
+    """Returns a list of players who defeated one player the most. """
     matchs = get_matchs(player)
     opponents = {}
 
@@ -692,7 +694,8 @@ def get_nemesis(player):
 
 def get_best_teammate(player):
     """Returns a player's best teammates. A player is another player's
-        best teammate when he won the most with him, while playing as a team"""
+        best teammate when he won the most with him, while playing as a team.
+    """
 
     matchs = get_matchs(player)
     teammates = {}
@@ -738,7 +741,9 @@ def get_best_teammate(player):
 
 def get_worst_teammate(player):
     """Returns a player's worst teammates. A player is another player's
-    worst teammate when he lost the most with him, while playing as a team"""
+    worst teammate when he lost the most with him, while playing as a team
+    """
+
     matchs = get_matchs(player)
     teammates = {}
 
