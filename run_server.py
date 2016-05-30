@@ -7,8 +7,8 @@ from itertools import groupby
 from copy import deepcopy
 from collections import OrderedDict
 from flask_sqlalchemy import SQLAlchemy
-from plainform import *
 from wtforms.validators import InputRequired, ValidationError
+from plainform import Form, StringField, SubmitField, SelectMultipleField
 import urllib
 import hashlib
 
@@ -22,23 +22,6 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/babylone.db'
 db = SQLAlchemy(app)
-
-
-class Unique(object):
-    """ validator that checks field uniqueness """
-    def __init__(self, model, field, message=None):
-        self.model = model
-        self.field = field
-        if not message:
-            message = u'this user already exists'
-        self.message = message
-
-    def __call__(self, form, field):
-        if field.object_data == field.data:
-            return
-        check = DBSession.query(model).filter(field == data).first()
-        if check:
-            raise ValidationError(self.message)
 
 
 class Match(db.Model):
@@ -433,12 +416,6 @@ def get_extension_file(filename):
 
     index = filename.rfind('.')
     return filename[index:]
-
-
-def allowed_file(filename):
-    """ Test to know if a file has a correct extension."""
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
 def compute_ranking():
