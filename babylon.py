@@ -29,7 +29,7 @@ db = SQLAlchemy(app)
 
 
 class Match(db.Model):
-    """This class represents a match in database."""
+    """Match table."""
     id_match = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime)
     score_e1 = db.Column(db.Integer)
@@ -55,7 +55,7 @@ class Match(db.Model):
 
 
 class User(db.Model):
-    """ This class represent a user in database with some attributes."""
+    """User table."""
     id_user = db.Column(db.Integer, primary_key=True)
     surname = db.Column(db.String(100))
     name = db.Column(db.String(100))
@@ -87,7 +87,7 @@ class User(db.Model):
 
 
 class UserSubscribeForm(Form):
-    """This class implements forms for registering new users"""
+    """Form registering new users."""
     def validate_nickname(form, field):
         """Validate the uniqueness of the nickname."""
         users = User.query.all()
@@ -103,17 +103,13 @@ class UserSubscribeForm(Form):
 
 
 class TournamentForm(Form):
-    """ This class implements forms for creating tournament."""
+    """Form creating tournaments."""
     players = SelectMultipleField('Players', choices=[])
     submit = SubmitField('Validate')
 
 
 def get_gravatar_url(email):
-    """Returns the gravatar url for the email in parameter.
-
-    Keyword arguments :
-    email -- Email associated to a gravatar picture
-    """
+    """Get the gravatar url for the email in parameter."""
     # If there is encoding problem here, it's YOUR fault."
     default = "http://urlz.fr/3z9I"
     size = 150
@@ -125,7 +121,7 @@ def get_gravatar_url(email):
 
 @app.route('/')
 def matchs():
-    """Querying for all matchs in the database."""
+    """Querying all the matchs, more recents first."""
     matchs = Match.query.order_by(-Match.id_match).all()
     return render_template('match.html', matchs=matchs,
                            get_gravatar_url=get_gravatar_url)
@@ -133,11 +129,7 @@ def matchs():
 
 @app.route('/profile/<int:id_player>')
 def profile(id_player):
-    """Querying for detailled informations about one player
-
-    Keyword arguments:
-    id_player -- id for target player
-    """
+    """Querying detailled informations about one player from its id."""
 
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
@@ -183,11 +175,7 @@ def profile(id_player):
 
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):
-    """Querying for the ranking informations for the different chart.
-
-    Keyword arguments:
-    id_player -- id for target player
-    """
+    """Querying ranking informations for one player from its id."""
 
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
@@ -223,7 +211,7 @@ def svg_victory(id_player):
 
 @app.route('/ranking')
 def ranking():
-    """ Querying for the ranking informations for the different chart. """
+    """Querying the ranking informations. """
     unordered_ranking = compute_ranking()
 
     for user in unordered_ranking:
@@ -259,7 +247,7 @@ def ranking():
 
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
-    """Called when trying to create a tournament."""
+    """Create a tournament."""
     form = TournamentForm(request.form)
     users = compute_ranking()
     user_pairs = []
@@ -312,7 +300,7 @@ def ranking_graph():
 
 @app.route('/add_match', methods=['GET', 'POST'])
 def add_match():
-    """Creates a new match using values given to the add_match form."""
+    """Create a new match."""
     users = User.query.all()
     if len(users) == 0:
         success = "There are no players yet !"
@@ -358,7 +346,7 @@ def add_match():
 
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
-    """Creates a new user using values given in the add_player form"""
+    """Create a new user."""
     form = UserSubscribeForm(request.form)
     success = None
     if request.method == 'POST' and form.validate():
@@ -374,9 +362,7 @@ def add_player():
 
 
 def compute_ranking():
-    """This method return a list of users with theirs attributes score
-    according to the matchs in the database.
-    """
+    """Get the list of all users with their current score."""
 
     users = User.query.all()
     for user in users:
@@ -407,6 +393,7 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
     my_ennemy2 -- the user 2 of team2 (perhaps None)
     my_score -- the score of team1
     opponent_score -- the score of team2
+
     """
 
     # Create fictive player1
@@ -497,13 +484,7 @@ def choose_g(score_e1, score_e2):
 
 
 def choose_w(score_e1, score_e2):
-    """Choose W coefficient. (Winner or not).
-
-    Keyword arguments:
-    score_e1 -- Score form team 1
-    score_e2 -- Score form team 2
-    """
-
+    """Choose W coefficient (winner or not)."""
     return 1 if score_e1 > score_e2 else 0
 
 
@@ -513,11 +494,7 @@ def p(i):
 
 
 def generate_tournament(participants):
-    """Create a tournament with the participants given in parameter.
-
-    Keyword arguments:
-    participants -- Players participating to the tournament.
-    """
+    """Create a tournament with the given participants."""
 
     number_of_participants = len(participants)
     if number_of_participants % 2 != 0:
@@ -556,7 +533,7 @@ def generate_tournament(participants):
 
 
 def build_avg_temp(pairs, participants):
-    """Create a array with the average elo for each team."""
+    """Create an array with the average elo for each team."""
     avg_array = []
     for pair in pairs:
         temp_avg = (
@@ -566,7 +543,7 @@ def build_avg_temp(pairs, participants):
 
 
 def get_matchs(player):
-    """Returns a list of all matchs involving a player"""
+    """Get a list of all matchs involving a given player."""
     matchs = Match.query.filter((Match.player11 == player) |
                                 (Match.player12 == player) |
                                 (Match.player21 == player) |
@@ -576,7 +553,7 @@ def get_matchs(player):
 
 
 def get_nemesis(player):
-    """Returns a list of players who defeated one player the most. """
+    """Get a list of players who defeated one given player the most. """
     matchs = get_matchs(player)
     opponents = {}
 
@@ -617,10 +594,12 @@ def get_nemesis(player):
 
 
 def get_best_teammate(player):
-    """Returns a player's best teammates. A player is another player's
-        best teammate when he won the most with him, while playing as a team.
-    """
+    """Get a player's best teammates.
 
+    A player is another player's best teammate when he won the most with him,
+    while playing as a team.
+
+    """
     matchs = get_matchs(player)
     teammates = {}
 
@@ -664,10 +643,12 @@ def get_best_teammate(player):
 
 
 def get_worst_teammate(player):
-    """Returns a player's worst teammates. A player is another player's
-    worst teammate when he lost the most with him, while playing as a team
-    """
+    """Get a player's worst teammates.
 
+    A player is another player's worst teammate when he lost the most with him,
+    while playing as a team.
+
+    """
     matchs = get_matchs(player)
     teammates = {}
 
@@ -714,12 +695,9 @@ def get_worst_teammate(player):
 def get_ranking_at_timet(date):
     """Generate data for ranking chart.
 
-    This method generate a dict with date as key and list of user
-    as values. Use this method to generate a chart of the ranking
-    evolution.
+    This method generate a dict with date as key and list of user as
+    values. Use this method to generate a chart of the ranking evolution.
 
-    Keyword argument:
-    date -- the starting date of the chart
     """
 
     date_score = {}
@@ -755,8 +733,9 @@ def get_ranking_at_timet(date):
 
 
 def init_db():
-    """ Initialize the database. """
+    """Initialize the database."""
     db.create_all()
+
 
 if __name__ == '__main__':
     app.run(debug=True)
