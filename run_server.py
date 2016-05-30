@@ -158,7 +158,11 @@ class TournamentForm(Form):
 
 
 def get_gravatar_url(email):
-    """Return the gravatar url for the email in parameter."""
+    """Returns the gravatar url for the email in parameter.
+
+    Keyword arguments :
+    email -- Email associated to a gravatar picture
+    """
     photo = email
     # If there is encoding problem here, it's YOUR fault."
     default = "http://urlz.fr/3z9I"
@@ -179,6 +183,11 @@ def matchs():
 
 @app.route('/profile/<int:id_player>')
 def profile(id_player):
+    """Querying for detailled informations about one player
+
+    Keyword arguments:
+    id_player -- id for target player
+    """
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
 
@@ -219,7 +228,11 @@ def profile(id_player):
 
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):
-    """ Querying for the ranking informations for the different chart. """
+    """Querying for the ranking informations for the different chart.
+
+    Keyword arguments:
+    id_player -- id for target player
+    """
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
 
@@ -417,7 +430,9 @@ def get_extension_file(filename):
 
 
 def allowed_file(filename):
-    """ Test to know if a file has a correct extension. s"""
+    """ Test to know if a file has a correct extension.
+    K
+    """
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
@@ -532,7 +547,7 @@ def choose_k(number_of_match, elo):
 
 
 def choose_g(score_e1, score_e2):
-    """ Choose the correct G (goal difference) coefficient. """
+    """Choose the correct G (goal difference) coefficient."""
     diff = abs(score_e1 - score_e2)
     if diff < 2:
         G = 1
@@ -546,17 +561,26 @@ def choose_g(score_e1, score_e2):
 
 
 def choose_w(score_e1, score_e2):
-    """ Choose W coefficient. (Winner or not)."""
+    """Choose W coefficient. (Winner or not).
+
+    Keyword arguments:
+    score_e1 -- Score form team 1
+    score_e2 -- Score form team 2
+    """
     return 1 if score_e1 > score_e2 else 0
 
 
 def p(i):
-    """ Helper method for elo scoring."""
+    """Helper method for elo scoring."""
     return 1/(1+10**(-i/400))
 
 
 def generate_tournament(participants):
-    """Create a tournament with the participants given in parameter."""
+    """Create a tournament with the participants given in parameter.
+
+    Keyword arguments:
+    participants -- Players participating to the tournament.
+    """
     number_of_participants = len(participants)
     if number_of_participants % 2 != 0:
         raise Exception("You must be a power of 2 !")
@@ -616,6 +640,7 @@ def build_avg_temp(pairs, participants):
 
 
 def get_matchs(player):
+    """Returns a list of all matchs involving a player"""
     matchs = Match.query.filter((Match.player11 == player) |
                                 (Match.player12 == player) |
                                 (Match.player21 == player) |
@@ -625,6 +650,7 @@ def get_matchs(player):
 
 
 def get_nemesis(player):
+    """Returns a list of players who defeated one player the most  """
     matchs = get_matchs(player)
     opponents = {}
 
@@ -665,6 +691,9 @@ def get_nemesis(player):
 
 
 def get_best_teammate(player):
+    """Returns a player's best teammates. A player is another player's
+        best teammate when he won the most with him, while playing as a team"""
+
     matchs = get_matchs(player)
     teammates = {}
 
@@ -708,6 +737,8 @@ def get_best_teammate(player):
 
 
 def get_worst_teammate(player):
+    """Returns a player's worst teammates. A player is another player's
+    worst teammate when he lost the most with him, while playing as a team"""
     matchs = get_matchs(player)
     teammates = {}
 
