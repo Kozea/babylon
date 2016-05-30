@@ -34,6 +34,15 @@
     {% endif %}
     
     <section>
+            <p>
+            {% for user in best_teammate %}
+            <b>Best Teammate : </b>
+            {{user.name}}
+            {{user.id_user}}
+            {% else %}
+            No best Teammate.
+            {% endfor %}
+        </p>
         <p>
             {% for user in nemesis %}
             <b>Nemesis : </b>
@@ -43,6 +52,51 @@
             No nemesis.
             {% endfor %}
         </p>
+    </section>
+    
+    <section>
+        <h1>Matchs played</h1>
+        {% for match in matchs %}
+        <article>
+                <h2>
+                    <time datetime ="{{match.date}}">{{match.date}}</time>
+                </h2>
+                <section>
+                    <h3>{{match.score_e1}}</h3>
+                    <figure>
+                        <img src={{get_gravatar_url(match.player11.photo)}}>
+                        <figcaption>
+                            <a href="{{ url_for('profile', id_player=match.player11.id_user)}}">{{match.player11.get_full_name()}}</a>
+                        </figcaption>
+                    </figure>
+                    {% if match.player12 %}
+                    <figure>
+                        <img src={{get_gravatar_url(match.player12.photo)}}>
+                        <figcaption>
+                            <a href="{{ url_for('profile', id_player=match.player12.id_user)}}">{{match.player12.get_full_name()}}</a>
+                        </figcaption>
+                    </figure>
+                    {% endif %}
+                <section>
+                </section>
+                    <h3>{{match.score_e2}}</h3>
+                    <figure>
+                        <img src={{get_gravatar_url(match.player21.photo)}}>
+                        <figcaption>
+                            <a href="{{ url_for('profile', id_player=match.player21.id_user)}}">{{match.player21.get_full_name()}}</a>
+                        </figcaption>
+                    </figure>
+                    {% if match.player22 %}
+                    <figure>
+                        <img src={{get_gravatar_url(match.player22.photo)}}>
+                        <figcaption>
+                            <a href="{{ url_for('profile', id_player=match.player22.id_user)}}">{{match.player22.get_full_name()}}</a>
+                        </figcaption>
+                    </figure>
+                    {% endif %}
+                </section>
+        </article>
+        {% endfor %}
     </section>
 </article>
 
