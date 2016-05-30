@@ -1,4 +1,12 @@
-""" The aim of this module is to launch our server."""
+"""
+Babylon
+=======
+
+1. A significant city in ancient Mesopotamia.
+2. A web interface managing table football matches and tournaments.
+
+"""
+
 from datetime import datetime
 import urllib
 from itertools import groupby
