@@ -4,4 +4,12 @@
 <img src={{get_gravatar_url(user.photo)}}>
 {{user.get_full_name()}}
 
+<br>
+{% for user in nemesis %}
+{{user.name}}
+{{user.id_user}}
+{% else %}
+No nemesis.
+{% endfor %}
+
 {% endblock %}

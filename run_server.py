@@ -178,8 +178,9 @@ def matchs():
 @app.route('/profile/<int:id_player>')
 def profile(id_player):
     user = User.query.filter(User.id_user == id_player).one()
+    nemesis = get_nemesis(user)
     return render_template('profile.html', user=user,
-                           get_gravatar_url=get_gravatar_url)
+                           get_gravatar_url=get_gravatar_url, nemesis=nemesis)
 
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):
@@ -579,7 +580,47 @@ def build_avg_temp(pairs, participants):
         avg_array.append(temp_avg)
     return avg_array
 
+def get_nemesis(player):
+    matchs = Match.query.filter((Match.player11==player) | (Match.player12==player) | (Match.player21==player) | (Match.player22==player)).all()
+    opponents = {}
 
+    for match in matchs:
+        print(match.id_match)
+        if(player==match.player11 or player==match.player12):
+            print("Team 1")
+            if(match.score_e1<match.score_e2):
+                if(match.player21 in opponents.keys()):
+                    opponents[match.player21] += 1
+                else:
+                    opponents[match.player21] = 1
+                if(match.player22 in opponents.keys()):
+                    opponents[match.player22] += 1
+                else:
+                    opponents[match.player22] = 1
+        else:
+            print("Team 2")
+            if(match.score_e1>match.score_e2):
+                if(match.player11 in opponents.keys()):
+                    opponents[match.player11] += 1
+                else:
+                    opponents[match.player11] = 1
+                if(match.player12 in opponents.keys()):
+                    opponents[match.player12] += 1
+                else:
+                    opponents[match.player12] = 1
+
+    score_temp = 0
+    nemesis = []
+    for player, score in opponents.items():
+        if(score_temp < score):
+            nemesis = []
+            nemesis.append(player)
+        if(score_temp == score):
+            nemesis.append(player)
+
+    return nemesis
+    
+            
 def get_ranking_at_timet(date):
     """Generate data for ranking chart.
 
