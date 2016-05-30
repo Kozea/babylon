@@ -9,7 +9,7 @@
     </header>
     
     <section>
-        <p><img src="{{ get_gravatar_url(user.email) }}"></p>
+        <p><img src="{{ user.gravatar_url }}"></p>
     </section>
     
     {% if user.number_of_match != 0 %}
@@ -68,14 +68,14 @@
                 <section>
                     <h3>{{ match.score_team_1 }}</h3>
                     <figure>
-                        <img src={{ get_gravatar_url(match.team_1_player_1.email) }}>
+                        <img src={{ match.team_1_player_1.gravatar_url }}>
                         <figcaption>
                             <a href="{{ url_for('profile', id_player=match.team_1_player_1.id_user) }}">{{ match.team_1_player_1.full_name }}</a>
                         </figcaption>
                     </figure>
                     {% if match.team_1_player_2 %}
                     <figure>
-                        <img src={{ get_gravatar_url(match.team_1_player_2.email) }}>
+                        <img src={{ match.team_1_player_2.gravatar_url }}>
                         <figcaption>
                             <a href="{{ url_for('profile', id_player=match.team_1_player_2.id_user) }}">{{ match.team_1_player_2.full_name }}</a>
                         </figcaption>
@@ -86,14 +86,14 @@
                 <section>
                     <h3>{{ match.score_team_2 }}</h3>
                     <figure>
-                        <img src={{ get_gravatar_url(match.team_2_player_1.email) }}>
+                        <img src={{ match.team_2_player_1.gravatar_url }}>
                         <figcaption>
                             <a href="{{ url_for('profile', id_player=match.team_2_player_1.id_user) }}">{{ match.team_2_player_1.full_name }}</a>
                         </figcaption>
                     </figure>
                     {% if match.team_2_player_2 %}
                     <figure>
-                        <img src={{ get_gravatar_url(match.team_2_player_2.email) }}>
+                        <img src={{ match.team_2_player_2.gravatar_url }}>
                         <figcaption>
                             <a href="{{ url_for('profile', id_player=match.team_2_player_2.id_user) }}">{{ match.team_2_player_2.full_name }}</a>
                         </figcaption>

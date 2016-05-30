@@ -22,6 +22,9 @@ from plainform import Form, StringField, SubmitField, SelectMultipleField
 from wtforms.validators import InputRequired, ValidationError
 
 
+GRAVATAR_DEFAULT = 'http://urlz.fr/3z9I'
+GRAVATAR_SIZE = '150'
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'development key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/babylone.db'
@@ -83,6 +86,13 @@ class User(db.Model):
         """Full name of the user."""
         return "{} {}".format(self.surname, self.name)
 
+    @property
+    def gravatar_url(self):
+        """Gravatar URL of the user."""
+        return "http://www.gravatar.com/avatar/{}?{}".format(
+            hashlib.md5(self.email.lower()).hexdigest(),
+            urllib.parse.urlencode({'d': GRAVATAR_DEFAULT, 's': GRAVATAR_SIZE}))
+
 
 class UserSubscribeForm(Form):
     """Form registering new users."""
@@ -106,28 +116,16 @@ class TournamentForm(Form):
     submit = SubmitField('Validate')
 
 
-def get_gravatar_url(email):
-    """Get the gravatar url for the email in parameter."""
-    # If there is encoding problem here, it's YOUR fault."
-    default = "http://urlz.fr/3z9I"
-    size = 150
-    gravatar_url = ("http://www.gravatar.com/avatar/" +
-                    hashlib.md5(email.lower()).hexdigest() + "?")
-    gravatar_url += urllib.parse.urlencode({'d': default, 's': str(size)})
-    return gravatar_url
-
-
 @app.route('/')
 def matchs():
-    """Querying all the matchs, more recents first."""
+    """Query all the matchs, more recents first."""
     matchs = Match.query.order_by(-Match.id_match).all()
-    return render_template('match.html', matchs=matchs,
-                           get_gravatar_url=get_gravatar_url)
+    return render_template('match.html', matchs=matchs)
 
 
 @app.route('/profile/<int:id_player>')
 def profile(id_player):
-    """Querying detailled informations about one player from its id."""
+    """Query detailled informations about one player from its id."""
 
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
@@ -164,16 +162,15 @@ def profile(id_player):
         user.ratio_gauge = gauge
 
     return render_template(
-        'profile.html', user=user, get_gravatar_url=get_gravatar_url,
-        nemesis=nemesis, nemesis_coeff=nemesis_coeff,
-        best_teammate=best_teammate, worst_teammate=worst_teammate,
-        best_teammate_coeff=best_teammate_coeff,
+        'profile.html', user=user, nemesis=nemesis,
+        nemesis_coeff=nemesis_coeff, best_teammate=best_teammate,
+        worst_teammate=worst_teammate, best_teammate_coeff=best_teammate_coeff,
         worst_teammate_coeff=worst_teammate_coeff, matchs=matchs)
 
 
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):
-    """Querying ranking informations for one player from its id."""
+    """Query ranking informations for one player from its id."""
 
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
@@ -211,7 +208,7 @@ def svg_victory(id_player):
 
 @app.route('/ranking')
 def ranking():
-    """Querying the ranking informations. """
+    """Query the ranking informations. """
     unordered_ranking = compute_ranking()
 
     for user in unordered_ranking:
@@ -243,8 +240,7 @@ def ranking():
     ordered_ranking = sorted(
         unordered_ranking, key=lambda user: -user.ranking)
 
-    return render_template('ranking.html', users=ordered_ranking,
-                           get_gravatar_url=get_gravatar_url)
+    return render_template('ranking.html', users=ordered_ranking)
 
 
 @app.route('/tournament', methods=['GET', 'POST'])
@@ -265,8 +261,7 @@ def tournament():
         tournament = generate_tournament(players)
 
         return render_template(
-            'tournament.html', users=users, tournament=tournament,
-            get_gravatar_url=get_gravatar_url, form=form())
+            'tournament.html', users=users, tournament=tournament, form=form())
 
     return render_template(
         'tournament.html', users=users, form=form())
@@ -306,9 +301,7 @@ def add_match():
     users = User.query.all()
     if len(users) == 0:
         success = "There are no players yet !"
-        return render_template(
-            'add_match.html', success=success, users=users,
-            get_gravatar_url=get_gravatar_url)
+        return render_template('add_match.html', success=success, users=users)
 
     error = None
     success = None
@@ -348,8 +341,7 @@ def add_match():
         success = "Match was successfully added "
 
     return render_template(
-        'add_match.html', users=users, success=success, error=error,
-        get_gravatar_url=get_gravatar_url)
+        'add_match.html', users=users, success=success, error=error)
 
 
 @app.route('/add_player', methods=['GET', 'POST'])
