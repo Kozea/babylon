@@ -34,6 +34,15 @@
     {% endif %}
     
     <section>
+            <p>
+            {% for user in best_teammate %}
+            <b>Best Teammate : </b>
+            {{user.name}}
+            {{user.id_user}}
+            {% else %}
+            No best Teammate.
+            {% endfor %}
+        </p>
         <p>
             {% for user in nemesis %}
             <b>Nemesis : </b>
