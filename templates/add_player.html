@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 
-
+{% block head %}
+<link rel="stylesheet" href="{{url_for('static', filename='add_player.css')}}">
+{% endblock %}
 
 {% block body %} 
-
 {% if success %}
-    <p class=success>
-        <strong>Info:</strong> {{ success }}
+    <p><strong>Info:</strong> {{ success }}</p>
 {% endif %}
 
     <main>

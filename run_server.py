@@ -111,7 +111,7 @@ class UserSubscribeForm(Form):
     name = StringField('Name', [InputRequired()])
     nickname = StringField('Nickname', [validate_nickname, InputRequired()])
     photo = StringField('Gravatar email')
-    submit = SubmitField('Validate')
+    submit = SubmitField('Create Player !')
 
 
 class MatchCreateForm(Form):
