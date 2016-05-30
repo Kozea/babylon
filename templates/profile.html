@@ -34,18 +34,28 @@
     {% endif %}
     
     <section>
-            <p>
+        <p>
+            <b>Best Teammate(s) : </b>
             {% for user in best_teammate %}
-            <b>Best Teammate : </b>
             {{user.name}}
             {{user.id_user}}
             {% else %}
             No best Teammate.
             {% endfor %}
         </p>
+        
         <p>
-            {% for user in nemesis %}
+            <b>Worst Teammate(s) : </b>
+            {% for user in worst_teammate %}
+            {{user.name}}
+            {{user.id_user}}
+            {% else %}
+            No Worst Teammate.
+            {% endfor %}
+        </p>
+        <p>
             <b>Nemesis : </b>
+            {% for user in nemesis %}
             {{user.name}}
             {{user.id_user}}
             {% else %}

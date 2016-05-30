@@ -183,6 +183,7 @@ def profile(id_player):
     user = User.query.filter(User.id_user == id_player).one()
     nemesis = get_nemesis(user)
     best_teammate = get_best_teammate(user)
+    worst_teammate = get_worst_teammate(user)
     matchs = get_matchs(user)
         
     victories_as_team1 = (
@@ -209,7 +210,7 @@ def profile(id_player):
         user.ratio_gauge = gauge
         
     return render_template('profile.html', user=user,
-                           get_gravatar_url=get_gravatar_url, nemesis=nemesis, best_teammate=best_teammate, matchs=matchs)
+                           get_gravatar_url=get_gravatar_url, nemesis=nemesis, best_teammate=best_teammate, worst_teammate=worst_teammate, matchs=matchs)
 
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):
@@ -611,7 +612,7 @@ def build_avg_temp(pairs, participants):
     
     
 def get_matchs(player):
-    matchs = Match.query.filter((Match.player11==player) | (Match.player12==player) | (Match.player21==player) | (Match.player22==player)).all()
+    matchs = Match.query.filter((Match.player11==player) | (Match.player12==player) | (Match.player21==player) | (Match.player22==player)).order_by(-Match.id_match).all()
     return matchs
     
     
@@ -695,7 +696,50 @@ def get_best_teammate(player):
             score_temp = score
         elif(score_temp == score):
             teammate.append(player)
-    return teammate 
+    return teammate
+    
+def get_worst_teammate(player):
+    matchs = get_matchs(player)
+    teammates = {}
+
+    for match in matchs:
+        
+        if(player==match.player11 and match.score_e1 < match.score_e2):
+            if(match.player12 is not None):
+                if(match.player12 in teammates.keys()):
+                    teammates[match.player12] += 1
+                else:
+                    teammates[match.player12] = 1
+                    
+        elif(player==match.player12 and match.score_e1 < match.score_e2):
+                if(match.player11 in teammates.keys()):
+                    teammates[match.player11] += 1
+                else:
+                    teammates[match.player11] = 1 
+                    
+        elif(player==match.player21 and match.score_e2 < match.score_e1):
+            if(match.player22 is not None):
+                if(match.player22 in teammates.keys()):
+                    teammates[match.player22] += 1
+                else:
+                    teammates[match.player22] = 1
+                    
+        elif(player==match.player22 and match.score_e2 < match.score_e1):
+                if(match.player21 in teammates.keys()):
+                    teammates[match.player21] += 1
+                else:
+                    teammates[match.player21] = 1
+                    
+    score_temp = 0
+    teammate = []
+    for player, score in teammates.items():
+        if(score_temp < score):
+            teammate = []
+            teammate.append(player)
+            score_temp = score
+        elif(score_temp == score):
+            teammate.append(player)
+    return teammate  
     
             
 def get_ranking_at_timet(date):
