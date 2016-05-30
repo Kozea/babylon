@@ -277,8 +277,7 @@ def ranking_graph():
         date = now.replace(month=now.month-5)
     else:
         date = now.replace(month=12).replace(year=now.year-1)
-    date_score = get_ranking_at_timet(date)
-    date_score = OrderedDict(sorted(date_score.items(), key=lambda t: t[0]))
+    date_score = OrderedDict(sorted(get_ranking(date).items()))
     title = 'Monthly Ranking Evolution'
     line_chart = pygal.Line(title=title)
     line_chart.x_labels = [str(date)[0:7] for date in date_score.keys()]
@@ -291,7 +290,7 @@ def ranking_graph():
             for user in users:
                 if user.id_user == user_base.id_user:
                     user_array.append(user.ranking)
-        line_chart.add(user_base.get_full_name(), user_array)
+        line_chart.add(user_base.full_name, user_array)
 
     return render_template('ranking_graph.html',
                            line_chart=line_chart.render())
@@ -694,7 +693,7 @@ def get_worst_teammate(player):
     return teammate, score_temp
 
 
-def get_ranking_at_timet(date):
+def get_ranking(date):
     """Generate data for ranking chart.
 
     This method generate a dict with date as key and list of user as
