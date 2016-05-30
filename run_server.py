@@ -302,7 +302,7 @@ def ranking_graph():
             for user in users:
                 if user.id_user == user_base.id_user:
                     user_array.append(user.ranking)
-        line_chart.add(user_base.nickname, user_array)
+        line_chart.add(user_base.get_full_name(), user_array)
 
     return render_template('ranking_graph.html',
                            line_chart=line_chart.render())
