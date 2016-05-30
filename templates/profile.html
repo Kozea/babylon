@@ -2,7 +2,6 @@
 {% block body %} 
 
 
-
 <article>
     <header>
         <h2>{{user.get_full_name()}}</h2>
@@ -15,12 +14,12 @@
     {% if user.number_of_match != 0 %}
     
     <section>
-        <p><b>Elo</b> : {{user.ranking}}</p>
-        <p><b>Victories :</b>  {{user.nb_victories}}</p>   
-        <p><b>Defeats :</b> {{user.nb_defeats}}</p>
+        <p><strong>Elo</strong> : {{user.ranking}}</p>
+        <p><strong>Victories :</strong>  {{user.nb_victories}}</p>   
+        <p><strong>Defeats :</strong> {{user.nb_defeats}}</p>
         
         <p>
-            <b>Ratio :</b> {{100*(user.nb_victories/user.number_of_match)| round(2)}}
+            <strong>Ratio :</strong> {{100*(user.nb_victories/user.number_of_match)| round(2)}}
            <img src="{{ url_for('svg_victory', id_player=user.id_user)}}"></img>
         </p>
     </section>
@@ -28,32 +27,32 @@
     
     <section>
         <p>
-            <b>Best Teammate(s) : </b>
+            <strong>Best Teammate(s) : </strong>
             {% for user in best_teammate %}
             <a href="{{ url_for('profile', id_player=user.id_user)}}">{{user.get_full_name()}}</a>
             {% else %}
             No best Teammate.
             {% endfor %}
-            <b>({{best_teammate_coeff}} team victories)</b> 
+            <strong>({{best_teammate_coeff}} team victories)</strong> 
         </p>
         
         <p>
-            <b>Worst Teammate(s) : </b>
+            <strong>Worst Teammate(s) : </strong>
             {% for user in worst_teammate %}
             <a href="{{ url_for('profile', id_player=user.id_user)}}">{{user.get_full_name()}}</a>
             {% else %}
             No Worst Teammate.
             {% endfor %}
-            <b>({{worst_teammate_coeff}} team defeat(s))</b> 
+            <strong>({{worst_teammate_coeff}} team defeat(s))</strong> 
         </p>
         <p>
-            <b>Nemesis : </b>
+            <strong>Nemesis : </strong>
             {% for user in nemesis %}
             <a href="{{ url_for('profile', id_player=user.id_user)}}">{{user.get_full_name()}}</a>
             {% else %}
             No nemesis.
             {% endfor %}
-            <b>({{nemesis_coeff}} defeat(s)))</b> 
+            <strong>({{nemesis_coeff}} defeat(s)))</strong> 
         </p>
     </section>
     
@@ -64,6 +63,7 @@
                 <h2>
                     <time datetime ="{{match.date}}">{{match.date}}</time>
                 </h2>
+                
                 <section>
                     <h3>{{match.score_e1}}</h3>
                     <figure>
@@ -80,8 +80,9 @@
                         </figcaption>
                     </figure>
                     {% endif %}
-                <section>
                 </section>
+                    
+                <section>
                     <h3>{{match.score_e2}}</h3>
                     <figure>
                         <img src={{get_gravatar_url(match.player21.photo)}}>
@@ -98,6 +99,7 @@
                     </figure>
                     {% endif %}
                 </section>
+                
         </article>
         {% endfor %}
     </section>
