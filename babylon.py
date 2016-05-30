@@ -744,10 +744,5 @@ def get_ranking_at_timet(date):
     return date_score
 
 
-def init_db():
-    """Initialize the database."""
-    db.create_all()
-
-
 if __name__ == '__main__':
     app.run(debug=True)

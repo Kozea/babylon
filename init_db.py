@@ -1,7 +1,6 @@
 import os
 
-from babylon import init_db
+import babylon
 
 os.remove('/tmp/babylone.db')
-
-init_db()
+babylon.db.create_all()
