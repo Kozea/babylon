@@ -418,17 +418,17 @@ def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
                          my_ennemy2.number_of_match)/2
 
     # Score for player1
-    We1 = p(my_score-opponent_score)
+    We1 = 1/(1+10**((opponent_score-my_score)/400))
     K = choose_k(number_match1, elo1)
     G = choose_g(my_score, opponent_score)
-    W = choose_w(my_score, opponent_score)
+    W = 1 if my_score > opponent_score else 0
     score_p1 = K*G*(W-We1)
 
     # Score for player2
     We2 = 1 - We1
     K = choose_k(number_match2, elo2)
     G = choose_g(opponent_score, my_score)
-    W = choose_w(opponent_score, my_score)
+    W = 1 if my_score > opponent_score else 0
     score_p2 = K*G*(W-We2)
 
     # Get points to real users
@@ -485,16 +485,6 @@ def choose_g(score_team_1, score_team_2):
     else:
         G = 1+3/4+(diff-3)/8
     return G
-
-
-def choose_w(score_team_1, score_team_2):
-    """Choose W coefficient (winner or not)."""
-    return 1 if score_team_1 > score_team_2 else 0
-
-
-def p(i):
-    """Helper method for elo scoring."""
-    return 1/(1+10**(-i/400))
 
 
 def generate_tournament(participants):
