@@ -66,36 +66,36 @@
                 </h2>
                 
                 <section>
-                    <h3>{{ match.score_e1 }}</h3>
+                    <h3>{{ match.score_team_1 }}</h3>
                     <figure>
-                        <img src={{ get_gravatar_url(match.player11.email) }}>
+                        <img src={{ get_gravatar_url(match.team_1_player_1.email) }}>
                         <figcaption>
-                            <a href="{{ url_for('profile', id_player=match.player11.id_user) }}">{{ match.player11.get_full_name() }}</a>
+                            <a href="{{ url_for('profile', id_player=match.team_1_player_1.id_user) }}">{{ match.team_1_player_1.get_full_name() }}</a>
                         </figcaption>
                     </figure>
-                    {% if match.player12 %}
+                    {% if match.team_1_player_2 %}
                     <figure>
-                        <img src={{ get_gravatar_url(match.player12.email) }}>
+                        <img src={{ get_gravatar_url(match.team_1_player_2.email) }}>
                         <figcaption>
-                            <a href="{{ url_for('profile', id_player=match.player12.id_user) }}">{{ match.player12.get_full_name() }}</a>
+                            <a href="{{ url_for('profile', id_player=match.team_1_player_2.id_user) }}">{{ match.team_1_player_2.get_full_name() }}</a>
                         </figcaption>
                     </figure>
                     {% endif %}
                 </section>
                     
                 <section>
-                    <h3>{{ match.score_e2 }}</h3>
+                    <h3>{{ match.score_team_2 }}</h3>
                     <figure>
-                        <img src={{ get_gravatar_url(match.player21.email) }}>
+                        <img src={{ get_gravatar_url(match.team_2_player_1.email) }}>
                         <figcaption>
-                            <a href="{{ url_for('profile', id_player=match.player21.id_user) }}">{{ match.player21.get_full_name() }}</a>
+                            <a href="{{ url_for('profile', id_player=match.team_2_player_1.id_user) }}">{{ match.team_2_player_1.get_full_name() }}</a>
                         </figcaption>
                     </figure>
-                    {% if match.player22 %}
+                    {% if match.team_2_player_2 %}
                     <figure>
-                        <img src={{ get_gravatar_url(match.player22.email) }}>
+                        <img src={{ get_gravatar_url(match.team_2_player_2.email) }}>
                         <figcaption>
-                            <a href="{{ url_for('profile', id_player=match.player22.id_user) }}">{{ match.player22.get_full_name() }}</a>
+                            <a href="{{ url_for('profile', id_player=match.team_2_player_2.id_user) }}">{{ match.team_2_player_2.get_full_name() }}</a>
                         </figcaption>
                     </figure>
                     {% endif %}
