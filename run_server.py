@@ -177,8 +177,35 @@ def matchs():
 
 @app.route('/profile/<int:id_player>')
 def profile(id_player):
+    # Never NEVER delete this line because it update score and number of match.
+    unordered_ranking = compute_ranking()
+    
     user = User.query.filter(User.id_user == id_player).one()
     nemesis = get_nemesis(user)
+        
+    victories_as_team1 = (
+        db.session.query(Match.id_match)
+        .filter((Match.player11 == user) | (Match.player12 == user))
+        .filter(Match.score_e1 > Match.score_e2)
+        .count())
+    victories_as_team2 = (
+        db.session.query(Match.id_match)
+        .filter((Match.player21 == user) | (Match.player22 == user))
+        .filter(Match.score_e1 < Match.score_e2)
+        .count())
+
+    user.nb_victories = victories_as_team1 + victories_as_team2
+    user.nb_defeats = user.number_of_match - user.nb_victories
+
+    if user.number_of_match != 0:
+        gauge = pygal.SolidGauge(inner_radius=0.70, show_legend=False)
+        gauge.value_formatter = lambda x: '{:.10g}%'.format(x)
+        gauge.add(
+            'Ratio', [{
+                'value': (user.nb_victories/user.number_of_match)*100,
+                'max_value': 100}])
+        user.ratio_gauge = gauge
+        
     return render_template('profile.html', user=user,
                            get_gravatar_url=get_gravatar_url, nemesis=nemesis)
 
