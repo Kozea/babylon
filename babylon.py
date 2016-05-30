@@ -488,16 +488,6 @@ def generate_tournament(players):
     return tournament
 
 
-def build_avg_temp(pairs, participants):
-    """Create an array with the average elo for each team."""
-    avg_array = []
-    for pair in pairs:
-        temp_avg = (
-            (participants[pair[0]].ranking+participants[pair[1]].ranking)/2)
-        avg_array.append(temp_avg)
-    return avg_array
-
-
 def get_matchs(player):
     """Get a list of all matchs involving a given player."""
     return Match.query.filter(
