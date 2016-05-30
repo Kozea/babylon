@@ -1,5 +1,6 @@
-from run_server import *
 import os
+
+from babylon import init_db
 
 os.remove('/tmp/babylone.db')
 
