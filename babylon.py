@@ -7,18 +7,19 @@ Babylon
 
 """
 
-from datetime import datetime
-import urllib
-from itertools import groupby
-from copy import deepcopy
-import math
-from collections import OrderedDict
 import hashlib
-from flask import request, render_template, Flask, make_response
+import math
+import urllib
+from copy import deepcopy
+from datetime import datetime
+from itertools import groupby
+from collections import OrderedDict
+
 import pygal
+from flask import request, render_template, Flask, make_response
 from flask_sqlalchemy import SQLAlchemy
-from wtforms.validators import InputRequired, ValidationError
 from plainform import Form, StringField, SubmitField, SelectMultipleField
+from wtforms.validators import InputRequired, ValidationError
 
 
 # configuration
