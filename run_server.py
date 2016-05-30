@@ -156,6 +156,7 @@ class TournamentForm(Form):
     players = SelectMultipleField('Players', choices=[])
     submit = SubmitField('Validate')
 
+
 def get_gravatar_url(email):
     """Return the gravatar url for the email in parameter."""
     photo = email
@@ -175,17 +176,18 @@ def matchs():
     return render_template('match.html', matchs=matchs,
                            get_gravatar_url=get_gravatar_url)
 
+
 @app.route('/profile/<int:id_player>')
 def profile(id_player):
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
-    
+
     user = User.query.filter(User.id_user == id_player).one()
     nemesis = get_nemesis(user)
     best_teammate = get_best_teammate(user)
     worst_teammate = get_worst_teammate(user)
     matchs = get_matchs(user)
-        
+
     victories_as_team1 = (
         db.session.query(Match.id_match)
         .filter((Match.player11 == user) | (Match.player12 == user))
@@ -208,9 +210,12 @@ def profile(id_player):
                 'value': (user.nb_victories/user.number_of_match)*100,
                 'max_value': 100}])
         user.ratio_gauge = gauge
-        
+
     return render_template('profile.html', user=user,
-                           get_gravatar_url=get_gravatar_url, nemesis=nemesis, best_teammate=best_teammate, worst_teammate=worst_teammate, matchs=matchs)
+                           get_gravatar_url=get_gravatar_url, nemesis=nemesis,
+                           best_teammate=best_teammate,
+                           worst_teammate=worst_teammate, matchs=matchs)
+
 
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):
@@ -283,7 +288,6 @@ def ranking():
                            get_gravatar_url=get_gravatar_url)
 
 
-
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
     """Called when trying to create a tournament."""
@@ -351,7 +355,7 @@ def add_match():
 
     if request.method == 'POST':
         param_list = request.form.to_dict().keys()
-                
+
         id_player11 = request.form["j11"][7:]
         print(id_player11)
         player11 = User.query.filter_by(id_user=id_player11).first()
@@ -609,20 +613,24 @@ def build_avg_temp(pairs, participants):
             (participants[pair[0]].ranking+participants[pair[1]].ranking)/2)
         avg_array.append(temp_avg)
     return avg_array
-    
-    
+
+
 def get_matchs(player):
-    matchs = Match.query.filter((Match.player11==player) | (Match.player12==player) | (Match.player21==player) | (Match.player22==player)).order_by(-Match.id_match).all()
+    matchs = Match.query.filter((Match.player11 == player) |
+                                (Match.player12 == player) |
+                                (Match.player21 == player) |
+                                (Match.player22 == player)
+                                ).order_by(-Match.id_match).all()
     return matchs
-    
-    
+
+
 def get_nemesis(player):
     matchs = get_matchs(player)
     opponents = {}
 
     for match in matchs:
-        if(player==match.player11 or player==match.player12):
-            if(match.score_e1<match.score_e2):
+        if player == match.player11 or player == match.player12:
+            if match.score_e1 < match.score_e2:
                 if(match.player21 in opponents.keys()):
                     opponents[match.player21] += 1
                 else:
@@ -633,7 +641,7 @@ def get_nemesis(player):
                     else:
                         opponents[match.player22] = 1
         else:
-            if(match.score_e1>match.score_e2):
+            if match.score_e1 > match.score_e2:
                 if(match.player11 in opponents.keys()):
                     opponents[match.player11] += 1
                 else:
@@ -654,39 +662,39 @@ def get_nemesis(player):
         elif(score_temp == score):
             nemesis.append(player)
     return nemesis
-    
+
+
 def get_best_teammate(player):
     matchs = get_matchs(player)
     teammates = {}
 
     for match in matchs:
-        
-        if(player==match.player11 and match.score_e1 > match.score_e2):
+        if player == match.player11 and match.score_e1 > match.score_e2:
             if(match.player12 is not None):
                 if(match.player12 in teammates.keys()):
                     teammates[match.player12] += 1
                 else:
                     teammates[match.player12] = 1
-                    
-        elif(player==match.player12 and match.score_e1 > match.score_e2):
+
+        elif player == match.player12 and match.score_e1 > match.score_e2:
                 if(match.player11 in teammates.keys()):
                     teammates[match.player11] += 1
                 else:
-                    teammates[match.player11] = 1 
-                    
-        elif(player==match.player21 and match.score_e2 > match.score_e1):
+                    teammates[match.player11] = 1
+
+        elif player == match.player21 and match.score_e2 > match.score_e1:
             if(match.player22 is not None):
                 if(match.player22 in teammates.keys()):
                     teammates[match.player22] += 1
                 else:
                     teammates[match.player22] = 1
-                    
-        elif(player==match.player22 and match.score_e2 > match.score_e1):
+
+        elif player == match.player22 and match.score_e2 > match.score_e1:
                 if(match.player21 in teammates.keys()):
                     teammates[match.player21] += 1
                 else:
                     teammates[match.player21] = 1
-                    
+
     score_temp = 0
     teammate = []
     for player, score in teammates.items():
@@ -697,39 +705,40 @@ def get_best_teammate(player):
         elif(score_temp == score):
             teammate.append(player)
     return teammate
-    
+
+
 def get_worst_teammate(player):
     matchs = get_matchs(player)
     teammates = {}
 
     for match in matchs:
-        
-        if(player==match.player11 and match.score_e1 < match.score_e2):
+
+        if player == match.player11 and match.score_e1 < match.score_e2:
             if(match.player12 is not None):
                 if(match.player12 in teammates.keys()):
                     teammates[match.player12] += 1
                 else:
                     teammates[match.player12] = 1
-                    
-        elif(player==match.player12 and match.score_e1 < match.score_e2):
+
+        elif player == match.player12 and match.score_e1 < match.score_e2:
                 if(match.player11 in teammates.keys()):
                     teammates[match.player11] += 1
                 else:
-                    teammates[match.player11] = 1 
-                    
-        elif(player==match.player21 and match.score_e2 < match.score_e1):
+                    teammates[match.player11] = 1
+
+        elif player == match.player21 and match.score_e2 < match.score_e1:
             if(match.player22 is not None):
                 if(match.player22 in teammates.keys()):
                     teammates[match.player22] += 1
                 else:
                     teammates[match.player22] = 1
-                    
-        elif(player==match.player22 and match.score_e2 < match.score_e1):
+
+        elif player == match.player22 and match.score_e2 < match.score_e1:
                 if(match.player21 in teammates.keys()):
                     teammates[match.player21] += 1
                 else:
                     teammates[match.player21] = 1
-                    
+
     score_temp = 0
     teammate = []
     for player, score in teammates.items():
@@ -739,9 +748,9 @@ def get_worst_teammate(player):
             score_temp = score
         elif(score_temp == score):
             teammate.append(player)
-    return teammate  
-    
-            
+    return teammate
+
+
 def get_ranking_at_timet(date):
     """Generate data for ranking chart.
 
