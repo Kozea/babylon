@@ -1,47 +1,50 @@
 {% extends "layout.html" %}
 {% block body %} 
 
-<h2>{{user.get_full_name()}}</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <th>Elo</th>
-            <th>Victories</th>
-            <th>Defeats</th>
-            <th>Ratio</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                <img src="{{get_gravatar_url(user.photo)}}">
-            </td>
-            <td>{{user.ranking}}</td>
-            {% if user.number_of_match != 0 %}
-            <td>{{user.nb_victories}}</td>
-            <td>{{user.nb_defeats}}</td>
-            <td>{{100*(user.nb_victories/user.number_of_match)| round(2)}}
-            <img src="{{ url_for('svg_victory', id_player=user.id_user)}}"></img>
-            </td>
+
+<article>
+    <header>
+        <h2>{{user.get_full_name()}}</h2>
+    </header>
+    
+    <section>
+        <p><img src="{{get_gravatar_url(user.photo)}}"></p>
+    </section>
+    
+    {% if user.number_of_match != 0 %}
+    
+    <section>
+        <p><b>Elo</b> : {{user.ranking}}</p>
+        <p><b>Victories :</b>  {{user.nb_victories}}</p>   
+        <p><b>Defeats :</b> {{user.nb_defeats}}</p>
+        
+        <p>
+            <b>Ratio :</b> {{100*(user.nb_victories/user.number_of_match)| round(2)}}
+           <img src="{{ url_for('svg_victory', id_player=user.id_user)}}"></img>
+        </p>
+    </section>
+    
+    {% else %}
+    
+    <section>
+        <p> Hasn't played yet.</p>
+    </section>
+    
+    {% endif %}
+    
+    <section>
+        <p>
+            {% for user in nemesis %}
+            <b>Nemesis : </b>
+            {{user.name}}
+            {{user.id_user}}
             {% else %}
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            {% endif %}
-        </tr>
-    </tbody>
-</table>
+            No nemesis.
+            {% endfor %}
+        </p>
+    </section>
+</article>
 
-
-<br>
-{% for user in nemesis %}
-{{user.name}}
-{{user.id_user}}
-{% else %}
-No nemesis.
-{% endfor %}
 
 {% endblock %}
