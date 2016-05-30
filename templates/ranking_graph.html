@@ -1,17 +1,12 @@
 {% extends "layout.html" %}
 
 {% block head %}
-    <script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/svg.jquery.js"></script>
-    <script type="text/javascript" src="http://kozea.github.com/pygal.js/2.0.x/pygal-tooltips.js"></script>
-{% endblock %}
+  <script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/svg.jquery.js"></script>
+  <script type="text/javascript" src="http://kozea.github.com/pygal.js/2.0.x/pygal-tooltips.js"></script>
+{% endblock head %}
 
-{% block body %}
-
-<h1>
-<a href="{{ url_for('ranking') }}">Go back to ranking !</a>
-</h1>
-
-
-    {{ line_chart|safe }}
-
-{% endblock %}
+{% block main %}
+  {# TODO: seriously? #}
+  <h1><a href="{{ url_for('ranking') }}">Go back to ranking!</a></h1>
+  {{ line_chart | safe }}
+{% endblock main %}

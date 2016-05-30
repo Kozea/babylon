@@ -2,25 +2,30 @@
 <html>
 
 <head>
-    <title>Babylone</title>
-    {% block head %}{% endblock %}
+  <title>Babylone</title>
+  {% block head %}{% endblock head %}
 </head>
 
 <body>
 
 <header>
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('matchs')}}">Matchs</a></li>
-            <li><a href="{{ url_for('ranking')}}">Ranking</a></li>
-            <li><a href="{{ url_for('add_match')}}">Add a Match</a></li>
-            <li><a href="{{ url_for('add_player')}}">Add a player</a></li>
-            <li><a href="{{ url_for('tournament')}}">Tournament</a></li>
-        </ul>
-    </nav>
+  <nav>
+    <ul>
+      <li><a href="{{ url_for('matchs')}}">Matchs</a></li>
+      <li><a href="{{ url_for('ranking')}}">Ranking</a></li>
+      <li><a href="{{ url_for('add_match')}}">Add a Match</a></li>
+      <li><a href="{{ url_for('add_player')}}">Add a Player</a></li>
+      <li><a href="{{ url_for('tournament')}}">Tournament</a></li>
+    </ul>
+  </nav>
 </header>
 
-{% block body %}{% endblock %}
+{# TODO: add a flash #}
+
+<main>
+  {% block main %}{% endblock main %}
+</main>
+
 </body>
 
 </html>

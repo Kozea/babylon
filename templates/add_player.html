@@ -1,15 +1,10 @@
 {% extends "layout.html" %}
 
-{% block head %}
-{% endblock %}
-
-{% block body %} 
-{% if success %}
+{% block main %}
+  {# TODO: use a flash #}
+  {% if success %}
     <p><strong>Info:</strong> {{ success }}</p>
-{% endif %}
+  {% endif %}
 
-    <main>
-      {{ form }}
-    </main>
-{% endblock %}
-
+  {{ form }}
+{% endblock main %}

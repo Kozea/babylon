@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 
+{# TODO: wow, such beauty, so bullshit #}
+
 {% block head %}
 <script type="text/javascript">
     //<![CDATA[
@@ -92,9 +94,9 @@
     
     //]]> 
 </script>
-{% endblock %}
+{% endblock head %}
 
-{% block body %} 
+{% block main %} 
 
 {% if error %}
     <p class=error>
@@ -134,4 +136,4 @@
 <button name="add_match_button" onclick="add_match()" >Add match !</button>
 {% endif %}
 
-{% endblock %}
+{% endblock main %}

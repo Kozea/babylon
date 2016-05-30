@@ -1,59 +1,59 @@
 {% extends "layout.html" %}
 
-{% block head %}
-{% endblock %}
+{% block main %}
+  {% if users %}
+    {# TODO: best title ever #}
+    <h1>
+      <a href="{{ url_for('ranking_graph') }}">Watch monthly ranking evolution !</a>
+    </h1>
 
-{% block body %} 
-
-{% if users %}
-<h1>
-<a href="{{ url_for('ranking_graph') }}">Watch monthly ranking evolution !</a>
-</h1>
-
-<table>
-    <thead>
+    <table>
+      <thead>
         <tr>
-            <th>Color</th>
-            <th>Player</th>
-            <th>Elo</th>
-            <th>Victories</th>
-            <th>Defeats</th>
-            <th>Ratio</th>
+          <th>Color</th>
+          <th>Player</th>
+          <th>Elo</th>
+          <th>Victories</th>
+          <th>Defeats</th>
+          <th>Ratio</th>
         </tr>
-    </thead>
-    <tbody>
-{% endif %}
-{% for user in users %}
-        <tr>
+      </thead>
+
+      <tbody>
+
+        {% for user in users %}
+          <tr>
+            {# TODO: why? #}
             {% if loop.index<3 %}
-            <td>Green</td>
+              <td>Green</td>
             {% elif loop.index>users|length -2 %}
-            <td>Red</td>
+              <td>Red</td>
             {% else %}
-            <td>Invisible</td>
+              <td>Invisible</td>
             {% endif %}
             <td>
-                <img src="{{ user.gravatar }}">
-                
-                <a href="{{ url_for('profile', id_player=user.id_user) }}">{{ user.full_name }}</a>
+              <img src="{{ user.gravatar }}">
+              <a href="{{ url_for('profile', id_player=user.id_user) }}">{{ user.full_name }}</a>
             </td>
-            <td>{{user.ranking}}</td>
-            {% if user.number_of_match != 0 %}
-            <td>{{user.nb_victories}}</td>
-            <td>{{user.nb_defeats}}</td>
-            <td>{{100*(user.nb_victories/user.number_of_match)| round(2)}}
-            <img src="{{ url_for('svg_victory', id_player=user.id_user) }}"></img>
-            </td>
+            <td>{{ user.ranking }}</td>
+            {% if user.number_of_match %}
+              <td>{{ user.nb_victories }}</td>
+              <td>{{ user.nb_defeats }}</td>
+              <td>
+                {{ (100 * user.nb_victories / user.number_of_match) | round(2) }}
+                <img src="{{ url_for('svg_victory', id_player=user.id_user) }}">
+              </td>
             {% else %}
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
+              <td></td>
+              <td></td>
+              <td></td>
             {% endif %}
-        </tr>
-{% else %}
-There is no scores yet ! 
-{% endfor %}
-    </tbody>
-</table>
-
-{% endblock %}
+          </tr>
+        {% else %}
+          {# TODO: oh no #}
+          There is no scores yet!
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock main %}
