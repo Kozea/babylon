@@ -22,10 +22,8 @@ from plainform import Form, StringField, SubmitField, SelectMultipleField
 from wtforms.validators import InputRequired, ValidationError
 
 
-SECRET_KEY = 'development key'
-
 app = Flask(__name__)
-app.config.from_object(__name__)
+app.config['SECRET_KEY'] = 'development key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/babylone.db'
 db = SQLAlchemy(app)
 
