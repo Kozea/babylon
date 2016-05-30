@@ -365,14 +365,12 @@ def add_player():
 
 def compute_ranking():
     """Get the list of all users with their current score."""
-
     users = User.query.all()
     for user in users:
         user.ranking = 1000
         user.number_of_match = 0
 
     matchs = Match.query.all()
-
     for match in matchs:
         elo(match.team_1_player_1, match.team_1_player_2,
             match.team_2_player_1, match.team_2_player_2,
@@ -381,89 +379,78 @@ def compute_ranking():
     return users
 
 
-def elo(me, my_friend, my_ennemy1, my_ennemy2, my_score, opponent_score):
+def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
+        score_team_1, score_team_2):
     """Update the ranking of each players in parameters.
 
-    with the score of the match according to the following formula :
-    Rn = Ro + KG(W-We)
-    @link : https://fr.wikipedia.org
-            /wiki/Classement_mondial_de_football_Elo
+    Calculate the score of the match according to the following formula:
+    Rn = Ro + KG (W - We)
 
-    Keyword arguments:
-    me -- the user 1 of team 1
-    my_friend -- the user 2 of team1 (perhaps None)
-    my_ennemy1 -- the user 1 of team2
-    my_ennemy2 -- the user 2 of team2 (perhaps None)
-    my_score -- the score of team1
-    opponent_score -- the score of team2
+    See: https://fr.wikipedia.org /wiki/Classement_mondial_de_football_Elo
 
     """
-
     # Create fictive player1
-    if my_friend is None:
-        elo1 = me.ranking
-        number_match1 = me.number_of_match
+    if team_1_player_2 is None:
+        elo1 = team_1_player_1.ranking
+        number_match1 = team_1_player_1.number_of_match
     else:
-        elo1 = (me.ranking+my_friend.ranking)/2
-        number_match1 = (me.number_of_match+my_friend.number_of_match)/2
+        elo1 = (team_1_player_1.ranking + team_1_player_2.ranking) / 2
+        number_match1 = (
+            team_1_player_1.number_of_match +
+            team_1_player_2.number_of_match) / 2
 
     # Create fictive player2
-    if my_ennemy2 is None:
-        elo2 = my_ennemy1.ranking
-        number_match2 = my_ennemy1.number_of_match
+    if team_2_player_2 is None:
+        elo2 = team_2_player_1.ranking
+        number_match2 = team_2_player_1.number_of_match
     else:
-        elo2 = (my_ennemy1.ranking+my_ennemy2.ranking)/2
-        number_match2 = (my_ennemy1.number_of_match +
-                         my_ennemy2.number_of_match)/2
+        elo2 = (team_2_player_1.ranking + team_2_player_2.ranking) / 2
+        number_match2 = (
+            team_2_player_1.number_of_match +
+            team_2_player_2.number_of_match) / 2
 
     # Score for player1
-    We1 = 1/(1+10**((opponent_score-my_score)/400))
-    K = choose_k(number_match1, elo1)
-    G = choose_g(my_score, opponent_score)
-    W = 1 if my_score > opponent_score else 0
-    score_p1 = K*G*(W-We1)
+    expected_result = 1 / (1 + 10 ** ((score_team_2 - score_team_1) / 400))
+    expertise = get_expertise_coefficient(number_match1, elo1)
+    goal_difference = get_goal_difference_coefficient(
+        score_team_1, score_team_2)
+    result = 1 if score_team_1 > score_team_2 else 0
+    score_p1 = expertise * goal_difference * (result - expected_result)
 
     # Score for player2
-    We2 = 1 - We1
-    K = choose_k(number_match2, elo2)
-    G = choose_g(opponent_score, my_score)
-    W = 1 if my_score > opponent_score else 0
-    score_p2 = K*G*(W-We2)
+    expected_result = 1 - expected_result
+    expertise = get_expertise_coefficient(number_match2, elo2)
+    goal_difference = get_goal_difference_coefficient(
+        score_team_2, score_team_1)
+    result = 1 if score_team_1 < score_team_2 else 0
+    score_p2 = expertise * goal_difference * (result - expected_result)
 
-    # Get points to real users
-    if my_friend is None:
-        me.ranking += int(round(score_p1, 0))
-        me.number_of_match += 1
+    # Update the ranking and the number of matches of the users
+    team_1_player_1.number_of_match += 1
+    if team_1_player_2 is None:
+        team_1_player_1.ranking += round(score_p1)
     else:
-        sum_ranking = me.ranking+my_friend.ranking
-        # update my score
-        me.ranking += int(round((me.ranking/sum_ranking)*score_p1, 0))
-        me.number_of_match += 1
-        # update my friend score
-        my_friend.ranking += (
-            int(round((my_friend.ranking/sum_ranking)*score_p1, 0)))
-        my_friend.number_of_match += 1
+        sum_ranking = team_1_player_1.ranking + team_1_player_2.ranking
+        team_1_player_1.ranking += round(
+            team_1_player_1.ranking / sum_ranking * score_p1)
+        team_1_player_2.ranking += round(
+            team_1_player_2.ranking / sum_ranking * score_p1)
+        team_1_player_2.number_of_match += 1
 
-    if my_ennemy2 is None:
-        my_ennemy1.ranking += int(round((score_p2), 0))
-        my_ennemy1.number_of_match += 1
+    team_2_player_1.number_of_match += 1
+    if team_2_player_2 is None:
+        team_2_player_1.ranking += round(score_p2)
     else:
-        sum_ranking = my_ennemy1.ranking+my_ennemy2.ranking
-        # update my score
-        my_ennemy1.ranking += (
-            int(round((my_ennemy1.ranking/sum_ranking)*score_p2, 0)))
-        my_ennemy1.number_of_match += 1
-        # update my friend score
-        my_ennemy2.ranking += (
-            int(round((my_ennemy2.ranking/sum_ranking)*score_p2, 0)))
-        my_ennemy2.number_of_match += 1
+        sum_ranking = team_2_player_1.ranking + team_2_player_2.ranking
+        team_2_player_1.ranking += round(
+            team_2_player_1.ranking / sum_ranking * score_p2)
+        team_2_player_2.ranking += round(
+            team_2_player_2.ranking / sum_ranking * score_p2)
+        team_2_player_2.number_of_match += 1
 
 
-def choose_k(number_of_match, elo):
-    """Choose the coefficient K, to know if the player is a new player
-    or an expert.
-    """
-
+def get_expertise_coefficient(number_of_match, elo):
+    """Get expertise coefficient corresponding to an user's elo and matches."""
     if number_of_match < 40:
         return 40
     elif elo < 2400:
@@ -472,32 +459,27 @@ def choose_k(number_of_match, elo):
         return 10
 
 
-def choose_g(score_team_1, score_team_2):
-    """Choose the correct G (goal difference) coefficient."""
+def get_goal_difference_coefficient(score_team_1, score_team_2):
+    """Get goal difference coefficient corresponding to a match score."""
     diff = abs(score_team_1 - score_team_2)
     if diff < 2:
-        G = 1
+        return 1
     elif diff == 2:
-        G = 1+1/2
+        return 1.5
     elif diff == 3:
-        G = 1+3/4
+        return 1.75
     else:
-        G = 1+3/4+(diff-3)/8
-    return G
+        return  1.75 + (diff - 3) / 8
 
 
 def generate_tournament(participants):
     """Create a tournament with the given participants."""
-
     number_of_participants = len(participants)
     if number_of_participants % 2 != 0:
         raise Exception("You must be a power of 2 !")
 
-    # get the list of all players
-    players = participants
-
     # ordered the list of all players
-    players = sorted(players, key=lambda player: player.ranking)
+    players = sorted(participants, key=lambda player: player.ranking)
 
     # create the team
     teams = [(players[i], players[len(players)-1-i])
