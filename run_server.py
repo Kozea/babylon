@@ -173,7 +173,7 @@ def profile(id_player):
     """
 
     # Never NEVER delete this line because it update score and number of match.
-    compute_ranking()
+    unordered_ranking = compute_ranking()
 
     user = User.query.filter(User.id_user == id_player).one()
     nemesis, nemesis_coeff = get_nemesis(user)
@@ -223,7 +223,7 @@ def svg_victory(id_player):
     """
 
     # Never NEVER delete this line because it update score and number of match.
-    compute_ranking()
+    unordered_ranking = compute_ranking()
 
     user = User.query.filter(User.id_user == id_player).one()
     victories_as_team1 = (
