@@ -371,17 +371,6 @@ def add_player():
     return render_template('add_player.html', success=success, form=form())
 
 
-def get_extension_file(filename):
-    """Return the extension of a file.
-
-    Keyword argument:
-    filename -- The full name of the file
-    """
-
-    index = filename.rfind('.')
-    return filename[index:]
-
-
 def compute_ranking():
     """This method return a list of users with theirs attributes score
     according to the matchs in the database.
