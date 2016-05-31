@@ -3,42 +3,45 @@
 {% block main %}
   {% if users %}
 
-    <a href="{{ url_for('ranking_graph') }}">Watch monthly ranking evolution !</a>
+  <a href="{{ url_for('ranking_graph') }}">Watch monthly ranking evolution !</a>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Player</th>
-          <th>Elo</th>
-          <th>Victories</th>
-          <th>Defeats</th>
-          <th>Ratio</th>
-        </tr>
-      </thead>
+  <table>
+    
+    <thead>
+      <tr>
+      <th>Player</th>
+      <th>Elo</th>
+      <th>Victories</th>
+      <th>Defeats</th>
+      <th>Ratio</th>
+      </tr>
+    </thead>
 
-      <tbody>
-        {% for user in users %}
-          <tr>
-            <td>
-              <img src="{{ user.gravatar_url }}">
-              <a href="{{ url_for('profile', id_player=user.id_user) }}">{{ user.full_name }}</a>
-            </td>
-            <td>{{ user.ranking }}</td>
-            {% if user.number_of_match %}
-              <td>{{ user.nb_victories }}</td>
-              <td>{{ user.nb_defeats }}</td>
-              <td>
-                {{ (100 * user.nb_victories / user.number_of_match) | round(2) }}
-                <img src="{{ url_for('svg_victory', id_player=user.id_user) }}">
-              </td>
-            {% else %}
-              <td></td>
-              <td></td>
-              <td></td>
-            {% endif %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>
+          <img src="{{ user.gravatar_url }}">
+          <a href="{{ url_for('profile', id_player=user.id_user) }}">{{ user.full_name }}</a>
+        </td>
+        <td>{{ user.ranking }}</td>
+        {% if user.number_of_match %}
+        <td>{{ user.nb_victories }}</td>
+        <td>{{ user.nb_defeats }}</td>
+        <td>
+          {{ (100 * user.nb_victories / user.number_of_match) | round(2) }}
+          <img src="{{ url_for('svg_victory', id_player=user.id_user) }}">
+        </td>
+        {% else %}
+        <td></td>
+        <td></td>
+        <td></td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+    
+  </table>
+  
   {% endif %}
 {% endblock main %}

@@ -5,38 +5,30 @@
 {% block head %}
 <script type="text/javascript">
     //<![CDATA[
-
     function post(path, params, method) {
-        method = method || "post"; // Set method to post by default if not specified.
-
-        // The rest of this code assumes you are not using a library.
-        // It can be made less wordy if you use one.
+        method = method || "post"; 
         var form = document.createElement("form");
         form.setAttribute("id","form_hidden");
         form.setAttribute("method", method);
         form.setAttribute("action", path);
-
         for (var [key, value] of params.entries()) {
             console.log(key+" "+value);
             var hiddenField = document.createElement("input");
             hiddenField.setAttribute("type", "hidden");
             hiddenField.setAttribute("name", key);
             hiddenField.setAttribute("value", value);
-
             form.appendChild(hiddenField);
-
         }
-
         document.body.appendChild(form);
         form.submit();
         document.body.removeChild(document.getElementById("form_hidden"));
     }
 
-    function OnDragStart (target, evt){
+    function OnDragStart(target, evt){
        evt.dataTransfer.setData("IdElement", target.id);
     }
     
-    function OnDropTarget (target, evt) {
+    function OnDropTarget(target, evt) {
         evt.preventDefault();
         if(document.getElementById(target.id).children.length < 2 || target.id == "players"){
             var id = evt.dataTransfer.getData("IdElement");
@@ -46,23 +38,19 @@
             alert("Too many people in "+target.id)
             return;
         }
-
     }
 
     function add_match(){
         var team1 = document.getElementById("team1");
         var team2 = document.getElementById("team2");
-
         if(team1.children.length == 0){
             alert("There must be at least one player in team1 !");
             return;
         }
-
         if(team2.children.length == 0){
             alert("There must be at least one player in team2 !");
             return;
         }
-
         if(isNaN(document.getElementById("scoret1").value) || document.getElementById("scoret1").value == ""){
             alert("Bad score for team 1 !");
             return;
@@ -71,27 +59,20 @@
             alert("Bad score for team 2 !");
             return;
         }
-
         var param = new Map();
-
         for (var i = 0; i < team1.children.length; i++) {
             param.set("j1"+(i+1), team1.children[i].id);
         }
-        
         for (var i = 0; i < team2.children.length; i++) {
             param.set("j2"+(i+1), team2.children[i].id);
         }
-
         for (var [key, value] of param.entries()) {
           console.log(key + " = " + value);
         }
-
         param.set("scoret1", document.getElementById("scoret1").value)
         param.set("scoret2", document.getElementById("scoret2").value)
-        
         post("{{url_for("add_match")}}", param);
     }
-    
     //]]> 
 </script>
 {% endblock head %}
@@ -100,22 +81,24 @@
 
 {% if users|length > 0 %}
 <div id="players" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false" ondrop="OnDropTarget(this, event);">
+
 {% for user in users %}
-    <div id="divdrag{{user.id_user}}" class="div-drag" draggable="true" ondragstart="OnDragStart(this, event);">
-        <img src={{ user.gravatar_url }} ondragstart="OnDragStart(this, event);">
-        <figcaption>
-            <a href="{{ url_for('profile', id_player=user.id_user)}}">{{user.full_name}}</a>
-        </figcaption>
-    </div>
+  <div id="divdrag{{user.id_user}}" class="div-drag" draggable="true" ondragstart="OnDragStart(this, event);">
+
+    <img src={{ user.gravatar_url }} ondragstart="OnDragStart(this, event);">
+    <figcaption>
+      <a href="{{ url_for('profile', id_player=user.id_user)}}">{{user.full_name}}</a>
+    </figcaption>
+    
+  </div>
 {% endfor %}
+
 </div>
 
 <div id="team1" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false;" ondrop="OnDropTarget(this, event);">
-
 </div>
 
 <div id="team2" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false;" ondrop="OnDropTarget(this, event);">
-
 </div>
 
 <label>Score team 1 :</label>

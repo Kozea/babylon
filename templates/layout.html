@@ -1,39 +1,39 @@
 <!doctype html>
 <html>
 
-<head>
-  <title>Babylone</title>
-  {% block head %}{% endblock head %}
-</head>
+  <head>
+    <title>Babylone</title>
+    {% block head %}{% endblock head %}
+  </head>
 
-<body>
+  <body>
 
-<header>
-  <nav>
-    <ul>
-      <li><a href="{{ url_for('matchs')}}">Matchs</a></li>
-      <li><a href="{{ url_for('ranking')}}">Ranking</a></li>
-      <li><a href="{{ url_for('add_match')}}">Add a Match</a></li>
-      <li><a href="{{ url_for('add_player')}}">Add a Player</a></li>
-      <li><a href="{{ url_for('tournament')}}">Tournament</a></li>
-    </ul>
-  </nav>
-</header>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('matchs')}}">Matchs</a></li>
+        <li><a href="{{ url_for('ranking')}}">Ranking</a></li>
+        <li><a href="{{ url_for('add_match')}}">Add a Match</a></li>
+        <li><a href="{{ url_for('add_player')}}">Add a Player</a></li>
+        <li><a href="{{ url_for('tournament')}}">Tournament</a></li>
+      </ul>
+    </nav>
+  </header>
 
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-    <ul>
-    {% for message in messages %}
-        <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-{% endif %}
-{% endwith %}
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <ul>
+  {% for message in messages %}
+    <li>{{ message }}</li>
+  {% endfor %}
+  </ul>
+  {% endif %}
+  {% endwith %}
 
-<main>
-  {% block main %}{% endblock main %}
-</main>
+  <main>
+    {% block main %}{% endblock main %}
+  </main>
 
-</body>
+  </body>
 
 </html>

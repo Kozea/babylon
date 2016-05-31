@@ -4,22 +4,25 @@
 
 {% macro round(team1, team2) -%}
 <article>
-    <section>
-        {{ macro_player(team1[0]) }}
-        {{ macro_player(team1[1]) }}
-    </section>
-    <section>
-        {{ macro_player(team2[0]) }}
-        {{ macro_player(team2[1]) }}
-    </section>
+  
+<section>
+  {{ macro_player(team1[0]) }}
+  {{ macro_player(team1[1]) }}
+</section>
+
+<section>
+  {{ macro_player(team2[0]) }}
+  {{ macro_player(team2[1]) }}
+</section>
+
 </article>
 {%- endmacro %}
 
 {% block main %}
-{{ form }}
+  {{ form }}
 
-{% for (team1, team2) in tournament %}
+  {% for (team1, team2) in tournament %}
     {{ round(team1, team2) }}
-{% endfor %}
+  {% endfor %}
 
 {% endblock main %}
