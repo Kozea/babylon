@@ -18,11 +18,12 @@
           <dd>{{user.nb_victories}}</dd>
           <dt>Defeats :</dt> 
           <dd>{{user.nb_defeats}}</dd>
+          <dt>Ratio :</dt>
+          <dd>{{100*(user.nb_victories/user.number_of_match)| round(2)}}</dd>
         </dl>
         
         <figure>
-          <figcaption>Ratio :{{100*(user.nb_victories/user.number_of_match)| round(2)}}</figcaption>
-          <img src="{{ url_for('svg_victory', id_player=user.id_user) }}"></img>
+          <embed src="{{ url_for('svg_victory', id_player=user.id_user) }}"></embed>
         </figure>
         
       </section>
