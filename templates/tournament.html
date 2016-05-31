@@ -1,47 +1,25 @@
 {% extends "layout.html" %}
 
-{# TODO: use (at least) a macro #}
+{% from "match.html" import macro_player %}
+
+{% macro round(team1, team2) -%}
+<article>
+    <section>
+        {{ macro_player(team1[0]) }}
+        {{ macro_player(team1[1]) }}
+    </section>
+    <section>
+        {{ macro_player(team2[0]) }}
+        {{ macro_player(team2[1]) }}
+    </section>
+</article>
+{%- endmacro %}
 
 {% block main %}
-  {{ form }}
+{{ form }}
 
-  <article>
-    {% for (team1, team2) in tournament %}
-      <section>
-        <figure>
-          <h3>{{ team1[0].ranking }}</h3>
-          <img src="{{ team1[0].gravatar_url }}">
-          <figcaption>
-            {{ team1[0].full_name }}
-          </figcaption>
-        </figure>
+{% for (team1, team2) in tournament %}
+    {{ round(team1, team2) }}
+{% endfor %}
 
-        <figure>
-          <h3>{{ team1[1].ranking }}</h3>
-          <img src="{{ team1[1].gravatar_url }}">
-          <figcaption>
-            {{ team1[1].full_name }}
-          </figcaption>
-        </figure>
-      </section>
-
-      <section>
-        <figure>
-          <h3>{{ team2[0].ranking }}</h3>
-          <img src="{{ team2[0].gravatar_url }}">
-          <figcaption>
-            {{ team2[0].full_name }}
-          </figcaption>
-        </figure>
-
-        <figure>
-          <h3>{{ team2[1].ranking }}</h3>
-          <img src="{{ team2[1].gravatar_url }}">
-          <figcaption>
-            {{ team2[1].full_name }}
-          </figcaption>
-        </figure>
-      </section>
-    {% endfor %}
-  </article>
 {% endblock main %}
