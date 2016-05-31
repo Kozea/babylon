@@ -284,6 +284,10 @@ def tournament():
 @app.route('/ranking_graph')
 def ranking_graph():
     """Draw the ranking chart with a monthly evolution."""
+    return render_template('ranking_graph.html')
+
+@app.route('/render_ranking_graph')
+def render_ranking_graph():
     now = datetime.now()
     if now.month-5 != 0:
         date = now.replace(month=now.month-5)
@@ -303,10 +307,11 @@ def ranking_graph():
                 if user.id_user == user_base.id_user:
                     user_array.append(user.ranking)
         line_chart.add(user_base.full_name, user_array)
-
-    return render_template('ranking_graph.html',
-                           line_chart=line_chart.render())
-
+    svg = line_chart.render()
+    response = make_response(svg)
+    response.content_type = 'image/svg+xml'
+    return response
+    
 
 @app.route('/add_match', methods=['GET', 'POST'])
 def add_match():
