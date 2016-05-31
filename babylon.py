@@ -10,7 +10,6 @@ Babylon
 """
 
 import hashlib
-import math
 import urllib
 from copy import deepcopy
 from datetime import datetime
@@ -93,7 +92,10 @@ class User(db.Model):
         """Gravatar URL of the user."""
         return "http://www.gravatar.com/avatar/{}?{}".format(
             hashlib.md5(self.email.lower()).hexdigest(),
-            urllib.parse.urlencode({'d': GRAVATAR_DEFAULT, 's': GRAVATAR_SIZE}))
+            urllib.parse.urlencode(
+                                    {'d': GRAVATAR_DEFAULT,
+                                     's': GRAVATAR_SIZE})
+                                  )
 
 
 class UserSubscribeForm(Form):
@@ -122,17 +124,23 @@ class TournamentForm(Form):
 def matchs():
     """Query all the matchs, more recents first."""
     matchs = Match.query.order_by(-Match.id_match).all()
+    if len(matchs) == 0:
+        flash("There are no matchs yet !")
     return render_template('match.html', matchs=matchs)
 
 
 @app.route('/profile/<int:id_player>')
 def profile(id_player):
     """Query detailled informations about one player from its id."""
-
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
 
-    user = User.query.filter(User.id_user == id_player).one()
+    user = None
+    for temp_user in unordered_ranking:
+        if temp_user.id_user == id_player:
+            user = temp_user
+            break
+
     nemesis, nemesis_coeff = get_nemesis(user)
     best_teammate, best_teammate_coeff = get_best_teammate(user)
     worst_teammate, worst_teammate_coeff = get_worst_teammate(user)
@@ -177,7 +185,12 @@ def svg_victory(id_player):
     # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
 
-    user = User.query.filter(User.id_user == id_player).one()
+    user = None
+    for temp_user in unordered_ranking:
+        if temp_user.id_user == id_player:
+            user = temp_user
+            break
+
     victories_as_team1 = (
         db.session.query(Match.id_match)
         .filter((Match.team_1_player_1 == user) |
@@ -211,12 +224,11 @@ def svg_victory(id_player):
 @app.route('/ranking')
 def ranking():
     """Query the ranking informations. """
-    
     users = User.query.all()
     if len(users) == 0:
         flash("There are no players yet !")
-        return render_template('ranking.html', users=users)
-        
+        return render_template('ranking.html')
+
     unordered_ranking = compute_ranking()
 
     for user in unordered_ranking:
@@ -254,12 +266,11 @@ def ranking():
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
     """Create a tournament."""
-    
     users = User.query.all()
     if len(users) == 0:
         flash("There are no players yet !")
         return render_template('tournament.html')
-        
+
     form = TournamentForm(request.form)
     users = compute_ranking()
     user_pairs = []
@@ -286,8 +297,10 @@ def ranking_graph():
     """Draw the ranking chart with a monthly evolution."""
     return render_template('ranking_graph.html')
 
+
 @app.route('/render_ranking_graph')
 def render_ranking_graph():
+    """Render the svg file for monthly evolution."""
     now = datetime.now()
     if now.month-5 != 0:
         date = now.replace(month=now.month-5)
@@ -311,7 +324,7 @@ def render_ranking_graph():
     response = make_response(svg)
     response.content_type = 'image/svg+xml'
     return response
-    
+
 
 @app.route('/add_match', methods=['GET', 'POST'])
 def add_match():
@@ -366,7 +379,6 @@ def add_match():
 def add_player():
     """Create a new user."""
     form = UserSubscribeForm(request.form)
-    success = None
     if request.method == 'POST' and form.validate():
         new_user = User(
             form.surname.data, form.name.data, form.nickname.data,
@@ -374,7 +386,8 @@ def add_player():
         db.session.add(new_user)
         db.session.commit()
 
-        flash (form.name.data + ' ' + form.surname.data + " was successfully registered" )
+        flash(form.name.data + ' ' + form.surname.data +
+              " was successfully registered")
 
     return render_template('add_player.html', form=form())
 
@@ -485,7 +498,7 @@ def get_goal_difference_coefficient(score_team_1, score_team_2):
     elif diff == 3:
         return 1.75
     else:
-        return  1.75 + (diff - 3) / 8
+        return 1.75 + (diff - 3) / 8
 
 
 def generate_tournament(players):
@@ -575,14 +588,14 @@ def get_best_teammate(player):
                     teammates[match.team_1_player_2] = 1
 
         elif (player == match.team_1_player_2 and
-                  match.score_team_1 > match.score_team_2):
+              match.score_team_1 > match.score_team_2):
             if match.team_1_player_1 in teammates.keys():
                 teammates[match.team_1_player_1] += 1
             else:
                 teammates[match.team_1_player_1] = 1
 
         elif (player == match.team_2_player_1 and
-                  match.score_team_2 > match.score_team_1):
+              match.score_team_2 > match.score_team_1):
             if match.team_2_player_2 is not None:
                 if match.team_2_player_2 in teammates.keys():
                     teammates[match.team_2_player_2] += 1
@@ -590,7 +603,7 @@ def get_best_teammate(player):
                     teammates[match.team_2_player_2] = 1
 
         elif (player == match.team_2_player_2 and
-                  match.score_team_2 > match.score_team_1):
+              match.score_team_2 > match.score_team_1):
             if match.team_2_player_1 in teammates.keys():
                 teammates[match.team_2_player_1] += 1
             else:
@@ -629,14 +642,14 @@ def get_worst_teammate(player):
                     teammates[match.team_1_player_2] = 1
 
         elif (player == match.team_1_player_2 and
-                  match.score_team_1 < match.score_team_2):
+              match.score_team_1 < match.score_team_2):
             if match.team_1_player_1 in teammates.keys():
                 teammates[match.team_1_player_1] += 1
             else:
                 teammates[match.team_1_player_1] = 1
 
         elif (player == match.team_2_player_1 and
-                  match.score_team_2 < match.score_team_1):
+              match.score_team_2 < match.score_team_1):
             if match.team_2_player_2 is not None:
                 if match.team_2_player_2 in teammates.keys():
                     teammates[match.team_2_player_2] += 1
@@ -644,7 +657,7 @@ def get_worst_teammate(player):
                     teammates[match.team_2_player_2] = 1
 
         elif (player == match.team_2_player_2 and
-                  match.score_team_2 < match.score_team_1):
+              match.score_team_2 < match.score_team_1):
             if match.team_2_player_1 in teammates.keys():
                 teammates[match.team_2_player_1] += 1
             else:

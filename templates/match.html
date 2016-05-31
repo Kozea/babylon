@@ -33,10 +33,7 @@
 
 
 {% block main %}
-    <h1>Matchs</h1>
     {% for match in matchs %}
         {{ macro_match(match) }}
-    {% else %}
-        <p>There is no match yet!</p>
     {% endfor %}
 {% endblock main %}
