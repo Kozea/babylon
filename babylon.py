@@ -132,7 +132,6 @@ def matchs():
 @app.route('/profile/<int:id_player>')
 def profile(id_player):
     """Query detailled informations about one player from its id."""
-    # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
 
     user = None
@@ -181,8 +180,6 @@ def profile(id_player):
 @app.route('/svg_victory/<int:id_player>')
 def svg_victory(id_player):
     """Query ranking informations for one player from its id."""
-
-    # Never NEVER delete this line because it update score and number of match.
     unordered_ranking = compute_ranking()
 
     user = None
