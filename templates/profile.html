@@ -1,38 +1,8 @@
 {% extends "layout.html" %}
-
-{% macro macro_player(player)-%}
-<figure>
-    <img src={{ player.gravatar_url }}>
-    <figcaption>
-        <a href="{{ url_for('profile', id_player=player.id_user) }}">{{ player.full_name }}</a>
-    </figcaption>
-</figure>
-{%- endmacro %}
-
-{% macro macro_match(match)-%}
-<article>
-    <h2>
-        <time datetime ="{{ match.date }}">{{ match.date.strftime("%Y-%m-%d %H:%M") }}</time>
-    </h2>
-    <section>
-        <h3>{{ match.score_team_1 }}</h3>
-        {{ macro_player(match.team_1_player_1) }}
-        {% if match.team_1_player_2 %}
-          {{ macro_player(match.team_1_player_2)}}
-        {% endif %}
-    </section>
-    <section>
-        <h3>{{ match.score_team_2 }}</h3>
-        {{ macro_player(match.team_2_player_1) }}
-        {% if match.team_2_player_2 %}
-          {{ macro_player(match.team_2_player_2)}}
-        {% endif %}
-    </section>
-</article>
-{%- endmacro %}
-
+{% from 'match.html' import macro_match %}
 
 {% block main %}
+
   <article>
     <h2>{{ user.full_name }}</h2>
 
