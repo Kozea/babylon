@@ -18,14 +18,14 @@
         <h3>{{ match.score_team_1 }}</h3>
         {{ macro_player(match.team_1_player_1) }}
         {% if match.team_1_player_2 %}
-            {{ macro_player(match.team_1_player_2)}}
+          {{ macro_player(match.team_1_player_2)}}
         {% endif %}
     </section>
     <section>
         <h3>{{ match.score_team_2 }}</h3>
         {{ macro_player(match.team_2_player_1) }}
         {% if match.team_2_player_2 %}
-            {{ macro_player(match.team_2_player_2)}}
+          {{ macro_player(match.team_2_player_2)}}
         {% endif %}
     </section>
 </article>
@@ -40,20 +40,26 @@
 
     {% if user.number_of_match %}
     
-      <section>
-        <p>Elo : {{user.ranking}}</p>
-        <p>Victories : {{user.nb_victories}}</p>
-        <p>Defeats : {{user.nb_defeats}}</p>
-
+    <section>
+      <dl>
+        <dt>Elo :</dt> 
+        <dd>{{user.ranking}}</dd>
+        <dt>Victories :</dt> 
+        <dd>{{user.nb_victories}}</dd>
+        <dt>Defeats :</dt> 
+        <dd>{{user.nb_defeats}}</dd>
+      </dl>
+      
         <figure>
           <figcaption>Ratio :{{100*(user.nb_victories/user.number_of_match)| round(2)}}</figcaption>
           <img src="{{ url_for('svg_victory', id_player=user.id_user) }}"></img>
         </figure>
-      </section>
-
-      <section>
-        <p>
-          Best Teammate(s) : 
+      </dl>
+    </section>
+    
+    <section>
+      <p>
+        Best Teammate(s) : 
           {% for user in best_teammate %}
             <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.full_name}}</a>
           {% else %}
