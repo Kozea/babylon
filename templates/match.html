@@ -1,50 +1,42 @@
 {% extends "layout.html" %}
 
-{# TODO: use (at least) a macro #}
+{% macro macro_player(player)-%}
+<figure>
+    <img src={{ player.gravatar_url }}>
+    <figcaption>
+        <a href="{{ url_for('profile', id_player=player.id_user) }}">{{ player.full_name }}</a>
+    </figcaption>
+</figure>
+{%- endmacro %}
+
+{% macro macro_match(match)-%}
+<article>
+    <h2>
+        <time datetime ="{{ match.date }}">{{ match.date.strftime("%Y-%m-%d %H:%M") }}</time>
+    </h2>
+    <section>
+        <h3>{{ match.score_team_1 }}</h3>
+        {{ macro_player(match.team_1_player_1) }}
+        {% if match.team_1_player_2 %}
+            {{ macro_player(match.team_1_player_2)}}
+        {% endif %}
+    </section>
+    <section>
+        <h3>{{ match.score_team_2 }}</h3>
+        {{ macro_player(match.team_2_player_1) }}
+        {% if match.team_2_player_2 %}
+            {{ macro_player(match.team_2_player_2)}}
+        {% endif %}
+    </section>
+</article>
+{%- endmacro %}
+
 
 {% block main %}
-  <h1>Matchs</h1>
-  {% for match in matchs %}
-    <article>
-      <h2>
-        <time datetime ="{{ match.date }}">{{ match.date.strftime("%Y-%m-%d %H:%M") }}</time>
-      </h2>
-      <section>
-        <h3>{{ match.score_team_1 }}</h3>
-        <figure>
-          <img src={{ match.team_1_player_1.gravatar_url }}>
-          <figcaption>
-            <a href="{{ url_for('profile', id_player=match.team_1_player_1.id_user) }}">{{ match.team_1_player_1.full_name }}</a>
-          </figcaption>
-        </figure>
-        {% if match.team_1_player_2 %}
-          <figure>
-            <img src={{ match.team_1_player_2.gravatar_url }}>
-            <figcaption>
-              <a href="{{ url_for('profile', id_player=match.team_1_player_2.id_user) }}">{{ match.team_1_player_2.full_name }}</a>
-            </figcaption>
-          </figure>
-        {% endif %}
-        <section>
-        </section>
-        <h3>{{ match.score_team_2 }}</h3>
-        <figure>
-          <img src={{ match.team_2_player_1.gravatar_url }}>
-          <figcaption>
-            <a href="{{ url_for('profile', id_player=match.team_2_player_1.id_user) }}">{{ match.team_2_player_1.full_name }}</a>
-          </figcaption>
-        </figure>
-        {% if match.team_2_player_2 %}
-          <figure>
-            <img src={{ match.team_2_player_2.gravatar_url }}>
-            <figcaption>
-              <a href="{{ url_for('profile', id_player=match.team_2_player_2.id_user) }}">{{ match.team_2_player_2.full_name }}</a>
-            </figcaption>
-          </figure>
-        {% endif %}
-      </section>
-    </article>
-  {% else %}
-    <p>There is no match yet!</p>
-  {% endfor %}
+    <h1>Matchs</h1>
+    {% for match in matchs %}
+        {{ macro_match(match) }}
+    {% else %}
+        <p>There is no match yet!</p>
+    {% endfor %}
 {% endblock main %}
