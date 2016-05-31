@@ -32,7 +32,7 @@
               <td>Invisible</td>
             {% endif %}
             <td>
-              <img src="{{ user.gravatar }}">
+              <img src="{{ user.gravatar_url }}">
               <a href="{{ url_for('profile', id_player=user.id_user) }}">{{ user.full_name }}</a>
             </td>
             <td>{{ user.ranking }}</td>
