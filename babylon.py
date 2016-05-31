@@ -245,15 +245,6 @@ def ranking():
         user.nb_victories = victories_as_team1 + victories_as_team2
         user.nb_defeats = user.number_of_match - user.nb_victories
 
-        if user.number_of_match != 0:
-            gauge = pygal.SolidGauge(inner_radius=0.70, show_legend=False)
-            gauge.value_formatter = lambda x: '{:.10g}%'.format(x)
-            gauge.add(
-                'Ratio', [{
-                    'value': (user.nb_victories/user.number_of_match)*100,
-                    'max_value': 100}])
-            user.ratio_gauge = gauge
-
     ordered_ranking = sorted(
         unordered_ranking, key=lambda user: -user.ranking)
 
