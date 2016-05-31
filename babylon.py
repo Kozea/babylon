@@ -15,6 +15,7 @@ from copy import deepcopy
 from datetime import datetime
 from itertools import groupby
 from collections import OrderedDict
+from functools import lru_cache
 
 import pygal
 from flask import request, render_template, Flask, make_response, flash
@@ -356,6 +357,7 @@ def add_match():
 
         db.session.add(match)
         db.session.commit()
+        compute_ranking.cache_clear()
 
         flash("Match was successfully added ")
 
@@ -380,6 +382,7 @@ def add_player():
     return render_template('add_player.html', form=form())
 
 
+@lru_cache(maxsize=None)
 def compute_ranking():
     """Get the list of all users with their current score."""
     users = User.query.all()
