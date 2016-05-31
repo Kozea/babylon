@@ -10,52 +10,52 @@
 
     {% if user.number_of_match %}
     
-    <section>
-      <dl>
+      <section>
+        <dl>
         <dt>Elo :</dt> 
         <dd>{{user.ranking}}</dd>
         <dt>Victories :</dt> 
         <dd>{{user.nb_victories}}</dd>
         <dt>Defeats :</dt> 
         <dd>{{user.nb_defeats}}</dd>
-      </dl>
-      
-      <figure>
+        </dl>
+        
+        <figure>
         <figcaption>Ratio :{{100*(user.nb_victories/user.number_of_match)| round(2)}}</figcaption>
         <img src="{{ url_for('svg_victory', id_player=user.id_user) }}"></img>
-      </figure>
+        </figure>
+        
+      </section>
       
-    </section>
-    
-    <section>
-      <p>
+      <section>
+        <p>
         Best Teammate(s) : 
-          {% for user in best_teammate %}
-            <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.full_name}}</a>
-          {% else %}
-            No best Teammate.
-          {% endfor %}
-          ({{best_teammate_coeff}} team victories)
+        {% for user in best_teammate %}
+          <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.full_name}}</a>
+        {% else %}
+          No best Teammate.
+        {% endfor %}
+        ({{best_teammate_coeff}} team victories)
         </p>
 
         <p>
-          Worst Teammate(s) : 
-          {% for user in worst_teammate %}
-            <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.full_name}}</a>
-          {% else %}
-            No Worst Teammate.
-          {% endfor %}
-          ({{worst_teammate_coeff}} team defeat(s)) 
+        Worst Teammate(s) : 
+        {% for user in worst_teammate %}
+          <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.full_name}}</a>
+        {% else %}
+          No Worst Teammate.
+        {% endfor %}
+        ({{worst_teammate_coeff}} team defeat(s)) 
         </p>
         
         <p>
-          Nemesis :
-          {% for user in nemesis %}
-            <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.full_name}}</a>
-          {% else %}
-            No nemesis.
-          {% endfor %}
-          ({{nemesis_coeff}} defeat(s))) 
+        Nemesis :
+        {% for user in nemesis %}
+          <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.full_name}}</a>
+        {% else %}
+          No nemesis.
+        {% endfor %}
+        ({{nemesis_coeff}} defeat(s)) 
         </p>
         
       </section>
@@ -63,9 +63,9 @@
       <section>
         <h1>Matchs played</h1>
         {% for match in matchs %}
-          {{ macro_match(match) }}
+        {{ macro_match(match) }}
         {% else %}
-          <p>There is no match yet!</p>  
+        <p>There is no match yet!</p>  
         {% endfor %}
       </section>
     {% endif %}
