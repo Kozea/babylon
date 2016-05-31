@@ -98,16 +98,6 @@
 
 {% block main %} 
 
-{% if error %}
-    <p class=error>
-        <strong>Error:</strong> {{ error }}
-{% endif %}
-
-{% if success %}
-    <p class=success>
-        <strong>Info:</strong> {{ success }}
-{% endif %}
-
 {% if users|length > 0 %}
 <div id="players" style="display:table-cell; width:255px; height:250px; border:dashed 1px black;" ondragover="return false" ondrop="OnDropTarget(this, event);">
 {% for user in users %}
