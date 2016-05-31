@@ -22,6 +22,16 @@
 
 {# TODO: add a flash #}
 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <strong>{{ message }}</strong>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 <main>
   {% block main %}{% endblock main %}
 </main>

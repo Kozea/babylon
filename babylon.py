@@ -18,7 +18,7 @@ from itertools import groupby
 from collections import OrderedDict
 
 import pygal
-from flask import request, render_template, Flask, make_response
+from flask import request, render_template, Flask, make_response, flash
 from flask_sqlalchemy import SQLAlchemy
 from plainform import Form, StringField, SubmitField, SelectMultipleField
 from wtforms.validators import InputRequired, ValidationError
@@ -211,6 +211,12 @@ def svg_victory(id_player):
 @app.route('/ranking')
 def ranking():
     """Query the ranking informations. """
+    
+    users = User.query.all()
+    if len(users) == 0:
+        flash("There are no players yet !")
+        return render_template('ranking.html', users=users)
+        
     unordered_ranking = compute_ranking()
 
     for user in unordered_ranking:
@@ -248,6 +254,12 @@ def ranking():
 @app.route('/tournament', methods=['GET', 'POST'])
 def tournament():
     """Create a tournament."""
+    
+    users = User.query.all()
+    if len(users) == 0:
+        flash("There are no players yet !")
+        return render_template('tournament.html')
+        
     form = TournamentForm(request.form)
     users = compute_ranking()
     user_pairs = []
@@ -301,8 +313,8 @@ def add_match():
     """Create a new match."""
     users = User.query.all()
     if len(users) == 0:
-        success = "There are no players yet !"
-        return render_template('add_match.html', success=success, users=users)
+        flash("There are no players yet !")
+        return render_template('add_match.html', users=users)
 
     error = None
     success = None
@@ -339,7 +351,7 @@ def add_match():
         db.session.add(match)
         db.session.commit()
 
-        success = "Match was successfully added "
+        flash("Match was successfully added ")
 
     return render_template(
         'add_match.html', users=users, success=success, error=error)
@@ -357,10 +369,9 @@ def add_player():
         db.session.add(new_user)
         db.session.commit()
 
-        success = (form.name.data + " " +
-                   form.surname.data + " was successfully registered !")
+        flash (form.name.data + ' ' + form.surname.data + " was successfully registered" )
 
-    return render_template('add_player.html', success=success, form=form())
+    return render_template('add_player.html', form=form())
 
 
 def compute_ranking():

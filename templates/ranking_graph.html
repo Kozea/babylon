@@ -6,7 +6,5 @@
 {% endblock head %}
 
 {% block main %}
-  {# TODO: seriously? #}
-  <h1><a href="{{ url_for('ranking') }}">Go back to ranking!</a></h1>
   {{ line_chart | safe }}
 {% endblock main %}
