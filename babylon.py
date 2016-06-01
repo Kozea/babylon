@@ -590,8 +590,6 @@ def get_nemesis(player):
         max_score = max(opponents.values())
         nemesis = [player for player, max
                    in opponents.items() if max == max_score]
-    import pdb
-    pdb.set_trace()
     return nemesis, max_score
 
 
