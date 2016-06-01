@@ -109,8 +109,8 @@ class User(db.Model):
         elif self == match.team_2_player_1:
             return match.team_2_player_2
             
-        elif self == match.team_1_player_2:
-            return match.team_1_player_1
+        elif self == match.team_2_player_2:
+            return match.team_2_player_1
 
 
 class UserSubscribeForm(Form):
