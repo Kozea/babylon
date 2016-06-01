@@ -111,6 +111,21 @@ class User(db.Model):
             
         elif self == match.team_2_player_2:
             return match.team_2_player_1
+            
+    def opponents(self,match):
+        """Return one player's opponent(s) in a match."""
+        opponents = []
+        
+        if self == match.team_1_player_1 or self == match.team_1_player_2:
+            opponents.append(match.team_2_player_1)
+            if match.team_2_player_2 != None:
+                opponents.append(match.team_2_player_2)
+        else:
+            opponents.append(match.team_1_player_1)
+            if match.team_1_player_2 != None:
+                opponents.append(match.team_1_player_2)
+                
+        return opponents
 
 
 class UserSubscribeForm(Form):
@@ -555,36 +570,20 @@ def get_matchs(player,team_match=False,win=None):
     
     return query.all()
         
-
-
+        
 def get_nemesis(player):
     """Get a list of players who defeated one given player the most. """
-    matchs = get_matchs(player)
+    matchs = get_matchs(player, False, False)
     opponents = {}
 
     for match in matchs:
-        if player == match.team_1_player_1 or player == match.team_1_player_2:
-            if match.score_team_1 < match.score_team_2:
-                if match.team_2_player_1 in opponents.keys():
-                    opponents[match.team_2_player_1] += 1
-                else:
-                    opponents[match.team_2_player_1] = 1
-                if match.team_2_player_2 is not None:
-                    if match.team_2_player_2 in opponents.keys():
-                        opponents[match.team_2_player_2] += 1
-                    else:
-                        opponents[match.team_2_player_2] = 1
-        else:
-            if match.score_team_1 > match.score_team_2:
-                if match.team_1_player_1 in opponents.keys():
-                    opponents[match.team_1_player_1] += 1
-                else:
-                    opponents[match.team_1_player_1] = 1
-                if match.team_1_player_2 is not None:
-                    if match.team_1_player_2 in opponents.keys():
-                        opponents[match.team_1_player_2] += 1
-                    else:
-                        opponents[match.team_1_player_2] = 1
+        player_opponents = player.opponents(match)
+        
+        for opponent in player_opponents:
+            if match.team_1_player_2 in opponents.keys():
+                opponents[opponent] += 1
+            else:
+                opponents[opponent] = 1
 
     nemesis = []
     max_score = 0
@@ -592,7 +591,8 @@ def get_nemesis(player):
         max_score = max(opponents.values())
         nemesis = [player for player, max
                    in opponents.items() if max == max_score]
-
+    import pdb
+    pdb.set_trace()
     return nemesis, max_score
 
 
