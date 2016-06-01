@@ -98,6 +98,19 @@ class User(db.Model):
                                     {'d': GRAVATAR_DEFAULT,
                                      's': GRAVATAR_SIZE})
                                   )
+    def teammate(self,match):
+        """Return the user's teammate if he exists."""
+        if self == match.team_1_player_1:
+            return match.team_1_player_2
+            
+        elif self == match.team_1_player_2:
+            return match.team_1_player_1
+            
+        elif self == match.team_2_player_1:
+            return match.team_2_player_2
+            
+        elif self == match.team_1_player_2:
+            return match.team_1_player_1
 
 
 class UserSubscribeForm(Form):
@@ -143,8 +156,8 @@ def profile(id_player):
             break
 
     nemesis, nemesis_coeff = get_nemesis(user)
-    best_teammate, best_teammate_coeff = get_best_teammate(user)
-    worst_teammate, worst_teammate_coeff = get_worst_teammate(user)
+    best_teammate, best_teammate_coeff = get_teammate(user, True)
+    worst_teammate, worst_teammate_coeff = get_teammate(user, False)
     matchs = get_matchs(user)
 
     victories_as_team1 = (
@@ -511,14 +524,36 @@ def generate_tournament(players):
     return tournament
 
 
-def get_matchs(player):
+def get_matchs(player,team_match=False,win=None):
     """Get a list of all matchs involving a given player."""
-    return Match.query.filter(
+    query = Match.query.filter(
         (Match.team_1_player_1 == player) |
         (Match.team_1_player_2 == player) |
         (Match.team_2_player_1 == player) |
         (Match.team_2_player_2 == player)
-    ).order_by(-Match.id_match).all()
+    ).order_by(-Match.id_match)
+    
+    if team_match:
+        query.filter(
+            (Match.team_1_player_1 == player & Match.team_1_player_2 != None) |   
+            (Match.team_2_player_1 == player & Match.team_2_player_2 != None) )
+            
+    if win == True:
+        query.filter(
+            (((Match.team1_player_1 == player | Match.team1_player_2 == player)
+            & Match.score_team_1 > Match.score_team_2)|
+            ((Match.team2_player_1 == player | Match.team2_player_2 == player)
+            & Match.score_team_2 > Match.score_team_1)))
+            
+    elif win == False:
+        query.filter(
+            (((Match.team1_player_1 == player | Match.team1_player_2 == player)
+            & Match.score_team_1 < Match.score_team_2)|
+            ((Match.team2_player_1 == player | Match.team2_player_2 == player)
+            & Match.score_team_2 > Match.score_team_1)))
+    
+    return query.all()
+        
 
 
 def get_nemesis(player):
@@ -560,102 +595,23 @@ def get_nemesis(player):
     return nemesis, max_score
 
 
-def get_best_teammate(player):
-    """Get a player's best teammates.
-
-    A player is another player's best teammate when he won the most with him,
-    while playing as a team.
-
-    """
-    matchs = get_matchs(player)
-
-    teammates = {}
-
-    for match in matchs:
-        if (player == match.team_1_player_1 and
-                match.score_team_1 > match.score_team_2):
-            if match.team_1_player_2 is not None:
-                print("PLAYER11")
-                if match.team_1_player_2 in teammates.keys():
-                    teammates[match.team_1_player_2] += 1
-                else:
-                    teammates[match.team_1_player_2] = 1
-
-        elif (player == match.team_1_player_2 and
-              match.score_team_1 > match.score_team_2):
-            print("PLAYER12")
-            if match.team_1_player_1 in teammates.keys():
-                teammates[match.team_1_player_1] += 1
-            else:
-                teammates[match.team_1_player_1] = 1
-
-        elif (player == match.team_2_player_1 and
-              match.score_team_2 > match.score_team_1):
-            print("PLAYER21")
-            if match.team_2_player_2 is not None:
-                if match.team_2_player_2 in teammates.keys():
-                    teammates[match.team_2_player_2] += 1
-                else:
-                    teammates[match.team_2_player_2] = 1
-
-        elif (player == match.team_2_player_2 and
-              match.score_team_2 > match.score_team_1):
-            print("PLAYER22")
-            if match.team_2_player_1 in teammates.keys():
-                teammates[match.team_2_player_1] += 1
-            else:
-                teammates[match.team_2_player_1] = 1
-    teammate = []
-    max_score = 0
-    if len(teammates.keys()) != 0:
-        max_score = max(teammates.values())
-        teammate = [player for player, max
-                    in teammates.items() if max == max_score]
-
-    return teammate, max_score
-
-
-def get_worst_teammate(player):
+def get_teammate(player,best=True):
     """Get a player's worst teammates.
 
     A player is another player's worst teammate when he lost the most with him,
     while playing as a team.
 
     """
-    matchs = get_matchs(player)
+    matchs = get_matchs(player, True, (True if best else False))
     teammates = {}
 
+
     for match in matchs:
-
-        if (player == match.team_1_player_1 and
-                match.score_team_1 < match.score_team_2):
-            if match.team_1_player_2 is not None:
-                if match.team_1_player_2 in teammates.keys():
-                    teammates[match.team_1_player_2] += 1
-                else:
-                    teammates[match.team_1_player_2] = 1
-
-        elif (player == match.team_1_player_2 and
-              match.score_team_1 < match.score_team_2):
-            if match.team_1_player_1 in teammates.keys():
-                teammates[match.team_1_player_1] += 1
-            else:
-                teammates[match.team_1_player_1] = 1
-
-        elif (player == match.team_2_player_1 and
-              match.score_team_2 < match.score_team_1):
-            if match.team_2_player_2 is not None:
-                if match.team_2_player_2 in teammates.keys():
-                    teammates[match.team_2_player_2] += 1
-                else:
-                    teammates[match.team_2_player_2] = 1
-
-        elif (player == match.team_2_player_2 and
-              match.score_team_2 < match.score_team_1):
-            if match.team_2_player_1 in teammates.keys():
-                teammates[match.team_2_player_1] += 1
-            else:
-                teammates[match.team_2_player_1] = 1
+        player_teammate = player.teammate(match)
+        if player_teammate in teammates.keys():
+            teammates[player_teammate] += 1
+        else:
+            teammates[player_teammate] = 1
 
     teammate = []
     max_score = 0
@@ -707,6 +663,7 @@ def get_ranking(date):
                 match.score_team_1, match.score_team_2)
         date_score[date] = deepcopy(users)
     return date_score
+
 
 
 if __name__ == '__main__':
