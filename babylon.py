@@ -547,16 +547,22 @@ def get_nemesis(player):
                     else:
                         opponents[match.team_1_player_2] = 1
 
-    score_temp = 0
     nemesis = []
-    for player, score in opponents.items():
-        if score_temp < score:
-            nemesis = []
-            nemesis.append(player)
-            score_temp = score
-        elif score_temp == score:
-            nemesis.append(player)
-    return nemesis, score_temp
+    max_score = 0
+    if len(teammates.keys()) != 0:
+      max_score = max(teammates.values())
+      nemesis = [player for player, max in teammates.items() if max == max_score]
+                
+    #~ score_temp = 0
+    #~ teammate = []
+    #~ for player, score in teammates.items():
+        #~ if score_temp < score:
+            #~ teammate = []
+            #~ teammate.append(player)
+            #~ score_temp = score
+        #~ elif score_temp == score:
+            #~ teammate.append(player)
+    return nemesis, max_score
 
 
 def get_best_teammate(player):
@@ -600,16 +606,22 @@ def get_best_teammate(player):
             else:
                 teammates[match.team_2_player_1] = 1
 
-    score_temp = 0
     teammate = []
-    for player, score in teammates.items():
-        if score_temp < score:
-            teammate = []
-            teammate.append(player)
-            score_temp = score
-        elif score_temp == score:
-            teammate.append(player)
-    return teammate, score_temp
+    max_score = 0
+    if len(teammates.keys()) != 0:
+      max_score = max(teammates.values())
+      teammate = [player for player, max in teammates.items() if max == max_score]
+                
+    #~ score_temp = 0
+    #~ teammate = []
+    #~ for player, score in teammates.items():
+        #~ if score_temp < score:
+            #~ teammate = []
+            #~ teammate.append(player)
+            #~ score_temp = score
+        #~ elif score_temp == score:
+            #~ teammate.append(player)
+    return teammate, max_score
 
 
 def get_worst_teammate(player):
@@ -654,16 +666,22 @@ def get_worst_teammate(player):
             else:
                 teammates[match.team_2_player_1] = 1
 
-    score_temp = 0
     teammate = []
-    for player, score in teammates.items():
-        if score_temp < score:
-            teammate = []
-            teammate.append(player)
-            score_temp = score
-        elif score_temp == score:
-            teammate.append(player)
-    return teammate, score_temp
+    max_score = 0
+    if len(teammates.keys()) != 0:
+      max_score = max(teammates.values())
+      teammate = [player for player, max in teammates.items() if max == max_score]
+                
+    #~ score_temp = 0
+    #~ teammate = []
+    #~ for player, score in teammates.items():
+        #~ if score_temp < score:
+            #~ teammate = []
+            #~ teammate.append(player)
+            #~ score_temp = score
+        #~ elif score_temp == score:
+            #~ teammate.append(player)
+    return teammate, max_score
 
 
 def get_ranking(date):
