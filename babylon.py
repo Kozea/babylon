@@ -98,33 +98,34 @@ class User(db.Model):
                                     {'d': GRAVATAR_DEFAULT,
                                      's': GRAVATAR_SIZE})
                                   )
-    def teammate(self,match):
+
+    def teammate(self, match):
         """Return the user's teammate if he exists."""
         if self == match.team_1_player_1:
             return match.team_1_player_2
-            
+
         elif self == match.team_1_player_2:
             return match.team_1_player_1
-            
+
         elif self == match.team_2_player_1:
             return match.team_2_player_2
-            
+
         elif self == match.team_2_player_2:
             return match.team_2_player_1
-            
-    def opponents(self,match):
+
+    def opponents(self, match):
         """Return one player's opponent(s) in a match."""
         opponents = []
-        
+
         if self == match.team_1_player_1 or self == match.team_1_player_2:
             opponents.append(match.team_2_player_1)
-            if match.team_2_player_2 != None:
+            if match.team_2_player_2 is not None:
                 opponents.append(match.team_2_player_2)
         else:
             opponents.append(match.team_1_player_1)
-            if match.team_1_player_2 != None:
+            if match.team_1_player_2 is not None:
                 opponents.append(match.team_1_player_2)
-                
+
         return opponents
 
 
@@ -530,7 +531,7 @@ def generate_tournament(players):
     return tournament
 
 
-def get_matchs(player,team_match=False,win=None):
+def get_matchs(player, team_match=False, win=None):
     """Get a list of all matchs involving a given player."""
     query = Match.query.filter(
         (Match.team_1_player_1 == player) |
@@ -538,39 +539,37 @@ def get_matchs(player,team_match=False,win=None):
         (Match.team_2_player_1 == player) |
         (Match.team_2_player_2 == player)
     ).order_by(-Match.id_match)
-    
+
     if team_match:
         query = query.filter(
-            ((Match.team_1_player_1 == player) & (Match.team_1_player_2 != None)) |   
-            ((Match.team_2_player_1 == player) & (Match.team_2_player_2 != None)) |
+            ((Match.team_1_player_1 == player) &
+             (Match.team_1_player_2 is not None)) |
+            ((Match.team_2_player_1 == player) &
+             (Match.team_2_player_2 is not None)) |
             (Match.team_1_player_2 == player) |
             (Match.team_2_player_2 == player))
-            
-    if win == True:
+
+    if win is True:
         query = query.filter(
-            (
-            (((Match.team_1_player_1 == player) | (Match.team_1_player_2 == player))
-            & (Match.score_team_1 > Match.score_team_2))
-            |
-            (((Match.team_2_player_1 == player) | (Match.team_2_player_2 == player))
-            & (Match.score_team_2 > Match.score_team_1))
-            )
-            )
-            
-    elif win == False:
+            ((((Match.team_1_player_1 == player) |
+              (Match.team_1_player_2 == player)) &
+              (Match.score_team_1 > Match.score_team_2)) |
+             (((Match.team_2_player_1 == player) |
+              (Match.team_2_player_2 == player)) &
+              (Match.score_team_2 > Match.score_team_1))))
+
+    elif win is False:
         query = query.filter(
-            (
-            (((Match.team_1_player_1 == player) | (Match.team_1_player_2 == player))
-            & (Match.score_team_1 < Match.score_team_2))
-            |
-            (((Match.team_2_player_1 == player) | (Match.team_2_player_2 == player))
-            & (Match.score_team_2 < Match.score_team_1))
-            )
-            )
-    
+            ((((Match.team_1_player_1 == player) |
+              (Match.team_1_player_2 == player)) &
+              (Match.score_team_1 < Match.score_team_2)) |
+             (((Match.team_2_player_1 == player) |
+              (Match.team_2_player_2 == player)) &
+              (Match.score_team_2 < Match.score_team_1))))
+
     return query.all()
-        
-        
+
+
 def get_nemesis(player):
     """Get a list of players who defeated one given player the most. """
     matchs = get_matchs(player, False, False)
@@ -578,7 +577,7 @@ def get_nemesis(player):
 
     for match in matchs:
         player_opponents = player.opponents(match)
-        
+
         for opponent in player_opponents:
             if match.team_1_player_2 in opponents.keys():
                 opponents[opponent] += 1
@@ -596,7 +595,7 @@ def get_nemesis(player):
     return nemesis, max_score
 
 
-def get_teammate(player,best=True):
+def get_teammate(player, best=True):
     """Get a player's worst teammates.
 
     A player is another player's worst teammate when he lost the most with him,
@@ -606,7 +605,6 @@ def get_teammate(player,best=True):
     matchs = get_matchs(player, True, (True if best else False))
     print(best, matchs)
     teammates = {}
-
 
     for match in matchs:
         player_teammate = player.teammate(match)
@@ -665,8 +663,6 @@ def get_ranking(date):
                 match.score_team_1, match.score_team_2)
         date_score[date] = deepcopy(users)
     return date_score
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
