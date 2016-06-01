@@ -33,6 +33,7 @@ db = SQLAlchemy(app)
 
 cached_ranking = None
 
+
 class Match(db.Model):
     """Match table."""
     id_match = db.Column(db.Integer, primary_key=True)
@@ -357,6 +358,7 @@ def add_match():
 
         db.session.add(match)
         db.session.commit()
+        global cached_ranking
         cached_ranking = None
 
         flash("Match was successfully added ")
