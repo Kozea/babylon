@@ -537,7 +537,7 @@ def get_matchs(player,team_match=False,win=None):
         query = query.filter(
             ((Match.team_1_player_1 == player) & (Match.team_1_player_2 != None)) |   
             ((Match.team_2_player_1 == player) & (Match.team_2_player_2 != None)) |
-            (Match.team_2_player_1 == player) |
+            (Match.team_1_player_2 == player) |
             (Match.team_2_player_2 == player))
             
     if win == True:
