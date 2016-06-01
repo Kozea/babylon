@@ -49,7 +49,7 @@
         {% for user in worst_teammate %}
           <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.full_name}}</a>
         {% else %}
-          No Worst Teammate.
+          No worst Teammate.
         {% endfor %}
         ({{worst_teammate_coeff}} team defeat(s))
       </dt>
@@ -59,9 +59,9 @@
         {% for user in nemesis %}
           <a href="{{ url_for('profile', id_player=user.id_user) }}">{{user.full_name}}</a>
         {% else %}
-          No best nemesis.
+          No nemesis.
         {% endfor %}
-        ({{nemesis_coeff}} team victories)
+        ({{nemesis_coeff}} defeats)
       </dt>
     
     </dl>

@@ -547,22 +547,22 @@ def get_nemesis(player):
                     else:
                         opponents[match.team_1_player_2] = 1
 
-    nemesis = []
-    max_score = 0
-    if len(teammates.keys()) != 0:
-      max_score = max(teammates.values())
-      nemesis = [player for player, max in teammates.items() if max == max_score]
+    #~ nemesis = []
+    #~ max_score = 0
+    #~ if len(opponents.keys()) != 0:
+      #~ max_score = max(opponents.values())
+      #~ nemesis = [player for player, max in opponents.items() if max == max_score]
                 
-    #~ score_temp = 0
-    #~ teammate = []
-    #~ for player, score in teammates.items():
-        #~ if score_temp < score:
-            #~ teammate = []
-            #~ teammate.append(player)
-            #~ score_temp = score
-        #~ elif score_temp == score:
-            #~ teammate.append(player)
-    return nemesis, max_score
+    score_temp = 0
+    nemesis= []
+    for player, score in opponents.items():
+        if score_temp < score:
+            nemesis = []
+            nemesis.append(player)
+            score_temp = score
+        elif score_temp == score:
+            nemesis.append(player)
+    return nemesis, score
 
 
 def get_best_teammate(player):
