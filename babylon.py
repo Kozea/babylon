@@ -15,7 +15,6 @@ from copy import deepcopy
 from datetime import datetime
 from itertools import groupby
 from collections import OrderedDict
-from functools import lru_cache
 
 import pygal
 from flask import request, render_template, Flask, make_response, flash
@@ -357,7 +356,6 @@ def add_match():
 
         db.session.add(match)
         db.session.commit()
-        compute_ranking.cache_clear()
 
         flash("Match was successfully added ")
 
@@ -382,7 +380,6 @@ def add_player():
     return render_template('add_player.html', form=form())
 
 
-@lru_cache(maxsize=None)
 def compute_ranking():
     """Get the list of all users with their current score."""
     users = User.query.all()
@@ -550,19 +547,10 @@ def get_nemesis(player):
     nemesis = []
     max_score = 0
     if len(opponents.keys()) != 0:
-      max_score = max(opponents.values())
-      nemesis = [player for player, max in opponents.items() if max == max_score]
-                
-    #~ max_score= 0
-    #~ nemesis = []
-    #~ for player, score in opponents.items():
- 
-        #~ if max_score < score:
-            #~ nemesis = []
-            #~ nemesis.append(player)
-            #~ max_score = score
-        #~ elif max_score == score:
-            #~ nemesis.append(player)
+        max_score = max(opponents.values())
+        nemesis = [player for player, max
+                   in opponents.items() if max == max_score]
+
     return nemesis, max_score
 
 
@@ -574,12 +562,14 @@ def get_best_teammate(player):
 
     """
     matchs = get_matchs(player)
+
     teammates = {}
 
     for match in matchs:
         if (player == match.team_1_player_1 and
                 match.score_team_1 > match.score_team_2):
             if match.team_1_player_2 is not None:
+                print("PLAYER11")
                 if match.team_1_player_2 in teammates.keys():
                     teammates[match.team_1_player_2] += 1
                 else:
@@ -587,6 +577,7 @@ def get_best_teammate(player):
 
         elif (player == match.team_1_player_2 and
               match.score_team_1 > match.score_team_2):
+            print("PLAYER12")
             if match.team_1_player_1 in teammates.keys():
                 teammates[match.team_1_player_1] += 1
             else:
@@ -594,6 +585,7 @@ def get_best_teammate(player):
 
         elif (player == match.team_2_player_1 and
               match.score_team_2 > match.score_team_1):
+            print("PLAYER21")
             if match.team_2_player_2 is not None:
                 if match.team_2_player_2 in teammates.keys():
                     teammates[match.team_2_player_2] += 1
@@ -602,26 +594,18 @@ def get_best_teammate(player):
 
         elif (player == match.team_2_player_2 and
               match.score_team_2 > match.score_team_1):
+            print("PLAYER22")
             if match.team_2_player_1 in teammates.keys():
                 teammates[match.team_2_player_1] += 1
             else:
                 teammates[match.team_2_player_1] = 1
-
     teammate = []
     max_score = 0
     if len(teammates.keys()) != 0:
-      max_score = max(teammates.values())
-      teammate = [player for player, max in teammates.items() if max == max_score]
-                
-    #~ score_temp = 0
-    #~ teammate = []
-    #~ for player, score in teammates.items():
-        #~ if score_temp < score:
-            #~ teammate = []
-            #~ teammate.append(player)
-            #~ score_temp = score
-        #~ elif score_temp == score:
-            #~ teammate.append(player)
+        max_score = max(teammates.values())
+        teammate = [player for player, max
+                    in teammates.items() if max == max_score]
+
     return teammate, max_score
 
 
@@ -670,18 +654,10 @@ def get_worst_teammate(player):
     teammate = []
     max_score = 0
     if len(teammates.keys()) != 0:
-      max_score = max(teammates.values())
-      teammate = [player for player, max in teammates.items() if max == max_score]
-                
-    #~ score_temp = 0
-    #~ teammate = []
-    #~ for player, score in teammates.items():
-        #~ if score_temp < score:
-            #~ teammate = []
-            #~ teammate.append(player)
-            #~ score_temp = score
-        #~ elif score_temp == score:
-            #~ teammate.append(player)
+        max_score = max(teammates.values())
+        teammate = [player for player, max
+                    in teammates.items() if max == max_score]
+
     return teammate, max_score
 
 
