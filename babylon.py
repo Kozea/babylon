@@ -534,19 +534,19 @@ def get_matchs(player,team_match=False,win=None):
     ).order_by(-Match.id_match)
     
     if team_match:
-        query.filter(
+        query = query.filter(
             ((Match.team_1_player_1 == player) & (Match.team_1_player_2 != None)) |   
             ((Match.team_2_player_1 == player) & (Match.team_2_player_2 != None)) )
             
     if win == True:
-        query.filter(
+        query = query.filter(
             ((((Match.team_1_player_1 == player) | (Match.team_1_player_2 == player))
             & (Match.score_team_1 > Match.score_team_2))|
             (((Match.team_2_player_1 == player) | (Match.team_2_player_2 == player))
             & (Match.score_team_2 > Match.score_team_1))))
             
     elif win == False:
-        query.filter(
+        query = query.filter(
             ((((Match.team_1_player_1 == player) | (Match.team_1_player_2 == player))
             & (Match.score_team_1 < Match.score_team_2))|
             (((Match.team_2_player_1 == player) | (Match.team_2_player_2 == player))
@@ -603,6 +603,7 @@ def get_teammate(player,best=True):
 
     """
     matchs = get_matchs(player, True, (True if best else False))
+    print(best, matchs)
     teammates = {}
 
 
