@@ -155,7 +155,7 @@ class TournamentForm(Form):
 def matchs():
     """Query all the matchs, more recents first."""
     matchs = Match.query.order_by(-Match.id_match).all()
-    if len(matchs) == 0:
+    if not matchs:
         flash("There are no matchs yet !")
     return render_template('match.html', matchs=matchs)
 
@@ -171,9 +171,9 @@ def profile(id_player):
             user = temp_user
             break
 
-    nemesis, nemesis_coeff = get_nemesis(user)
-    best_teammate, best_teammate_coeff = get_teammate(user, True)
-    worst_teammate, worst_teammate_coeff = get_teammate(user, False)
+    nemesis, nemesis_coeff = get_related_player(user, True, True)
+    best_teammate, best_teammate_coeff = get_related_player(user, True, False)
+    worst_teammate, worst_teammate_coeff = get_related_player(user, False, False)
     matchs = get_matchs(user)
 
     victories_as_team1 = (
@@ -244,7 +244,7 @@ def svg_victory(id_player):
 def ranking():
     """Query the ranking informations. """
     users = User.query.all()
-    if len(users) == 0:
+    if not users:
         flash("There are no players yet !")
         return render_template('ranking.html')
 
@@ -277,7 +277,7 @@ def ranking():
 def tournament():
     """Create a tournament."""
     users = User.query.all()
-    if len(users) == 0:
+    if not users:
         flash("There are no players yet !")
         return render_template('tournament.html')
 
@@ -340,7 +340,7 @@ def render_ranking_graph():
 def add_match():
     """Create a new match."""
     users = User.query.all()
-    if len(users) == 0:
+    if not users:
         flash("There are no players yet !")
         return render_template('add_match.html', users=users)
 
@@ -549,7 +549,7 @@ def get_matchs(player, team_match=False, win=None):
             (Match.team_1_player_2 == player) |
             (Match.team_2_player_2 == player))
 
-    if win is True:
+    if win:
         query = query.filter(
             ((((Match.team_1_player_1 == player) |
               (Match.team_1_player_2 == player)) &
@@ -558,7 +558,7 @@ def get_matchs(player, team_match=False, win=None):
               (Match.team_2_player_2 == player)) &
               (Match.score_team_2 > Match.score_team_1))))
 
-    elif win is False:
+    elif not win:
         query = query.filter(
             ((((Match.team_1_player_1 == player) |
               (Match.team_1_player_2 == player)) &
@@ -569,50 +569,26 @@ def get_matchs(player, team_match=False, win=None):
     return query.all()
 
 
-def get_nemesis(player):
-    """Get a list of players who defeated one given player the most. """
-    matchs = get_matchs(player, False, False)
-    opponents = {}
-
-    for match in matchs:
-        player_opponents = player.opponents(match)
-
-        for opponent in player_opponents:
-            if match.team_1_player_2 in opponents.keys():
-                opponents[opponent] += 1
-            else:
-                opponents[opponent] = 1
-
-    nemesis = []
-    max_score = 0
-    if len(opponents.keys()) != 0:
-        max_score = max(opponents.values())
-        nemesis = [player for player, max
-                   in opponents.items() if max == max_score]
-    return nemesis, max_score
-
-
-def get_teammate(player, best=True):
+def get_related_player(player, best=True, nemesis=False):
     """Get a player's worst teammates.
 
     A player is another player's worst teammate when he lost the most with him,
     while playing as a team.
 
     """
-    matchs = get_matchs(player, True, (True if best else False))
-    print(best, matchs)
+    matchs = get_matchs(player, not nemesis, best and not nemesis)
     teammates = {}
 
     for match in matchs:
         player_teammate = player.teammate(match)
-        if player_teammate in teammates.keys():
+        if player_teammate in teammates:
             teammates[player_teammate] += 1
         else:
             teammates[player_teammate] = 1
 
     teammate = []
     max_score = 0
-    if len(teammates.keys()) != 0:
+    if teammates:
         max_score = max(teammates.values())
         teammate = [player for player, max
                     in teammates.items() if max == max_score]
