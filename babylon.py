@@ -543,9 +543,9 @@ def get_matchs(player, team_match=False, win=None):
     if team_match:
         query = query.filter(
             ((Match.team_1_player_1 == player) &
-             (Match.team_1_player_2 is not None)) |
+             (Match.team_1_player_2 != None)) |
             ((Match.team_2_player_1 == player) &
-             (Match.team_2_player_2 is not None)) |
+             (Match.team_2_player_2 != None)) |
             (Match.team_1_player_2 == player) |
             (Match.team_2_player_2 == player))
 
@@ -566,7 +566,6 @@ def get_matchs(player, team_match=False, win=None):
              (((Match.team_2_player_1 == player) |
               (Match.team_2_player_2 == player)) &
               (Match.score_team_2 < Match.score_team_1))))
-
     return query.all()
 
 
@@ -617,7 +616,6 @@ def get_teammate(player, best=True):
         max_score = max(teammates.values())
         teammate = [player for player, max
                     in teammates.items() if max == max_score]
-
     return teammate, max_score
 
 
