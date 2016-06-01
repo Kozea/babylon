@@ -31,6 +31,7 @@ app.config['SECRET_KEY'] = 'development key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/babylone.db'
 db = SQLAlchemy(app)
 
+cached_ranking = None
 
 class Match(db.Model):
     """Match table."""
@@ -356,6 +357,7 @@ def add_match():
 
         db.session.add(match)
         db.session.commit()
+        cached_ranking = None
 
         flash("Match was successfully added ")
 
@@ -382,18 +384,20 @@ def add_player():
 
 def compute_ranking():
     """Get the list of all users with their current score."""
-    users = User.query.all()
-    for user in users:
-        user.ranking = 1000
-        user.number_of_match = 0
+    if cached_ranking is None:
+        users = User.query.all()
+        for user in users:
+            user.ranking = 1000
+            user.number_of_match = 0
 
-    matchs = Match.query.all()
-    for match in matchs:
-        elo(match.team_1_player_1, match.team_1_player_2,
-            match.team_2_player_1, match.team_2_player_2,
-            match.score_team_1, match.score_team_2)
-
-    return users
+        matchs = Match.query.all()
+        for match in matchs:
+            elo(match.team_1_player_1, match.team_1_player_2,
+                match.team_2_player_1, match.team_2_player_2,
+                match.score_team_1, match.score_team_2)
+        return users
+    else:
+        return cached_ranking
 
 
 def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
