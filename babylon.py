@@ -549,7 +549,7 @@ def get_matchs(player, team_match=False, win=None):
             (Match.team_1_player_2 == player) |
             (Match.team_2_player_2 == player))
 
-    if win:
+    if win is True:
         query = query.filter(
             ((((Match.team_1_player_1 == player) |
               (Match.team_1_player_2 == player)) &
@@ -558,7 +558,7 @@ def get_matchs(player, team_match=False, win=None):
               (Match.team_2_player_2 == player)) &
               (Match.score_team_2 > Match.score_team_1))))
 
-    elif not win:
+    elif win is False:
         query = query.filter(
             ((((Match.team_1_player_1 == player) |
               (Match.team_1_player_2 == player)) &
@@ -566,6 +566,7 @@ def get_matchs(player, team_match=False, win=None):
              (((Match.team_2_player_1 == player) |
               (Match.team_2_player_2 == player)) &
               (Match.score_team_2 < Match.score_team_1))))
+
     import pdb
     pdb.set_trace()
     return query.all()
