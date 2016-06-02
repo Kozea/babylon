@@ -230,13 +230,13 @@ def svg_victory(id_player):
 
     if user.number_of_match != 0:
         gauge = pygal.SolidGauge(inner_radius=0.70, show_legend=False)
-        gauge.value_formatter = lambda x: '{:.10g}%'.format(x)
+        gauge.value_formatter = lambda x: '{:.0f}%'.format(x)
         gauge.add(
             'Ratio', [{
                 'value': (user.nb_victories/user.number_of_match)*100,
                 'max_value': 100}])
-        user.ratio_gauge = gauge
-    svg = user.ratio_gauge.render()
+        
+    svg = gauge.render()
     response = make_response(svg)
     response.content_type = 'image/svg+xml'
     return response
@@ -598,8 +598,8 @@ def get_related_player(player, best=True, nemesis=False):
     max_score = 0
     if teammates:
         max_score = max(teammates.values())
-        teammate = [player for player, max
-                    in teammates.items() if max == max_score]
+        teammate = [player_temp for player_temp, max_s
+                    in teammates.items() if max_s == max_score]
     return teammate, max_score
 
 
