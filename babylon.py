@@ -567,8 +567,6 @@ def get_matchs(player, team_match=False, win=None):
               (Match.team_2_player_2 == player)) &
               (Match.score_team_2 < Match.score_team_1))))
 
-    import pdb
-    pdb.set_trace()
     return query.all()
 
 
@@ -584,10 +582,11 @@ def get_related_player(player, best=True, nemesis=False):
 
     for match in matchs:
         player_teammate = player.teammate(match)
-        if player_teammate in teammates:
-            teammates[player_teammate] += 1
-        else:
-            teammates[player_teammate] = 1
+        if player_teammate:
+            if player_teammate in teammates:
+                teammates[player_teammate] += 1
+            else:
+                teammates[player_teammate] = 1
 
     teammate = []
     max_score = 0
