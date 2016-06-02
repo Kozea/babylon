@@ -19,6 +19,7 @@ from collections import OrderedDict
 import pygal
 from flask import request, render_template, Flask, make_response, flash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.hybrid import hybrid_method
 from plainform import Form, StringField, SubmitField, SelectMultipleField
 from wtforms.validators import InputRequired, ValidationError
 
@@ -64,7 +65,21 @@ class Match(db.Model):
         self.team_2_player_1 = team_2_player_1
         self.team_2_player_2 = team_2_player_2
 
-
+    @hybrid_method
+    def result(self, player,win=True):
+        if player == self.team_1_player_1 or player == self.team_1_player_2:
+            if score_team1 > score_team2:
+                return win
+            else:
+                return not win
+        elif  player == self.team_2_player_1 or player == self.team_2_player_2:
+            if score_team2 > score_team1:
+                return win
+            else:
+                return not win
+        else:
+            return False
+        
 class User(db.Model):
     """User table."""
     id_user = db.Column(db.Integer, primary_key=True)
@@ -551,23 +566,8 @@ def get_matchs(player, team_match=False, win=None):
             (Match.team_1_player_2 == player) |
             (Match.team_2_player_2 == player))
 
-    if win is True:
-        query = query.filter(
-            ((((Match.team_1_player_1 == player) |
-              (Match.team_1_player_2 == player)) &
-              (Match.score_team_1 > Match.score_team_2)) |
-             (((Match.team_2_player_1 == player) |
-              (Match.team_2_player_2 == player)) &
-              (Match.score_team_2 > Match.score_team_1))))
-
-    elif win is False:
-        query = query.filter(
-            ((((Match.team_1_player_1 == player) |
-              (Match.team_1_player_2 == player)) &
-              (Match.score_team_1 < Match.score_team_2)) |
-             (((Match.team_2_player_1 == player) |
-              (Match.team_2_player_2 == player)) &
-              (Match.score_team_2 < Match.score_team_1))))
+    if win:
+        query = query.filter(Match.result(player,win))
 
     return query.all()
 
