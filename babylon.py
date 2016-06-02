@@ -101,17 +101,19 @@ class User(db.Model):
 
     def teammate(self, match):
         """Return the user's teammate if he exists."""
+        teammate = []
         if self == match.team_1_player_1:
-            return match.team_1_player_2
+            teammate.append(match.team_1_player_2)
 
         elif self == match.team_1_player_2:
-            return match.team_1_player_1
+            teammate.append(match.team_1_player_1)
 
         elif self == match.team_2_player_1:
-            return match.team_2_player_2
+            teammate.append(match.team_2_player_2)
 
         elif self == match.team_2_player_2:
-            return match.team_2_player_1
+            teammate.append(match.team_2_player_1)
+        return teammate
 
     def opponents(self, match):
         """Return one player's opponent(s) in a match."""
@@ -581,12 +583,16 @@ def get_related_player(player, best=True, nemesis=False):
     teammates = {}
 
     for match in matchs:
-        player_teammate = player.teammate(match)
-        if player_teammate:
-            if player_teammate in teammates:
-                teammates[player_teammate] += 1
-            else:
-                teammates[player_teammate] = 1
+        if nemesis:
+            player_teammate = player.opponents(match)
+        else:
+            player_teammate = player.teammate(match)
+        for player in player_teammate:
+            if player:
+                if player in teammates:
+                    teammates[player] += 1
+                else:
+                    teammates[player] = 1
 
     teammate = []
     max_score = 0
@@ -594,7 +600,6 @@ def get_related_player(player, best=True, nemesis=False):
         max_score = max(teammates.values())
         teammate = [player for player, max
                     in teammates.items() if max == max_score]
-
     return teammate, max_score
 
 
