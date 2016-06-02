@@ -587,12 +587,12 @@ def get_related_player(player, best=True, nemesis=False):
             player_teammate = player.opponents(match)
         else:
             player_teammate = player.teammate(match)
-        for player in player_teammate:
-            if player:
-                if player in teammates:
-                    teammates[player] += 1
+        for player_related in player_teammate:
+            if player_related:
+                if player_related in teammates:
+                    teammates[player_related] += 1
                 else:
-                    teammates[player] = 1
+                    teammates[player_related] = 1
 
     teammate = []
     max_score = 0
