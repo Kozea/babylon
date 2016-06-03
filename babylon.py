@@ -178,21 +178,8 @@ def profile(id_player):
     best_teammate, best_teammate_coeff = get_related_player(user, True, False)
     worst_teammate, worst_teammate_coeff = get_related_player(user, False, False)
     matchs = get_matchs(user)
-
-    victories_as_team1 = (
-        db.session.query(Match.id_match)
-        .filter((Match.team_1_player_1 == user) |
-                (Match.team_1_player_2 == user))
-        .filter(Match.score_team_1 > Match.score_team_2)
-        .count())
-    victories_as_team2 = (
-        db.session.query(Match.id_match)
-        .filter((Match.team_2_player_1 == user) |
-                (Match.team_2_player_2 == user))
-        .filter(Match.score_team_1 < Match.score_team_2)
-        .count())
-
-    user.nb_victories = victories_as_team1 + victories_as_team2
+    
+    user.nb_victories = get_matchs(user, False, True, False).count()
     user.nb_defeats = user.number_of_match - user.nb_victories
 
     return render_template(
@@ -534,7 +521,7 @@ def generate_tournament(players):
     return tournament
 
 
-def get_matchs(player, team_match=False, win=None):
+def get_matchs(player, team_match=False, win=None, execute=True):
     """Get a list of all matchs involving a given player."""
     comparison = lambda x,y :((x>y if win is True else  x<y) if win is not None else True)
     test_team = lambda y : (y != None if team_match else True)
@@ -547,9 +534,10 @@ def get_matchs(player, team_match=False, win=None):
           (Match.team_2_player_2 == player)) &
           test_team(Match.team_2_player_2) &
           (comparison(Match.score_team_2, Match.score_team_1)))))
-        
-    return query.order_by(-Match.id_match).all()
-
+    if execute:    
+        return query.order_by(-Match.id_match).all()
+    else:
+        return query.order_by(-Match.id_match)
 
 def get_related_player(player, best=True, nemesis=False):
     """Get a player's worst teammates.
