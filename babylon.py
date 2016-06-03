@@ -406,6 +406,18 @@ def compute_fictive_score(score_team, score_opponent, elo_team, elo_opponent, nb
     score = expertise * goal_difference * (result - expected_result)
     return score
 
+def update_score(player_1, player_2, score):
+    player_1.number_of_match += 1
+    if player_2 is None:
+        player_1.ranking += round(score)
+    else:
+        sum_ranking = player_1.ranking + player_2.ranking
+        player_1.ranking += round(
+            player_1.ranking / sum_ranking * score)
+        player_2.ranking += round(
+            player_2.ranking / sum_ranking * score)
+        player_2.number_of_match += 1
+
 def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
         score_team_1, score_team_2):
     """Update the ranking of each players in parameters.
@@ -416,35 +428,15 @@ def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
     See: https://fr.wikipedia.org /wiki/Classement_mondial_de_football_Elo
 
     """
-    elo1, number_match1 = fictive_player(team_1_player1, team_1_player_2)
-    elo2, number_match2 = fictive_player(team_2_player1, team_2_player_2)
+    elo1, number_match1 = fictive_player(team_1_player_1, team_1_player_2)
+    elo2, number_match2 = fictive_player(team_2_player_1, team_2_player_2)
     
-    score_p1 = compute_fictive_score(score_team1, score_team2, elo1, elo2, number_match1)
-    score_p2 = compute_fictive_score(score_team2, score_team1, elo2, elo1, number_match2)
+    score_p1 = compute_fictive_score(score_team_1, score_team_2, elo1, elo2, number_match1)
+    score_p2 = compute_fictive_score(score_team_2, score_team_1, elo2, elo1, number_match2)
 
-    # Update the ranking and the number of matches of the users
-    team_1_player_1.number_of_match += 1
-    if team_1_player_2 is None:
-        team_1_player_1.ranking += round(score_p1)
-    else:
-        sum_ranking = team_1_player_1.ranking + team_1_player_2.ranking
-        team_1_player_1.ranking += round(
-            team_1_player_1.ranking / sum_ranking * score_p1)
-        team_1_player_2.ranking += round(
-            team_1_player_2.ranking / sum_ranking * score_p1)
-        team_1_player_2.number_of_match += 1
-
-    team_2_player_1.number_of_match += 1
-    if team_2_player_2 is None:
-        team_2_player_1.ranking += round(score_p2)
-    else:
-        sum_ranking = team_2_player_1.ranking + team_2_player_2.ranking
-        team_2_player_1.ranking += round(
-            team_2_player_1.ranking / sum_ranking * score_p2)
-        team_2_player_2.ranking += round(
-            team_2_player_2.ranking / sum_ranking * score_p2)
-        team_2_player_2.number_of_match += 1
-
+    update_score(team_1_player_1, team_1_player_2, score_p1)
+    update_score(team_2_player_1, team_2_player_2, score_p2)
+    
 
 def get_expertise_coefficient(number_of_match, elo):
     """Get expertise coefficient corresponding to an user's elo and matches."""
