@@ -199,21 +199,7 @@ def svg_victory(id_player):
         if temp_user.id_user == id_player:
             user = temp_user
             break
-
-    victories_as_team1 = (
-        db.session.query(Match.id_match)
-        .filter((Match.team_1_player_1 == user) |
-                (Match.team_1_player_2 == user))
-        .filter(Match.score_team_1 > Match.score_team_2)
-        .count())
-    victories_as_team2 = (
-        db.session.query(Match.id_match)
-        .filter((Match.team_2_player_1 == user) |
-                (Match.team_2_player_2 == user))
-        .filter(Match.score_team_1 < Match.score_team_2)
-        .count())
-
-    user.nb_victories = victories_as_team1 + victories_as_team2
+    user.nb_victories = get_matchs(user, False, True, False).count()
     user.nb_defeats = user.number_of_match - user.nb_victories
 
     if user.number_of_match != 0:
@@ -241,20 +227,7 @@ def ranking():
     unordered_ranking = compute_ranking()
 
     for user in unordered_ranking:
-        victories_as_team1 = (
-            db.session.query(Match.id_match)
-            .filter((Match.team_1_player_1 == user) |
-                    (Match.team_1_player_2 == user))
-            .filter(Match.score_team_1 > Match.score_team_2)
-            .count())
-        victories_as_team2 = (
-            db.session.query(Match.id_match)
-            .filter((Match.team_2_player_1 == user) |
-                    (Match.team_2_player_2 == user))
-            .filter(Match.score_team_1 < Match.score_team_2)
-            .count())
-
-        user.nb_victories = victories_as_team1 + victories_as_team2
+        user.nb_victories = get_matchs(user, False, True, False).count()
         user.nb_defeats = user.number_of_match - user.nb_victories
 
     ordered_ranking = sorted(
@@ -411,7 +384,7 @@ def compute_ranking():
     else:
         return cached_ranking
 
-
+    
 def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
         score_team_1, score_team_2):
     """Update the ranking of each players in parameters.
