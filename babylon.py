@@ -537,15 +537,15 @@ def generate_tournament(players):
 def get_matchs(player, team_match=False, win=None):
     """Get a list of all matchs involving a given player."""
     comparison = lambda x,y :((x>y if win is True else  x<y) if win is not None else True)
-    test_team = lambda x,y : (y != None if x else True)
+    test_team = lambda y : (y != None if team_match else True)
     query = Match.query.filter(
         ((((Match.team_1_player_1 == player) |
           (Match.team_1_player_2 == player)) &
-          test_team(team_match, Match.team_1_player_2) &
+          test_team(Match.team_1_player_2) &
           (comparison(Match.score_team_1, Match.score_team_2))) |
          (((Match.team_2_player_1 == player) |
           (Match.team_2_player_2 == player)) &
-          test_team(team_match, Match.team_2_player_2) &
+          test_team(Match.team_2_player_2) &
           (comparison(Match.score_team_2, Match.score_team_1)))))
         
     return query.order_by(-Match.id_match).all()
