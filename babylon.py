@@ -543,23 +543,17 @@ def get_matchs(player, team_match=False, win=None):
         (Match.team_2_player_2 == player)
     ).order_by(-Match.id_match)
 
-    if team_match:
-        query = query.filter(
-            ((Match.team_1_player_1 == player) &
-             (Match.team_1_player_2 != None)) |
-            ((Match.team_2_player_1 == player) &
-             (Match.team_2_player_2 != None)) |
-            (Match.team_1_player_2 == player) |
-            (Match.team_2_player_2 == player))
-        
     if win is not None:
         comparison = lambda x,y :(x>y if win is True else  x<y)
+        test_team = lambda x,y : (y != None if x else True)
         query = query.filter(
             ((((Match.team_1_player_1 == player) |
               (Match.team_1_player_2 == player)) &
+              test_team(team_match, Match.team_1_player_2) &
               (comparison(Match.score_team_1, Match.score_team_2))) |
              (((Match.team_2_player_1 == player) |
               (Match.team_2_player_2 == player)) &
+              test_team(team_match, Match.team_2_player_2) &
               (comparison(Match.score_team_2, Match.score_team_1)))))
         
     return query.all()
