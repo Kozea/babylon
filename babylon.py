@@ -65,20 +65,6 @@ class Match(db.Model):
         self.team_2_player_1 = team_2_player_1
         self.team_2_player_2 = team_2_player_2
 
-    @hybrid_method
-    def result(self, player,win=True):
-        if player == self.team_1_player_1 or player == self.team_1_player_2:
-            if score_team1 > score_team2:
-                return win
-            else:
-                return not win
-        elif  player == self.team_2_player_1 or player == self.team_2_player_2:
-            if score_team2 > score_team1:
-                return win
-            else:
-                return not win
-        else:
-            return False
         
 class User(db.Model):
     """User table."""
@@ -565,10 +551,17 @@ def get_matchs(player, team_match=False, win=None):
              (Match.team_2_player_2 != None)) |
             (Match.team_1_player_2 == player) |
             (Match.team_2_player_2 == player))
-
-    if win:
-        query = query.filter(Match.result(player,win))
-
+        
+    if win is not None:
+        comparison = lambda x,y :(x>y if win is True else  x<y)
+        query = query.filter(
+            ((((Match.team_1_player_1 == player) |
+              (Match.team_1_player_2 == player)) &
+              (comparison(Match.score_team_1, Match.score_team_2))) |
+             (((Match.team_2_player_1 == player) |
+              (Match.team_2_player_2 == player)) &
+              (comparison(Match.score_team_2, Match.score_team_1)))))
+        
     return query.all()
 
 
