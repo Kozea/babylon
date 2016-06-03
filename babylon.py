@@ -65,7 +65,7 @@ class Match(db.Model):
         self.team_2_player_1 = team_2_player_1
         self.team_2_player_2 = team_2_player_2
 
-        
+
 class User(db.Model):
     """User table."""
     id_user = db.Column(db.Integer, primary_key=True)
@@ -176,9 +176,10 @@ def profile(id_player):
 
     nemesis, nemesis_coeff = get_related_player(user, True, True)
     best_teammate, best_teammate_coeff = get_related_player(user, True, False)
-    worst_teammate, worst_teammate_coeff = get_related_player(user, False, False)
+    worst_teammate, worst_teammate_coeff = get_related_player(user,
+                                                              False, False)
     matchs = get_matchs(user)
-    
+
     user.nb_victories = get_matchs(user, False, True, False).count()
     user.nb_defeats = user.number_of_match - user.nb_victories
 
@@ -209,7 +210,7 @@ def svg_victory(id_player):
             'Ratio', [{
                 'value': (user.nb_victories/user.number_of_match)*100,
                 'max_value': 100}])
-        
+
     svg = gauge.render()
     response = make_response(svg)
     response.content_type = 'image/svg+xml'
@@ -384,8 +385,9 @@ def compute_ranking():
     else:
         return cached_ranking
 
+
 def fictive_player(player_1, player_2):
-    # Create fictive player1
+    """Create fictive player for elo computation."""
     if player_2 is None:
         elo = player_1.ranking
         number_match = player_1.number_of_match
@@ -396,8 +398,10 @@ def fictive_player(player_1, player_2):
             player_2.number_of_match) / 2
     return elo, number_match
 
-def compute_fictive_score(score_team, score_opponent, elo_team, elo_opponent, nb_match_team,):
-    
+
+def compute_fictive_score(score_team, score_opponent, elo_team, elo_opponent,
+                          nb_match_team):
+    """Compute fictive score for elo ranking."""
     expected_result = 1 / (1 + 10 ** ((elo_opponent - elo_team) / 400))
     expertise = get_expertise_coefficient(nb_match_team, elo_team)
     goal_difference = get_goal_difference_coefficient(
@@ -406,7 +410,9 @@ def compute_fictive_score(score_team, score_opponent, elo_team, elo_opponent, nb
     score = expertise * goal_difference * (result - expected_result)
     return score
 
+
 def update_score(player_1, player_2, score):
+    """Update score during elo computation."""
     player_1.number_of_match += 1
     if player_2 is None:
         player_1.ranking += round(score)
@@ -417,6 +423,7 @@ def update_score(player_1, player_2, score):
         player_2.ranking += round(
             player_2.ranking / sum_ranking * score)
         player_2.number_of_match += 1
+
 
 def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
         score_team_1, score_team_2):
@@ -430,13 +437,15 @@ def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
     """
     elo1, number_match1 = fictive_player(team_1_player_1, team_1_player_2)
     elo2, number_match2 = fictive_player(team_2_player_1, team_2_player_2)
-    
-    score_p1 = compute_fictive_score(score_team_1, score_team_2, elo1, elo2, number_match1)
-    score_p2 = compute_fictive_score(score_team_2, score_team_1, elo2, elo1, number_match2)
+
+    score_p1 = compute_fictive_score(score_team_1, score_team_2,
+                                     elo1, elo2, number_match1)
+    score_p2 = compute_fictive_score(score_team_2, score_team_1,
+                                     elo2, elo1, number_match2)
 
     update_score(team_1_player_1, team_1_player_2, score_p1)
     update_score(team_2_player_1, team_2_player_2, score_p2)
-    
+
 
 def get_expertise_coefficient(number_of_match, elo):
     """Get expertise coefficient corresponding to an user's elo and matches."""
@@ -479,8 +488,8 @@ def generate_tournament(players):
 
 def get_matchs(player, team_match=False, win=None, execute=True):
     """Get a list of all matchs involving a given player."""
-    comparison = lambda x,y :((x>y if win is True else  x<y) if win is not None else True)
-    test_team = lambda y : (y != None if team_match else True)
+    comparison = lambda x, y: ((x > y if win is True else x < y) if win is not None else True)
+    test_team = lambda y: (y is not None if team_match else True)
     query = Match.query.filter(
         ((((Match.team_1_player_1 == player) |
           (Match.team_1_player_2 == player)) &
@@ -490,10 +499,11 @@ def get_matchs(player, team_match=False, win=None, execute=True):
           (Match.team_2_player_2 == player)) &
           test_team(Match.team_2_player_2) &
           (comparison(Match.score_team_2, Match.score_team_1)))))
-    if execute:    
+    if execute:
         return query.order_by(-Match.id_match).all()
     else:
         return query.order_by(-Match.id_match)
+
 
 def get_related_player(player, best=True, nemesis=False):
     """Get a player's worst teammates.
