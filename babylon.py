@@ -384,6 +384,17 @@ def compute_ranking():
     else:
         return cached_ranking
 
+def fictive_player(player_1, player_2):
+    # Create fictive player1
+    if player_2 is None:
+        elo = player_1.ranking
+        number_match = player_1.number_of_match
+    else:
+        elo = (player_1.ranking + player_2.ranking) / 2
+        number_match = (
+            player_1.number_of_match +
+            player_2.number_of_match) / 2
+    return elo, number_match
     
 def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
         score_team_1, score_team_2):
@@ -395,26 +406,9 @@ def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
     See: https://fr.wikipedia.org /wiki/Classement_mondial_de_football_Elo
 
     """
-    # Create fictive player1
-    if team_1_player_2 is None:
-        elo1 = team_1_player_1.ranking
-        number_match1 = team_1_player_1.number_of_match
-    else:
-        elo1 = (team_1_player_1.ranking + team_1_player_2.ranking) / 2
-        number_match1 = (
-            team_1_player_1.number_of_match +
-            team_1_player_2.number_of_match) / 2
-
-    # Create fictive player2
-    if team_2_player_2 is None:
-        elo2 = team_2_player_1.ranking
-        number_match2 = team_2_player_1.number_of_match
-    else:
-        elo2 = (team_2_player_1.ranking + team_2_player_2.ranking) / 2
-        number_match2 = (
-            team_2_player_1.number_of_match +
-            team_2_player_2.number_of_match) / 2
-
+    elo1, number_match1 = fictive_player(team_1_player1, team_1_player_2)
+    elo2, number_match2 = fictive_player(team_2_player1, team_2_player_2)
+    
     # Score for player1
     expected_result = 1 / (1 + 10 ** ((score_team_2 - score_team_1) / 400))
     expertise = get_expertise_coefficient(number_match1, elo1)
