@@ -536,16 +536,9 @@ def generate_tournament(players):
 
 def get_matchs(player, team_match=False, win=None):
     """Get a list of all matchs involving a given player."""
-    query = Match.query.filter(
-        (Match.team_1_player_1 == player) |
-        (Match.team_1_player_2 == player) |
-        (Match.team_2_player_1 == player) |
-        (Match.team_2_player_2 == player)
-    ).order_by(-Match.id_match)
-
     comparison = lambda x,y :((x>y if win is True else  x<y) if win is not None else True)
     test_team = lambda x,y : (y != None if x else True)
-    query = query.filter(
+    query = Match.query.filter(
         ((((Match.team_1_player_1 == player) |
           (Match.team_1_player_2 == player)) &
           test_team(team_match, Match.team_1_player_2) &
@@ -555,7 +548,7 @@ def get_matchs(player, team_match=False, win=None):
           test_team(team_match, Match.team_2_player_2) &
           (comparison(Match.score_team_2, Match.score_team_1)))))
         
-    return query.all()
+    return query.order_by(-Match.id_match).all()
 
 
 def get_related_player(player, best=True, nemesis=False):
