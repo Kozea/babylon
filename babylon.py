@@ -395,7 +395,17 @@ def fictive_player(player_1, player_2):
             player_1.number_of_match +
             player_2.number_of_match) / 2
     return elo, number_match
+
+def compute_fictive_score(score_team, score_opponent, elo_team, elo_opponent, nb_match_team,):
     
+    expected_result = 1 / (1 + 10 ** ((elo_opponent - elo_team) / 400))
+    expertise = get_expertise_coefficient(nb_match_team, elo_team)
+    goal_difference = get_goal_difference_coefficient(
+        score_team, score_opponent)
+    result = 1 if score_team > score_opponent else 0
+    score = expertise * goal_difference * (result - expected_result)
+    return score
+
 def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
         score_team_1, score_team_2):
     """Update the ranking of each players in parameters.
@@ -409,21 +419,8 @@ def elo(team_1_player_1, team_1_player_2, team_2_player_1, team_2_player_2,
     elo1, number_match1 = fictive_player(team_1_player1, team_1_player_2)
     elo2, number_match2 = fictive_player(team_2_player1, team_2_player_2)
     
-    # Score for player1
-    expected_result = 1 / (1 + 10 ** ((score_team_2 - score_team_1) / 400))
-    expertise = get_expertise_coefficient(number_match1, elo1)
-    goal_difference = get_goal_difference_coefficient(
-        score_team_1, score_team_2)
-    result = 1 if score_team_1 > score_team_2 else 0
-    score_p1 = expertise * goal_difference * (result - expected_result)
-
-    # Score for player2
-    expected_result = 1 - expected_result
-    expertise = get_expertise_coefficient(number_match2, elo2)
-    goal_difference = get_goal_difference_coefficient(
-        score_team_2, score_team_1)
-    result = 1 if score_team_1 < score_team_2 else 0
-    score_p2 = expertise * goal_difference * (result - expected_result)
+    score_p1 = compute_fictive_score(score_team1, score_team2, elo1, elo2, number_match1)
+    score_p2 = compute_fictive_score(score_team2, score_team1, elo2, elo1, number_match2)
 
     # Update the ranking and the number of matches of the users
     team_1_player_1.number_of_match += 1
